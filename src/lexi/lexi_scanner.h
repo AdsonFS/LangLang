@@ -1,7 +1,7 @@
 #ifndef LEXI_SCANNER_H
 #define LEXI_SCANNER_H
 
-#include "token.h"
+#include "../tokens/token.h"
 #include <fstream>
 #include <string>
 
@@ -22,6 +22,7 @@ private:
   bool isSemicolon(char c);
   bool isWhitespace(char c);
   bool isCmpOperator(char c);
+  bool isUpperLetter(char c);
   
   bool isEOF();
 
