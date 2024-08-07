@@ -1,6 +1,5 @@
-#include "lexi/lang_parser.h"
 #include "lexi/lexi_scanner.h"
-#include "lexi/token.h"
+#include "parser/lang_parser.h"
 #include <iostream>
 
 int main() {

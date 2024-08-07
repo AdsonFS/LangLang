@@ -1,5 +1,6 @@
-#include "lexi_scanner.h"
-#include "token.h"
+#include "../lexi/lexi_scanner.h"
+#include <string>
+#include <set>
 
 LexiScanner::LexiScanner(std::string fileContent) {
   this->fileContent = fileContent;
@@ -20,6 +21,8 @@ Token LexiScanner::nextToken() {
     case 0:
       if (this->isWhitespace(currentChar))
         state = 0;
+      else if (this->isUpperLetter(currentChar))
+        state = 7;
       else if (this->isLetter(currentChar))
         state = 1;
       else if (this->isDigit(currentChar))
@@ -30,13 +33,15 @@ Token LexiScanner::nextToken() {
         this->backChar();
         state = 6;
       } else
-        throw std::runtime_error("Unknown Symbol");
+        throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     case 1:
       if (this->isLetter(currentChar) || this->isDigit(currentChar))
         state = 1;
-      else
+      else {
+        this->backChar();
         state = 2;
+      }
       break;
     case 2:
       this->backChar();
@@ -47,7 +52,7 @@ Token LexiScanner::nextToken() {
       else if (this->isWhitespace(currentChar))
         state = 4;
       else
-        throw std::runtime_error("Unknown Symbol");
+        throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     case 4:
       this->backChar();
@@ -57,6 +62,21 @@ Token LexiScanner::nextToken() {
       return Token(TokenType::TK_OPERATOR, tokenValue);
     case 6:
       return Token(TokenType::TK_SEMICOLON, ";");
+    case 7:
+      if (this->isUpperLetter(currentChar))
+        state = 7;
+      else if (this->isWhitespace(currentChar))
+        state = 8;
+      else
+        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+      break;
+    case 8:
+      this->backChar();
+      std::set<std::string> reservedWords = {"LOUT", "IF", "THEN", "ELSE",
+                                             "ENDIF"};
+      if (reservedWords.find(tokenValue) != reservedWords.end())
+        return Token(TokenType::TK_RESERVED_WORD, tokenValue);
+      throw std::runtime_error("Unknown Symbol: " + tokenValue);
     }
     if (!this->isWhitespace(currentChar))
       tokenValue.push_back(currentChar);
@@ -71,6 +91,8 @@ bool LexiScanner::isDigit(char c) { return c >= '0' && c <= '9'; }
 bool LexiScanner::isLetter(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
+
+bool LexiScanner::isUpperLetter(char c) { return c >= 'A' && c <= 'Z'; }
 
 bool LexiScanner::isOperator(char c) {
   return c == '+' || c == '-' || c == '*' || c == '/';
