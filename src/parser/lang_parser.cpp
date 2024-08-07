@@ -30,7 +30,7 @@ void LangParser::Lout() {
   this->nextToken();
   if (this->token.getType() != TokenType::TK_NUMBER)
     throw std::runtime_error("Syntax error: NUMBER");
-  std::cout << "Lout: " << this->token.getValue() << std::endl;
+  std::cout << this->token.getValue() << std::endl;
   this->nextToken();
   this->semiColon();
 }
