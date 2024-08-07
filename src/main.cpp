@@ -2,17 +2,22 @@
 #include "parser/lang_parser.h"
 #include <iostream>
 
-int main() {
-  std::string filename = "examples/main.ll";
-  std::ifstream file;
+int main(int argc, char **argv) {
+  std::string filename;
+  if (argc > 1) filename = argv[1]; 
+  else {
+    std::cout << "file not found\nPlease provide\n";
+    return 1;
+  }
 
+  std::ifstream file;
   file.open(filename);
   if (!file.is_open()) {
     std::cout << "Error: could not open file " << filename << std::endl;
     throw std::runtime_error("Error: could not open file " + filename);
   }
   std::string fileContent = std::string((std::istreambuf_iterator<char>(file)),
-                                  std::istreambuf_iterator<char>());
+                                        std::istreambuf_iterator<char>());
   LexiScanner scanner(fileContent);
 
   LangParser parser(scanner, Token(TokenType::TK_UNKNOWN, ""));
