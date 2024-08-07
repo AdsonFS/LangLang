@@ -2,7 +2,7 @@ name: lang-lang-workflow
 on:
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   dockerhub-push:
     runs-on: ubuntu-latest
@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: adsons/lang-lang:latest
