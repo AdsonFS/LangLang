@@ -2,7 +2,7 @@ name: lang-lang-workflow
 on:
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   dockerhub-push:
     runs-on: ubuntu-latest
