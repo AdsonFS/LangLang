@@ -21,7 +21,12 @@ Token LexiScanner::nextToken() {
 
     switch (state) {
     case 0:
-      if (this->isWhitespace(currentChar)) continue;
+      if (this->isWhitespace(currentChar))
+        continue;
+      else if (this->isOperator(currentChar))
+        return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
+      else if (this->isSemicolon(currentChar))
+        return Token(TokenType::TK_SEMICOLON, ";");
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
