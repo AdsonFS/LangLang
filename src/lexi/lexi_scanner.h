@@ -23,7 +23,7 @@ private:
   bool isWhitespace(char c);
   bool isCmpOperator(char c);
   bool isUpperLetter(char c);
-  
+  bool isDoubleQuotes(char c);
   bool isEOF();
 
   char nextChar();
