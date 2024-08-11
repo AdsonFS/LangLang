@@ -1,9 +1,9 @@
 #include "../lexi/lexi_scanner.h"
 #include <string>
-#include <set>
+/*#include <set>*/
 
 LexiScanner::LexiScanner(std::string fileContent) {
-  this->fileContent = fileContent;
+  this->fileContent = fileContent + "\0";
   this->position = 0;
 }
 
@@ -13,6 +13,8 @@ Token LexiScanner::nextToken() {
   std::string tokenValue = "";
   while (1 < 2) {
     if (this->isEOF()) {
+      if (state)
+        std::runtime_error("Unknown Symbol: " + tokenValue);
       return Token(TokenType::TK_EOF, "EOF");
     }
     currentChar = this->nextChar();
@@ -20,69 +22,103 @@ Token LexiScanner::nextToken() {
     switch (state) {
     case 0:
       if (this->isWhitespace(currentChar))
-        state = 0;
-      else if (this->isUpperLetter(currentChar))
-        state = 7;
-      else if (this->isLetter(currentChar))
-        state = 1;
-      else if (this->isDigit(currentChar))
-        state = 3;
+        continue;
       else if (this->isOperator(currentChar))
-        state = 5;
-      else if (this->isSemicolon(currentChar)) {
-        this->backChar();
-        state = 6;
+        return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
+      else if (this->isSemicolon(currentChar))
+        return Token(TokenType::TK_SEMICOLON, ";");
+      else if (this->isDoubleQuotes(currentChar)) {
+        state = 1;
+        continue;
       } else
         throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     case 1:
-      if (this->isLetter(currentChar) || this->isDigit(currentChar))
-        state = 1;
-      else {
-        this->backChar();
-        state = 2;
+      if (this->isDoubleQuotes(currentChar)) {
+        return Token(TokenType::TK_STRING, tokenValue);
       }
-      break;
-    case 2:
-      this->backChar();
-      return Token(TokenType::TK_IDENTIFIER, tokenValue);
-    case 3:
-      if (this->isDigit(currentChar))
-        state = 3;
-      else if (this->isWhitespace(currentChar))
-        state = 4;
-      else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
-      break;
-    case 4:
-      this->backChar();
-      return Token(TokenType::TK_NUMBER, tokenValue);
-    case 5:
-      this->backChar();
-      return Token(TokenType::TK_OPERATOR, tokenValue);
-    case 6:
-      return Token(TokenType::TK_SEMICOLON, ";");
-    case 7:
-      if (this->isUpperLetter(currentChar))
-        state = 7;
-      else if (this->isWhitespace(currentChar))
-        state = 8;
-      else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
-      break;
-    case 8:
-      this->backChar();
-      std::set<std::string> reservedWords = {"LOUT", "IF", "THEN", "ELSE",
-                                             "ENDIF"};
-      if (reservedWords.find(tokenValue) != reservedWords.end())
-        return Token(TokenType::TK_RESERVED_WORD, tokenValue);
-      throw std::runtime_error("Unknown Symbol: " + tokenValue);
     }
-    if (!this->isWhitespace(currentChar))
-      tokenValue.push_back(currentChar);
+    tokenValue.push_back(currentChar);
   }
   return Token(TokenType::TK_UNKNOWN, "");
 }
+
+/*Token LexiScanner::nextToken() {*/
+/*  int state = 0;*/
+/*  char currentChar;*/
+/*  std::string tokenValue = "";*/
+/*  while (1 < 2) {*/
+/*    if (this->isEOF()) {*/
+/*      return Token(TokenType::TK_EOF, "EOF");*/
+/*    }*/
+/*    currentChar = this->nextChar();*/
+/**/
+/*    switch (state) {*/
+/*    case 0:*/
+/*      if (this->isWhitespace(currentChar))*/
+/*        state = 0;*/
+/*      else if (this->isUpperLetter(currentChar))*/
+/*        state = 7;*/
+/*      else if (this->isLetter(currentChar))*/
+/*        state = 1;*/
+/*      else if (this->isDigit(currentChar))*/
+/*        state = 3;*/
+/*      else if (this->isOperator(currentChar))*/
+/*        state = 5;*/
+/*      else if (this->isSemicolon(currentChar)) {*/
+/*        this->backChar();*/
+/*        state = 6;*/
+/*      } else*/
+/*        throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+/*      break;*/
+/*    case 1:*/
+/*      if (this->isLetter(currentChar) || this->isDigit(currentChar))*/
+/*        state = 1;*/
+/*      else {*/
+/*        this->backChar();*/
+/*        state = 2;*/
+/*      }*/
+/*      break;*/
+/*    case 2:*/
+/*      this->backChar();*/
+/*      return Token(TokenType::TK_IDENTIFIER, tokenValue);*/
+/*    case 3:*/
+/*      if (this->isDigit(currentChar))*/
+/*        state = 3;*/
+/*      else if (this->isWhitespace(currentChar))*/
+/*        state = 4;*/
+/*      else*/
+/*        throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+/*      break;*/
+/*    case 4:*/
+/*      this->backChar();*/
+/*      return Token(TokenType::TK_NUMBER, tokenValue);*/
+/*    case 5:*/
+/*      this->backChar();*/
+/*      return Token(TokenType::TK_OPERATOR, tokenValue);*/
+/*    case 6:*/
+/*      return Token(TokenType::TK_SEMICOLON, ";");*/
+/*    case 7:*/
+/*      if (this->isUpperLetter(currentChar))*/
+/*        state = 7;*/
+/*      else if (this->isWhitespace(currentChar))*/
+/*        state = 8;*/
+/*      else*/
+/*        throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+/*      break;*/
+/*    case 8:*/
+/*      this->backChar();*/
+/*      std::set<std::string> reservedWords = {"LOUT", "IF", "THEN", "ELSE",*/
+/*                                             "ENDIF"};*/
+/*      if (reservedWords.find(tokenValue) != reservedWords.end())*/
+/*        return Token(TokenType::TK_RESERVED_WORD, tokenValue);*/
+/*      throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+/*    }*/
+/*    if (!this->isWhitespace(currentChar))*/
+/*      tokenValue.push_back(currentChar);*/
+/*  }*/
+/*  return Token(TokenType::TK_UNKNOWN, "");*/
+/*}*/
 
 bool LexiScanner::isSemicolon(char c) { return c == ';'; }
 
@@ -115,4 +151,5 @@ char LexiScanner::nextChar() {
   return this->fileContent[this->position++];
 }
 
+bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
 void LexiScanner::backChar() { this->position--; }

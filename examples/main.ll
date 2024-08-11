@@ -1,4 +1,1 @@
-
-LOUT 23 ;
-LOUT * 1123 ;
-
+"qwerty" + " " + "123456789" + " - " + "asdfghjkl";

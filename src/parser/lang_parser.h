@@ -7,24 +7,21 @@
 
 class LangParser {
 public:
-  LangParser(LexiScanner &_scanner, Token _token);
-  void Parser();
+  LangParser(LexiScanner &_scanner, Token &_token);
+  void parser();
 private:
   LexiScanner &scanner;
-  Token token;
+  Token &token;
 
-  
-
-  Token nextToken();
   void semiColon();
-  void EoF();
-  void arithmeticExpression();
-  void E();
-  void T();
-  void OP();
-
-  void E_();
-  void Lout();
+  void eof();
+  /*void arithmeticExpression();*/
+  /*void E();*/
+  /*void T();*/
+  /*void OP();*/
+  /**/
+  /*void E_();*/
+  /*void Lout();*/
 };
 
 #endif // LANG_PARSER_H
