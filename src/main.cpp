@@ -6,8 +6,8 @@
 void parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   try {
-    parser.Parser();
-    std::cout << "Syntax is correct" << std::endl;
+    parser.parser();
+    std::cout << "Success!!! :)\n\n";
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
   }
