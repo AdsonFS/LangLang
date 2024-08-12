@@ -1,4 +1,5 @@
 #include "lang_parser.h"
+#include "validators/expression_validator.h"
 #include "validators/string_validator.h"
 #include <iostream>
 
@@ -9,21 +10,19 @@ void LangParser::parser() {
   this->token = this->scanner.nextToken();
   switch (this->token.getType()) {
   case TokenType::TK_STRING:
-      std::cout << StringValidator(this->scanner, this->token).stringExpression() << std::endl;
+      std::cout << StringValidator(this->scanner, this->token).validate() << std::endl;
       this->semiColon();
     break;
-  /*case TokenType::TK_RESERVED_WORD:*/
-  /*  if (this->token.getValue() == "LOUT")*/
-  /*    this->Lout();*/
-  /*  else*/
-  /*    throw std::runtime_error("Syntax error");*/
-  /*  break;*/
-  /*default:*/
-  /*  throw std::runtime_error("Syntax error!");*/
+  case TokenType::TK_NUMBER:
+    std::cout << ExpressionValidator(this->scanner, this->token).validate() << std::endl;
+    this->semiColon();
+    break;
+  default:
+    throw std::runtime_error("Syntax error");
   }
 
   /*this->ArithmeticExpression();*/
-  this->eof();
+  /*this->eof();*/
 }
 
 /*void LangParser::Lout() {*/

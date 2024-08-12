@@ -7,7 +7,7 @@
 class StringValidator {
 public:
   StringValidator(LexiScanner &_scanner, Token &_token);
-  std::string stringExpression();
+  std::string validate();
 
 private:
   LexiScanner &scanner;
