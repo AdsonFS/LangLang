@@ -4,7 +4,7 @@
 ```bash
 g++ -g -std=c++20 $(find src/ -type f -name "*.cpp") -o langlang.out
 ./langlang.out <langlang_file>
-
+```
 ## How run tests
 ```bash
 g++ -I../googletest/googletest/include -I../googletest/googletest \
