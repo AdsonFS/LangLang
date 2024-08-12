@@ -13,6 +13,14 @@ void parser(LexiScanner &scanner, Token &token) {
   }
 }
 
+void tokens(LexiScanner &scanner) {
+  Token token = Token(TokenType::TK_UNKNOWN, "");
+  do {
+    token = scanner.nextToken();
+    std::cout << token.getType() << " " << token.getValue() << std::endl;
+  } while (token.getType() != TokenType::TK_UNKNOWN && token.getType() != TokenType::TK_EOF);
+}
+
 int main(int argc, char **argv) {
   std::string filename;
   if (argc > 1)
@@ -34,12 +42,7 @@ int main(int argc, char **argv) {
   LexiScanner scanner(fileContent);
   Token token = Token(TokenType::TK_UNKNOWN, "");
   parser(scanner, token);
-
-  /*Token token = Token(TokenType::TK_UNKNOWN, "");*/
-  /*do {*/
-  /*  token = scanner.nextToken();*/
-  /*  std::cout << token.getType() << " " << token.getValue() << std::endl;*/
-  /*} while (token.getType() != TokenType::TK_UNKNOWN && token.getType() != TokenType::TK_EOF);*/
+  /*tokens(scanner);*/
 
   return 0;
 }

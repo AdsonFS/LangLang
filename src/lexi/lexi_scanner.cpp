@@ -27,6 +27,8 @@ Token LexiScanner::nextToken() {
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");
+      else if (this->isDigit(currentChar))
+        state = 2;
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
@@ -37,6 +39,14 @@ Token LexiScanner::nextToken() {
       if (this->isDoubleQuotes(currentChar)) {
         return Token(TokenType::TK_STRING, tokenValue);
       }
+      break;
+    case 2:
+      if (this->isDigit(currentChar)) state = 2;
+      else {
+        this->backChar();
+        return Token(TokenType::TK_NUMBER, tokenValue);
+      }
+      break; 
     }
     tokenValue.push_back(currentChar);
   }
