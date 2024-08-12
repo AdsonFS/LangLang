@@ -1,11 +1,9 @@
 #include "expression_validator.h"
-#include <iostream>
 
 ExpressionValidator::ExpressionValidator(LexiScanner &scanner, Token &token)
     : scanner(scanner), token(token) {}
 
 int ExpressionValidator::validate() {
-  std::cout << "ExpressionValidator::validate()" << std::endl;
   int result = stoi(this->token.getValue());
   while ((this->token = this->scanner.nextToken()).getType() == TK_OPERATOR) {
     if (this->token.getValue() != "+")

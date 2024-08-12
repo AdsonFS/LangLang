@@ -1,10 +1,10 @@
-#include "../../../src/parser/validators/string_validator.h"
+#include "../../../src/parser/validators/expression_validator.h"
 #include <gtest/gtest.h>
 
-TEST(StringValidatorTest, valid_string_result) {
-  LexiScanner scanner("\"234\"+\" \"+\"string:\"\n+\t\"test\"+\"test 2\"+\t\"#2-.,aZ~\"");
-  std::string value = "234 string:testtest 2#2-.,aZ~";
+TEST(IntegerValidatorTest, valid_integer_result) {
+  LexiScanner scanner("1 + 2 + 3+4+5");
+  int result = 15;
   Token token = scanner.nextToken();
-  StringValidator stringValidator(scanner, token);
-  EXPECT_EQ(stringValidator.validate(), value);
+  ExpressionValidator expressionValidator(scanner, token);
+  EXPECT_EQ(expressionValidator.validate(), result);
 }
