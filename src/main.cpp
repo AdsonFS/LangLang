@@ -22,6 +22,7 @@ void tokens(LexiScanner &scanner) {
 }
 
 int main(int argc, char **argv) {
+  std::cout << 12+8*2-10%3*5 << std::endl;
   std::string filename;
   if (argc > 1)
     filename = argv[1];

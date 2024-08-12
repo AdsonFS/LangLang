@@ -2,6 +2,7 @@
 #define EXPRESSION_VALIDATOR_H
 
 #include "../../lexi/lexi_scanner.h"
+#include <stack>
 
 class ExpressionValidator {
 public:
@@ -11,6 +12,9 @@ public:
 private:
   LexiScanner &scanner;
   Token &token;
+
+  int procedence(char op);
+  void applyOpration(std::stack<int> &values, char op);
 };
 
 #endif // EXPRESSION_VALIDATOR_H

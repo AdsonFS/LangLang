@@ -24,6 +24,8 @@ Token LexiScanner::nextToken() {
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");
+      else if (this->isParentheses(currentChar))
+        return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
       else if (this->isDigit(currentChar))
         state = 2;
       else if (this->isDoubleQuotes(currentChar)) {
@@ -141,7 +143,7 @@ bool LexiScanner::isLetter(char c) {
 bool LexiScanner::isUpperLetter(char c) { return c >= 'A' && c <= 'Z'; }
 
 bool LexiScanner::isOperator(char c) {
-  return c == '+' || c == '-' || c == '*' || c == '/';
+  return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
 }
 
 bool LexiScanner::isCmpOperator(char c) {
@@ -160,6 +162,6 @@ char LexiScanner::nextChar() {
   }
   return this->fileContent[this->position++];
 }
-
+bool LexiScanner::isParentheses(char c) { return c == '(' || c == ')'; }
 bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
 void LexiScanner::backChar() { if(!this->isEOF()) this->position--; }

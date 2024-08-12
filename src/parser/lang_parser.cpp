@@ -22,7 +22,7 @@ void LangParser::parser() {
   }
 
   /*this->ArithmeticExpression();*/
-  this->eof();
+  /*this->eof();*/
 }
 
 /*void LangParser::Lout() {*/
