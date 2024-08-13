@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   if (argc > 1)
     filename = argv[1];
   else {
-    filename = "examples/main.ll";
+    filename = "examples/integer.ll";
     /*std::cout << "file not found\nPlease provide\n";*/
     
   }
