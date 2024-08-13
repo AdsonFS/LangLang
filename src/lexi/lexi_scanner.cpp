@@ -1,8 +1,10 @@
 #include "../lexi/lexi_scanner.h"
 #include <string>
-/*#include <set>*/
 
 LexiScanner::LexiScanner(std::string fileContent) {
+  // add EOF for tests
+  if(fileContent[fileContent.size() - 1] != 10)
+    fileContent.push_back(10);
   this->fileContent = fileContent;
   this->position = 0;
 }

@@ -13,8 +13,12 @@ private:
   LexiScanner &scanner;
   Token &token;
 
-  int procedence(char op);
-  void applyOpration(std::stack<int> &values, char op);
+  int expression();
+  int term();
+  int factor();
+
+  bool isPlusOrMinus();
+  bool isMultOrDivOrMod();
 };
 
 #endif // EXPRESSION_VALIDATOR_H
