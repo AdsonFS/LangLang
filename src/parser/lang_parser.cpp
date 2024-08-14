@@ -1,6 +1,5 @@
 #include "lang_parser.h"
-#include "validators/expression_validator.h"
-#include "validators/string_validator.h"
+#include "validators/expression_parser.h"
 #include <iostream>
 
 LangParser::LangParser(LexiScanner &_scanner, Token &_token)
@@ -9,7 +8,7 @@ LangParser::LangParser(LexiScanner &_scanner, Token &_token)
 void LangParser::parser() {
   this->token = this->scanner.nextToken();
   std::cout << "Result: "
-            << ExpressionValidator(this->scanner, this->token).validate()
+            << std::get<int>(ExpressionParser(this->scanner, this->token).parser()->solve())
             << std::endl;
   /*switch (this->token.getType()) {*/
   /*case TokenType::TK_STRING:*/
