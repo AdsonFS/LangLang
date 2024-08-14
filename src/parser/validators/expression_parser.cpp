@@ -6,7 +6,7 @@ ExpressionParser::ExpressionParser(LexiScanner &scanner, Token &token)
 /*
  * expression: term ((+|-) term)*
  * term: factor ((*|/|%) factor)*
- * factor: number | '(' expression ')'
+ * factor: (+\-)factor | number | '(' expression ')'
  */
 
 AST* ExpressionParser::parser() { return this->expression(); }
@@ -37,6 +37,14 @@ AST* ExpressionParser::factor() {
     this->token = this->scanner.nextToken();
     return new NumberAST(token);
   }
+
+  if (this->isPlusOrMinus()) {
+    Token opToken = this->token;
+    this->token = this->scanner.nextToken();
+    return new UnaryOperatorAST(this->factor(), opToken);
+  }
+
+
   if (this->token.getType() == TK_PARENTHESES && this->token.getValue() == "(") {
     this->token = this->scanner.nextToken();
     AST* node = this->expression();

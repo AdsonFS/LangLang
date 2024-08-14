@@ -21,6 +21,15 @@ private:
   Token op;
 };
 
+class UnaryOperatorAST : public AST {
+public:
+  UnaryOperatorAST(AST* child, Token op) : child(child), op(op) {}
+  std::variant<int, std::string> solve() override;
+private:
+  AST* child;
+  Token op;
+};
+
 class NumberAST : public AST {
 public:
   NumberAST(Token token) : token(token) {}

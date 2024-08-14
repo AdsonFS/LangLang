@@ -7,8 +7,9 @@ LangParser::LangParser(LexiScanner &_scanner, Token &_token)
 
 void LangParser::parser() {
   this->token = this->scanner.nextToken();
+  AST* ast = ExpressionParser(this->scanner, this->token).parser();
   std::cout << "Result: "
-            << std::get<int>(ExpressionParser(this->scanner, this->token).parser()->solve())
+            << std::get<int>(ast->solve())
             << std::endl;
   /*switch (this->token.getType()) {*/
   /*case TokenType::TK_STRING:*/
@@ -24,7 +25,7 @@ void LangParser::parser() {
   /*default:*/
   /*  throw std::runtime_error("Syntax error");*/
   /*}*/
-  /*this->semiColon();*/
+  this->semiColon();
   /*this->ArithmeticExpression();*/
   /*this->eof();*/
 }

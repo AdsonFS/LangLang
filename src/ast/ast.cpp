@@ -25,6 +25,19 @@ std::variant<int, std::string> BinaryOperatorAST::solve() {
   }
 }
 
+/////////// UnaryOperatorAST
+std::variant<int, std::string> UnaryOperatorAST::solve() {
+  switch (this->op.getValue()[0]) {
+  case '+':
+    return std::get<int>(child->solve());
+  case '-':
+    return -std::get<int>(child->solve());
+  default:
+    throw std::runtime_error(
+        "Error: UnaryOperatorAST::solve() invalid operator");
+  }
+}
+
 /////////// NumberAST
 std::variant<int, std::string> NumberAST::solve() {
   return std::stoi(this->token.getValue());
