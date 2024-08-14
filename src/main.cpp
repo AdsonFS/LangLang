@@ -1,7 +1,7 @@
 #include "lexi/lexi_scanner.h"
 #include "parser/lang_parser.h"
+#include "tokens/token.h"
 #include <iostream>
-
 
 void parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
@@ -18,18 +18,17 @@ void tokens(LexiScanner &scanner) {
   do {
     token = scanner.nextToken();
     std::cout << token.getType() << " " << token.getValue() << std::endl;
-  } while (token.getType() != TokenType::TK_UNKNOWN && token.getType() != TokenType::TK_EOF);
+  } while (token.getType() != TokenType::TK_UNKNOWN &&
+           token.getType() != TokenType::TK_EOF);
 }
 
 int main(int argc, char **argv) {
-  std::cout << 12+8*2-10%3*5 << std::endl;
   std::string filename;
   if (argc > 1)
     filename = argv[1];
   else {
     filename = "examples/integer.ll";
     /*std::cout << "file not found\nPlease provide\n";*/
-    
   }
 
   std::ifstream file;
