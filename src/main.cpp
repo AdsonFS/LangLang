@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   if (argc > 1)
     filename = argv[1];
   else {
-    filename = "examples/integer.ll";
+    filename = "examples/main.ll";
     /*std::cout << "file not found\nPlease provide\n";*/
   }
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   file.open(filename);
   if (!file.is_open()) {
     std::cout << "Error: could not open file " << filename << std::endl;
-    throw std::runtime_error("Error: could not open file " + filename);
+    throw std::runtime_error("Error: could not read file " + filename);
   }
   std::string fileContent = std::string((std::istreambuf_iterator<char>(file)),
                                         std::istreambuf_iterator<char>());
