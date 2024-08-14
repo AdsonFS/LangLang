@@ -4,7 +4,7 @@
 StringValidator::StringValidator(LexiScanner &_scanner, Token &_token)
     : scanner(_scanner), token(_token) {}
 
-std::string StringValidator::stringExpression() {
+std::string StringValidator::validate() {
   std::string str = this->token.getValue();
   while ((this->token = this->scanner.nextToken()).getType() == TK_OPERATOR &&
          this->token.getValue() == "+") {

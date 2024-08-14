@@ -6,8 +6,9 @@
 enum TokenType {
   /*TK_IDENTIFIER,*/
   TK_STRING,
-  /*TK_NUMBER,*/
+  TK_NUMBER,
   TK_OPERATOR,
+  TK_PARENTHESES,
   /*TK_RESERVED_WORD,*/
   /*TK_CMP_OPERATOR,*/
   /*TK_WHITESPACE,*/

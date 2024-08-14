@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-TEST(LexiTest, lexi_string_success_test) {
+TEST(LexiTest, lexi_string_valid_tokens) {
   LexiScanner scanner("   \"234\"\"string\"\n\t\"test\"\"test 2\"\t\"#2-.,aZ~\"");
   std::string valueTokens[] = {"234", "string", "test", "test 2", "#2-.,aZ~"};
   Token token;

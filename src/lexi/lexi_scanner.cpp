@@ -1,9 +1,11 @@
 #include "../lexi/lexi_scanner.h"
 #include <string>
-/*#include <set>*/
 
 LexiScanner::LexiScanner(std::string fileContent) {
-  this->fileContent = fileContent + "\0";
+  // add EOF for tests
+  if(fileContent[fileContent.size() - 1] != 10)
+    fileContent.push_back(10);
+  this->fileContent = fileContent;
   this->position = 0;
 }
 
@@ -12,21 +14,22 @@ Token LexiScanner::nextToken() {
   char currentChar;
   std::string tokenValue = "";
   while (1 < 2) {
-    if (this->isEOF()) {
-      if (state)
-        std::runtime_error("Unknown Symbol: " + tokenValue);
-      return Token(TokenType::TK_EOF, "EOF");
-    }
     currentChar = this->nextChar();
 
     switch (state) {
     case 0:
-      if (this->isWhitespace(currentChar))
+      if (this->isEOF() && this->isWhitespace(currentChar))
+        return Token(TokenType::TK_EOF, "EOF");
+      else if (this->isWhitespace(currentChar))
         continue;
       else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");
+      else if (this->isParentheses(currentChar))
+        return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
+      else if (this->isDigit(currentChar))
+        state = 2;
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
@@ -37,6 +40,17 @@ Token LexiScanner::nextToken() {
       if (this->isDoubleQuotes(currentChar)) {
         return Token(TokenType::TK_STRING, tokenValue);
       }
+      break;
+    case 2:
+      if (this->isDigit(currentChar))
+        state = 2;
+      else if (this->isLetter(currentChar))
+        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+      else {
+        this->backChar();
+        return Token(TokenType::TK_NUMBER, tokenValue);
+      }
+      break;
     }
     tokenValue.push_back(currentChar);
   }
@@ -131,7 +145,7 @@ bool LexiScanner::isLetter(char c) {
 bool LexiScanner::isUpperLetter(char c) { return c >= 'A' && c <= 'Z'; }
 
 bool LexiScanner::isOperator(char c) {
-  return c == '+' || c == '-' || c == '*' || c == '/';
+  return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
 }
 
 bool LexiScanner::isCmpOperator(char c) {
@@ -150,6 +164,6 @@ char LexiScanner::nextChar() {
   }
   return this->fileContent[this->position++];
 }
-
+bool LexiScanner::isParentheses(char c) { return c == '(' || c == ')'; }
 bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
-void LexiScanner::backChar() { this->position--; }
+void LexiScanner::backChar() { if(!this->isEOF()) this->position--; }
