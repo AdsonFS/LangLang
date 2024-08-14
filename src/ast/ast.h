@@ -38,7 +38,13 @@ private:
   Token token;
 };
 
-
+class StringAST : public AST {
+public:
+  StringAST(Token token) : token(token) {}
+  std::variant<int, std::string> solve() override;
+private:
+  Token token;
+};
 
 
 

@@ -1,4 +1,4 @@
-#include "../../../src/parser/validators/expression_parser.h"
+#include "../../../src/parser/lang_parser.h"
 #include <gtest/gtest.h>
 
 TEST(IntegerValidatorTest, valid_integer_result) {
@@ -8,7 +8,7 @@ TEST(IntegerValidatorTest, valid_integer_result) {
   for (int i = 0; i < 7; i++) {
     LexiScanner scanner(expressions[i]);
     Token token = scanner.nextToken();
-    ExpressionParser expressionParser(scanner, token);
-    EXPECT_EQ(std::get<int>(expressionParser.parser()->solve()), results[i]);
+    LangParser langParser(scanner, token);
+    EXPECT_EQ(std::get<int>(langParser.numericExpression()->solve()), results[i]);
   }
 }

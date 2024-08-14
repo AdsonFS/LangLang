@@ -1,17 +1,14 @@
-#include "expression_parser.h"
-
-ExpressionParser::ExpressionParser(LexiScanner &scanner, Token &token)
-    : scanner(scanner), token(token) {}
+#include "../lang_parser.h"
 
 /*
- * expression: term ((+|-) term)*
+ * numericExpression: term ((+|-) term)*
  * term: factor ((*|/|%) factor)*
- * factor: (+\-)factor | number | '(' expression ')'
+ * factor: (+\-)factor | NUMBER | '(' numericExpression ')'
  */
 
-AST* ExpressionParser::parser() { return this->expression(); }
+/*AST* LangParser::parser() { return this->expression(); }*/
 
-AST* ExpressionParser::expression() {
+AST* LangParser::numericExpression() {
   AST* node = this->term();
   while (this->isPlusOrMinus()) {
     Token opToken = this->token;
@@ -21,7 +18,7 @@ AST* ExpressionParser::expression() {
   return node;
 }
 
-AST* ExpressionParser::term() {
+AST* LangParser::term() {
   AST* node = this->factor();
   while ( this->isMultOrDivOrMod()) {
     Token opToken = this->token;
@@ -31,7 +28,7 @@ AST* ExpressionParser::term() {
   return node;
 }
 
-AST* ExpressionParser::factor() {
+AST* LangParser::factor() {
   if (this->token.getType() == TK_NUMBER) {
     Token token = this->token;
     this->token = this->scanner.nextToken();
@@ -47,7 +44,7 @@ AST* ExpressionParser::factor() {
 
   if (this->token.getType() == TK_PARENTHESES && this->token.getValue() == "(") {
     this->token = this->scanner.nextToken();
-    AST* node = this->expression();
+    AST* node = this->numericExpression();
     if (this->token.getType() != TK_PARENTHESES || this->token.getValue() != ")")
       throw std::runtime_error("Expected ')' but got: " + this->token.getValue());
     this->token = this->scanner.nextToken();
@@ -56,13 +53,3 @@ AST* ExpressionParser::factor() {
   throw std::runtime_error("Invalid expression");
 }
 
-bool ExpressionParser::isPlusOrMinus() {
-  return this->token.getType() == TK_OPERATOR &&
-         (this->token.getValue() == "+" || this->token.getValue() == "-");
-}
-
-bool ExpressionParser::isMultOrDivOrMod() {
-  return this->token.getType() == TK_OPERATOR &&
-         (this->token.getValue() == "*" || this->token.getValue() == "/" ||
-          this->token.getValue() == "%");
-}
