@@ -4,18 +4,7 @@
 #include "../ast/ast.h"
 #include "../lexi/lexi_scanner.h"
 #include "../tokens/token.h"
-/*
 
-outputStream        : >> output outputStream*
-output              : stringExpression | numericExpression
-
-stringExpression    : string (+ stringExpression)*
-string              : STRING
-
-numericExpression   : numericExpression: term ((PLUS|MINUS) term)*
-term                : factor ((DIV|MULT|MOD) factor)*
-factor              : (PLUS|MINUS)factor | NUMBER | '(' numericExpression ')'
-*/
 class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
@@ -23,7 +12,9 @@ public:
   AST *numericExpression();
   AST *stringExpression();
   AST *outputStream();
-
+  AST *statementList();
+  AST *statement();
+  std::vector<std::string> reservedWords;
 private:
   LexiScanner &scanner;
   Token &token;

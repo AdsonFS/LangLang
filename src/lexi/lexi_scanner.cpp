@@ -5,8 +5,10 @@ LexiScanner::LexiScanner(std::string fileContent) {
   // add EOF for tests
   if (fileContent[fileContent.size() - 1] != 10)
     fileContent.push_back(10);
+
   this->fileContent = fileContent;
   this->position = 0;
+  this->reservedWords = {"NUMBER"};
 }
 
 Token LexiScanner::nextToken() {
@@ -28,16 +30,19 @@ Token LexiScanner::nextToken() {
         return Token(TokenType::TK_SEMICOLON, ";");
       else if (this->isParentheses(currentChar))
         return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
+      else if (this->isUpperLetter(currentChar))
+        state = 4;
       else if (this->isDigit(currentChar))
         state = 2;
+      else if (this->isLowerLetter(currentChar))
+        state = 3;
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
       } else if (currentChar == '>' && this->peekChar() == '>') {
         this->nextChar();
         return Token(TokenType::TK_OUTPUTSTREAM, ">>");
-      }
-      else
+      } else
         throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     case 1:
@@ -48,12 +53,31 @@ Token LexiScanner::nextToken() {
     case 2:
       if (this->isDigit(currentChar))
         state = 2;
-      else if (this->isLetter(currentChar))
+      else if (this->isLowerLetter(currentChar) ||
+               this->isUpperLetter(currentChar))
         throw std::runtime_error("Unknown Symbol: " + tokenValue);
       else {
         this->backChar();
         return Token(TokenType::TK_NUMBER, tokenValue);
       }
+      break;
+    case 3:
+      if (this->isLowerLetter(currentChar) || this->isDigit(currentChar))
+        state = 3;
+      else {
+        this->backChar();
+        return Token(TokenType::TK_IDENTIFIER, tokenValue);
+      }
+      break;
+    case 4:
+      if (this->isUpperLetter(currentChar))
+        state = 4;
+      else if (this->reservedWords.find(tokenValue) !=
+               this->reservedWords.end()) {
+        this->backChar();
+        return Token(TokenType::TK_RESERVED_WORD, tokenValue);
+      } else
+        throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     }
     tokenValue.push_back(currentChar);
@@ -142,9 +166,7 @@ bool LexiScanner::isSemicolon(char c) { return c == ';'; }
 
 bool LexiScanner::isDigit(char c) { return c >= '0' && c <= '9'; }
 
-bool LexiScanner::isLetter(char c) {
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-}
+bool LexiScanner::isLowerLetter(char c) { return (c >= 'a' && c <= 'z'); }
 
 bool LexiScanner::isUpperLetter(char c) { return c >= 'A' && c <= 'Z'; }
 

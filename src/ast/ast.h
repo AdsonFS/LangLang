@@ -6,15 +6,25 @@
 #include <variant>
 #include <vector>
 
+typedef std::variant<int, std::string> ASTValue;
+
 class AST {
 public:
-  virtual std::variant<int, std::string> solve();
+  virtual ASTValue solve();
+};
+
+class StatementListAST : public AST {
+public:
+  StatementListAST(std::vector<AST*> statements) : statements(statements) {}
+  ASTValue solve() override;
+private:
+  std::vector<AST*> statements;
 };
 
 class OutputStreamAST : public AST {
 public:
   OutputStreamAST(std::vector<AST*> outputs) : outputs(outputs) {}
-  std::variant<int, std::string> solve() override;
+  ASTValue solve() override;
 private:
   std::vector<AST*> outputs;
 };
@@ -23,7 +33,7 @@ class BinaryOperatorAST : public AST {
 public:
   BinaryOperatorAST(AST *left, AST *right, Token op)
       : left(left), right(right), op(op) {}
-  std::variant<int, std::string> solve() override;
+  ASTValue solve() override;
 private:
   AST *left;
   AST *right;
@@ -33,7 +43,7 @@ private:
 class UnaryOperatorAST : public AST {
 public:
   UnaryOperatorAST(AST* child, Token op) : child(child), op(op) {}
-  std::variant<int, std::string> solve() override;
+  ASTValue solve() override;
 private:
   AST* child;
   Token op;
@@ -42,7 +52,7 @@ private:
 class NumberAST : public AST {
 public:
   NumberAST(Token token) : token(token) {}
-  std::variant<int, std::string> solve() override;
+  ASTValue solve() override;
 private:
   Token token;
 };
@@ -50,7 +60,7 @@ private:
 class StringAST : public AST {
 public:
   StringAST(Token token) : token(token) {}
-  std::variant<int, std::string> solve() override;
+  ASTValue solve() override;
 private:
   Token token;
 };

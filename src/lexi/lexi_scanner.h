@@ -3,27 +3,27 @@
 
 #include "../tokens/token.h"
 #include <fstream>
-#include <string>
+#include <set>
 
 class LexiScanner {
 public:
   LexiScanner(std::string fileContent);
-  /*void scan();*/
   Token nextToken();
 
+  std::set<std::string> reservedWords;
 private:
   int position;
 
   std::string fileContent;
   
   bool isDigit(char c);
-  bool isLetter(char c);
   bool isOperator(char c);
   bool isSemicolon(char c);
   bool isWhitespace(char c);
   bool isParentheses(char c);
   bool isCmpOperator(char c);
   bool isUpperLetter(char c);
+  bool isLowerLetter(char c);
   bool isDoubleQuotes(char c);
   bool isEOF();
 

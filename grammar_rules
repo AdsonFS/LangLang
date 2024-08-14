@@ -1,0 +1,14 @@
+statement_list      : statement
+                    | statement statement_list
+
+statement           : outputStream
+
+outputStream        : >> output outputStream*
+output              : stringExpression | numericExpression
+
+stringExpression    : string (+ stringExpression)*
+string              : STRING
+
+numericExpression   : numericExpression: term ((PLUS|MINUS) term)*
+term                : factor ((DIV|MULT|MOD) factor)*
+factor              : (PLUS|MINUS)factor | NUMBER | '(' numericExpression ')'

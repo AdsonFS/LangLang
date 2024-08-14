@@ -7,6 +7,13 @@ std::variant<int, std::string> AST::solve() {
   throw std::runtime_error("Error: AST::solve() not implemented");
 }
 
+/////////// StatementListAST
+std::variant<int, std::string> StatementListAST::solve() {
+  for (auto &statement : this->statements) 
+    statement->solve();
+  return 0;
+}
+
 /////////// OutputStreamAST
 std::variant<int, std::string> OutputStreamAST::solve() {
   int cnt = this->outputs.size() - 1;
