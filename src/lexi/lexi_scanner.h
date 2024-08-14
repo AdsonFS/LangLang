@@ -28,6 +28,7 @@ private:
   bool isEOF();
 
   char nextChar();
+  char peekChar();
   void backChar();
 };
 

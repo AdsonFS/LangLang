@@ -1,11 +1,5 @@
 #include "../lang_parser.h"
 
-/*
-* stringExpression: string (+ stringExpression)*
-* string: STRING
-*/
-
-
 AST* LangParser::stringExpression() {
   AST* node = this->string();
   while (this->isPlusOrMinus()) {

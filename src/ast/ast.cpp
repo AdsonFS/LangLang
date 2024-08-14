@@ -1,9 +1,26 @@
 #include "ast.h"
+#include <iostream>
 #include <stdexcept>
 
 /////////// AST
 std::variant<int, std::string> AST::solve() {
   throw std::runtime_error("Error: AST::solve() not implemented");
+}
+
+/////////// OutputStreamAST
+std::variant<int, std::string> OutputStreamAST::solve() {
+  int cnt = this->outputs.size() - 1;
+  std::cout << cnt << std::endl;
+  for (auto &output : this->outputs) {
+    std::variant<int, std::string> outputValue = output->solve();
+    if (std::holds_alternative<std::string>(outputValue))
+      std::cout << std::get<std::string>(outputValue);
+    else
+      std::cout << std::get<int>(outputValue);
+    if (cnt--) std::cout << " ";
+  }
+  std::cout << "#" << std::endl;
+  return (int)this->outputs.size();
 }
 
 /////////// BinaryOperatorAST

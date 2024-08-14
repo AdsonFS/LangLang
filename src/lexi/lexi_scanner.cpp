@@ -3,7 +3,7 @@
 
 LexiScanner::LexiScanner(std::string fileContent) {
   // add EOF for tests
-  if(fileContent[fileContent.size() - 1] != 10)
+  if (fileContent[fileContent.size() - 1] != 10)
     fileContent.push_back(10);
   this->fileContent = fileContent;
   this->position = 0;
@@ -33,7 +33,11 @@ Token LexiScanner::nextToken() {
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
-      } else
+      } else if (currentChar == '>' && this->peekChar() == '>') {
+        this->nextChar();
+        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
+      }
+      else
         throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
     case 1:
@@ -159,11 +163,18 @@ bool LexiScanner::isWhitespace(char c) {
 bool LexiScanner::isEOF() { return this->position >= this->fileContent.size(); }
 
 char LexiScanner::nextChar() {
-  if (this->position >= this->fileContent.size()) {
+  if (this->position >= this->fileContent.size())
     return '\0';
-  }
   return this->fileContent[this->position++];
+}
+char LexiScanner::peekChar() {
+  if (this->position >= this->fileContent.size())
+    return '\0';
+  return this->fileContent[this->position];
 }
 bool LexiScanner::isParentheses(char c) { return c == '(' || c == ')'; }
 bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
-void LexiScanner::backChar() { if(!this->isEOF()) this->position--; }
+void LexiScanner::backChar() {
+  if (!this->isEOF())
+    this->position--;
+}

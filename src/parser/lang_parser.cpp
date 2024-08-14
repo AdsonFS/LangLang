@@ -6,8 +6,9 @@ LangParser::LangParser(LexiScanner &_scanner, Token &_token)
 
 void LangParser::parser() {
   this->token = this->scanner.nextToken();
-  AST* ast = this->stringExpression();
-  std::cout << "Result: " << std::get<std::string>(ast->solve()) << std::endl;
+  AST* ast = this->outputStream();
+  int result = std::get<int>(ast->solve());
+  std::cout << "Result: " << result << std::endl;
   /*AST* ast = this->numericExpression();*/
   /*std::cout << "Result: "*/
   /*          << std::get<int>(ast->solve())*/

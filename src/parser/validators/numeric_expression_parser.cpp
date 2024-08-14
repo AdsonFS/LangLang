@@ -1,15 +1,7 @@
 #include "../lang_parser.h"
 
-/*
- * numericExpression: term ((+|-) term)*
- * term: factor ((*|/|%) factor)*
- * factor: (+\-)factor | NUMBER | '(' numericExpression ')'
- */
-
-/*AST* LangParser::parser() { return this->expression(); }*/
-
-AST* LangParser::numericExpression() {
-  AST* node = this->term();
+AST *LangParser::numericExpression() {
+  AST *node = this->term();
   while (this->isPlusOrMinus()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
@@ -18,9 +10,9 @@ AST* LangParser::numericExpression() {
   return node;
 }
 
-AST* LangParser::term() {
-  AST* node = this->factor();
-  while ( this->isMultOrDivOrMod()) {
+AST *LangParser::term() {
+  AST *node = this->factor();
+  while (this->isMultOrDivOrMod()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
     node = new BinaryOperatorAST(node, this->factor(), opToken);
@@ -28,7 +20,7 @@ AST* LangParser::term() {
   return node;
 }
 
-AST* LangParser::factor() {
+AST *LangParser::factor() {
   if (this->token.getType() == TK_NUMBER) {
     Token token = this->token;
     this->token = this->scanner.nextToken();
@@ -41,15 +33,16 @@ AST* LangParser::factor() {
     return new UnaryOperatorAST(this->factor(), opToken);
   }
 
-
-  if (this->token.getType() == TK_PARENTHESES && this->token.getValue() == "(") {
+  if (this->token.getType() == TK_PARENTHESES &&
+      this->token.getValue() == "(") {
     this->token = this->scanner.nextToken();
-    AST* node = this->numericExpression();
-    if (this->token.getType() != TK_PARENTHESES || this->token.getValue() != ")")
-      throw std::runtime_error("Expected ')' but got: " + this->token.getValue());
+    AST *node = this->numericExpression();
+    if (this->token.getType() != TK_PARENTHESES ||
+        this->token.getValue() != ")")
+      throw std::runtime_error("Expected ')' but got: " +
+                               this->token.getValue());
     this->token = this->scanner.nextToken();
     return node;
   }
   throw std::runtime_error("Invalid expression");
 }
-
