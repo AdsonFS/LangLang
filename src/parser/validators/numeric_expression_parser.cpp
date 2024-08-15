@@ -1,4 +1,5 @@
 #include "../lang_parser.h"
+#include <iostream>
 
 AST *LangParser::numericExpression() {
   AST *node = this->term();
@@ -26,6 +27,15 @@ AST *LangParser::factor() {
     this->token = this->scanner.nextToken();
     return new NumberAST(token);
   }
+
+  if (this->token.getType() == TK_IDENTIFIER) {
+    Token token = this->token;
+    this->token = this->scanner.nextToken();
+    return new IdentifierAST(token);
+  }
+
+
+
 
   if (this->isPlusOrMinus()) {
     Token opToken = this->token;

@@ -12,15 +12,19 @@ public:
   AST *numericExpression();
   AST *stringExpression();
   AST *outputStream();
+  AST *inputStream();
   AST *statementList();
   AST *statement();
-  std::vector<std::string> reservedWords;
+  AST *variableDeclaration();
+
 private:
   LexiScanner &scanner;
   Token &token;
 
   void semiColon();
   void eof();
+
+  Token consume(Token expectedToken);
 
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();

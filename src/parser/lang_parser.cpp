@@ -1,27 +1,23 @@
 #include "lang_parser.h"
-#include <iostream>
 
 LangParser::LangParser(LexiScanner &_scanner, Token &_token)
-    : scanner(_scanner), token(_token) {
-}
+    : scanner(_scanner), token(_token) {}
 
 void LangParser::parser() {
   this->token = this->scanner.nextToken();
-  this->statementList();
-
-  /*this->semiColon();*/
-  /*this->ArithmeticExpression();*/
-  /*this->eof();*/
+  this->statementList()->solve();
+  this->eof();
 }
 
-/*void LangParser::Lout() {*/
-/*this->nextToken();*/
-/*if (this->token.getType() != TokenType::TK_NUMBER)*/
-/*  throw std::runtime_error("Syntax error: NUMBER");*/
-/*std::cout << this->token.getValue() << std::endl;*/
-/*this->nextToken();*/
-/*this->semiColon();*/
-/*}*/
+Token LangParser::consume(Token expectedToken) {
+  Token consumed = this->token;
+  if (this->token.getType() != expectedToken.getType())
+    throw std::runtime_error("Syntax error: expected " + expectedToken.toString());
+  if (expectedToken.getValue() != "" && this->token.getValue() != expectedToken.getValue())
+    throw std::runtime_error("Syntax error: expected " + expectedToken.getValue());
+  this->token = this->scanner.nextToken();
+  return consumed;
+}
 
 void LangParser::semiColon() {
   if (this->token.getType() != TokenType::TK_SEMICOLON)
