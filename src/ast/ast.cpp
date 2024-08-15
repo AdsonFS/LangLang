@@ -2,32 +2,32 @@
 #include <iostream>
 #include <stdexcept>
 
-std::unordered_map<int, std::unordered_map<std::string, ASTValue>>
-    AST::hashTable;
+std::unordered_map<std::string, ASTValue> AST::hashTable;
 /////////// AST
-std::variant<int, std::string> AST::solve() {
+ASTValue AST::solve() {
   throw std::runtime_error("Error: AST::solve() not implemented");
 }
 
 /////////// StatementListAST
-std::variant<int, std::string> StatementListAST::solve() {
+ASTValue StatementListAST::solve() {
   for (auto &statement : this->statements)
     statement->solve();
   return 0;
 }
 
 /////////// VariableDeclarationAST
-std::variant<int, std::string> VariableDeclarationAST::solve() {
-  /*[TODO]*/
-  this->hashTable[0][this->identifier.getValue()] = this->value->solve();
+ASTValue VariableDeclarationAST::solve() {
+  if (this->hashTable.find(this->identifier.getValue()) != this->hashTable.end())
+    throw std::runtime_error("Error: VariableDeclarationAST::solve() identifier already declared: " + this->identifier.getValue());
+  this->hashTable[this->identifier.getValue()] = this->value->solve();
   return 0;
 }
 
 /////////// OutputStreamAST
-std::variant<int, std::string> OutputStreamAST::solve() {
+ASTValue OutputStreamAST::solve() {
   int cnt = this->outputs.size() - 1;
   for (auto &output : this->outputs) {
-    std::variant<int, std::string> outputValue = output->solve();
+    ASTValue outputValue = output->solve();
     if (std::holds_alternative<std::string>(outputValue))
       std::cout << std::get<std::string>(outputValue);
     else
@@ -40,8 +40,8 @@ std::variant<int, std::string> OutputStreamAST::solve() {
 }
 
 /////////// BinaryOperatorAST
-std::variant<int, std::string> BinaryOperatorAST::solve() {
-  std::variant<int, std::string> leftValue = this->left->solve();
+ASTValue BinaryOperatorAST::solve() {
+  ASTValue leftValue = this->left->solve();
   switch (this->op.getValue()[0]) {
   case '+':
     if (std::holds_alternative<std::string>(leftValue))
@@ -63,7 +63,7 @@ std::variant<int, std::string> BinaryOperatorAST::solve() {
 }
 
 /////////// UnaryOperatorAST
-std::variant<int, std::string> UnaryOperatorAST::solve() {
+ASTValue UnaryOperatorAST::solve() {
   switch (this->op.getValue()[0]) {
   case '+':
     return std::get<int>(this->child->solve());
@@ -76,15 +76,18 @@ std::variant<int, std::string> UnaryOperatorAST::solve() {
 }
 
 /////////// IdentifierAST
-std::variant<int, std::string> IdentifierAST::solve() {
-  return this->hashTable[0][this->token.getValue()];
+ASTValue IdentifierAST::solve() {
+  // verify if the identifier is in the hashTable
+  if (this->hashTable.find(this->token.getValue()) == this->hashTable.end())
+    throw std::runtime_error("Error: IdentifierAST::solve() identifier not found: " + this->token.getValue());
+  return this->hashTable[this->token.getValue()];
 }
 /////////// NumberAST
-std::variant<int, std::string> NumberAST::solve() {
+ASTValue NumberAST::solve() {
   return std::stoi(this->token.getValue());
 }
 
 /////////// StringAST
-std::variant<int, std::string> StringAST::solve() {
+ASTValue StringAST::solve() {
   return this->token.getValue();
 }

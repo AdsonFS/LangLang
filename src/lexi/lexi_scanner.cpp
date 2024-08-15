@@ -8,7 +8,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
 
   this->fileContent = fileContent;
   this->position = 0;
-  this->reservedWords = {"NUMBER"};
+  this->reservedWords = {"NUMBER", "STRING"};
 }
 
 Token LexiScanner::nextToken() {

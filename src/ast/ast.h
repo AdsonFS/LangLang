@@ -15,7 +15,7 @@ public:
   virtual ASTValue solve();
 
 protected:
-  static std::unordered_map<int, std::unordered_map<std::string, ASTValue>>
+  static std::unordered_map<std::string, ASTValue>
       hashTable;
 };
 
