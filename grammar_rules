@@ -3,6 +3,9 @@ statement_list      : statement
 
 statement           : outputStream
 
+
+variableDeclaration : NUMBER identifier = numericExpression 
+
 outputStream        : >> output outputStream*
 output              : stringExpression | numericExpression
 

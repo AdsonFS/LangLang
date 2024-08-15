@@ -14,7 +14,8 @@ public:
   AST *outputStream();
   AST *statementList();
   AST *statement();
-  std::vector<std::string> reservedWords;
+  AST *variableDeclaration();
+
 private:
   LexiScanner &scanner;
   Token &token;

@@ -14,6 +14,12 @@ std::variant<int, std::string> StatementListAST::solve() {
   return 0;
 }
 
+/////////// VariableDeclarationAST
+std::variant<int, std::string> VariableDeclarationAST::solve() {
+  /*AST::hashTable[this->identifier] = 0;*/
+  return 0;
+}
+
 /////////// OutputStreamAST
 std::variant<int, std::string> OutputStreamAST::solve() {
   int cnt = this->outputs.size() - 1;
