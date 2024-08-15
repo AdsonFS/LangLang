@@ -7,11 +7,9 @@ LangParser::LangParser(LexiScanner &_scanner, Token &_token)
 
 void LangParser::parser() {
   this->token = this->scanner.nextToken();
-  this->statementList();
+  this->statementList()->solve();
 
-  /*this->semiColon();*/
-  /*this->ArithmeticExpression();*/
-  /*this->eof();*/
+  this->eof();
 }
 
 /*void LangParser::Lout() {*/

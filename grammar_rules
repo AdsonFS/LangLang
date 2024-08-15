@@ -1,7 +1,7 @@
 statement_list      : statement
                     | statement statement_list
 
-statement           : outputStream
+statement           : outputStream SEMICOLON
 
 
 variableDeclaration : NUMBER identifier = numericExpression 
@@ -14,4 +14,7 @@ string              : STRING
 
 numericExpression   : numericExpression: term ((PLUS|MINUS) term)*
 term                : factor ((DIV|MULT|MOD) factor)*
-factor              : (PLUS|MINUS)factor | NUMBER | '(' numericExpression ')'
+factor              : (PLUS|MINUS)factor 
+                    | NUMBER 
+                    | IDENTIFIER
+                    | '(' numericExpression ')'

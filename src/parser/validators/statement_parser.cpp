@@ -18,6 +18,12 @@ AST *LangParser::statement() {
       throw std::runtime_error("Syntax error: expected SEMICOLON");
     this->token = this->scanner.nextToken();
     return node;
+  case TK_RESERVED_WORD:
+    node = this->variableDeclaration();
+    if (this->token.getType() != TK_SEMICOLON)
+      throw std::runtime_error("Syntax error: expected SEMICOLON");
+    this->token = this->scanner.nextToken();
+    return node;
   default:
     throw std::runtime_error("Syntax error: expected OUTPUTSTREAM");
   }
