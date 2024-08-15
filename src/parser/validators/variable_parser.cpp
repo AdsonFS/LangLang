@@ -1,23 +1,16 @@
 #include "../lang_parser.h"
+#include <string>
 
-AST* LangParser::variableDeclaration() {
-  if (this->token.getType() != TokenType::TK_RESERVED_WORD)
-    throw std::runtime_error("Syntax error: expected VAR");
-  if (this->token.getValue() != "NUMBER")
-    throw std::runtime_error("Syntax error: expected NUMBER");
-  Token type = this->token; 
+AST *LangParser::variableDeclaration() {
+  Token type = this->consume(Token(TokenType::TK_RESERVED_WORD, ""));
+  Token identifier = this->consume(Token(TokenType::TK_IDENTIFIER, ""));
+  this->consume(Token(TokenType::TK_ASSIGNMENT, ""));
 
-  this->token = this->scanner.nextToken();
-  if (this->token.getType() != TokenType::TK_IDENTIFIER)
-    throw std::runtime_error("Syntax error: expected IDENTIFIER");
-  Token identifier = this->token;
-  this->token = this->scanner.nextToken();
- 
-  if (this->token.getType() != TokenType::TK_ASSIGNMENT)
-    throw std::runtime_error("Syntax error: expected ASSIGN");
-  this->token = this->scanner.nextToken();
-
-  AST* value = this->numericExpression();
-   
-  return new VariableDeclarationAST(type, identifier, value);
+  if (type.getValue() == "NUMBER")
+    return new VariableDeclarationAST(type, identifier,
+                                      this->numericExpression());
+  if (type.getValue() == "STRING")
+    return new VariableDeclarationAST(type, identifier,
+                                      this->stringExpression());
+  throw std::runtime_error("Syntax error: expected NUMBER or STRING");
 }

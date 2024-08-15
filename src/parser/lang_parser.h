@@ -23,6 +23,8 @@ private:
   void semiColon();
   void eof();
 
+  Token consume(Token expectedToken);
+
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
 

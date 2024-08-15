@@ -26,6 +26,7 @@ public:
   Token(TokenType type, std::string value);
   TokenType getType() { return this->type; }
   std::string getValue() { return this->value; }
+  std::string toString();
 private:
   TokenType type;
   std::string value;

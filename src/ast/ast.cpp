@@ -77,7 +77,6 @@ ASTValue UnaryOperatorAST::solve() {
 
 /////////// IdentifierAST
 ASTValue IdentifierAST::solve() {
-  // verify if the identifier is in the hashTable
   if (this->hashTable.find(this->token.getValue()) == this->hashTable.end())
     throw std::runtime_error("Error: IdentifierAST::solve() identifier not found: " + this->token.getValue());
   return this->hashTable[this->token.getValue()];
