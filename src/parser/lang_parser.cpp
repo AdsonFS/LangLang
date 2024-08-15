@@ -1,5 +1,4 @@
 #include "lang_parser.h"
-#include <iostream>
 
 LangParser::LangParser(LexiScanner &_scanner, Token &_token)
     : scanner(_scanner), token(_token) {}

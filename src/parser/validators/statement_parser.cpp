@@ -14,15 +14,15 @@ AST *LangParser::statement() {
   switch (this->token.getType()) {
   case TK_OUTPUTSTREAM:
     node = this->outputStream();
-    if (this->token.getType() != TK_SEMICOLON)
-      throw std::runtime_error("Syntax error: expected SEMICOLON");
-    this->token = this->scanner.nextToken();
+    this->consume(Token(TK_SEMICOLON, ""));
+    return node;
+  case TK_INPUTSTREAM:
+    node = this->inputStream();
+    this->consume(Token(TK_SEMICOLON, ""));
     return node;
   case TK_RESERVED_WORD:
     node = this->variableDeclaration();
-    if (this->token.getType() != TK_SEMICOLON)
-      throw std::runtime_error("Syntax error: expected SEMICOLON");
-    this->token = this->scanner.nextToken();
+    this->consume(Token(TK_SEMICOLON, ""));
     return node;
   default:
     throw std::runtime_error("Syntax error: expected OUTPUTSTREAM");

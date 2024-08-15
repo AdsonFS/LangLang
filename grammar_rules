@@ -1,13 +1,18 @@
 statement_list      : statement
                     | statement statement_list
 
-statement           : outputStream SEMICOLON
+statement           : variableDeclaration SEMICOLON 
+                    | outputStream SEMICOLON
+                    | inputStream SEMICOLON                    
 
 
-variableDeclaration : NUMBER identifier = numericExpression 
+variableDeclaration : NUMBER identifier = numericExpression
+                    | STRING identifier = stringExpression
 
 outputStream        : >> output outputStream*
 output              : stringExpression | numericExpression
+
+inputStream         : << identifier inputStream*
 
 stringExpression    : string (+ stringExpression)*
 string              : STRING

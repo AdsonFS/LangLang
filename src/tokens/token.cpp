@@ -30,6 +30,8 @@ std::string Token::toString() {
       return "UNKNOWN";
     case TK_EOF:
       return "EOF";
-  }
+    case TK_INPUTSTREAM:
+      return "INPUTSTREAM";
+    }
   return "";
 }

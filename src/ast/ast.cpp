@@ -23,6 +23,25 @@ ASTValue VariableDeclarationAST::solve() {
   return 0;
 }
 
+/////////// InputStreamAST
+ASTValue InputStreamAST::solve() {
+  for (auto &identifier: this->identifiers) {
+    if (this->hashTable.find(identifier.getValue()) == this->hashTable.end())
+      throw std::runtime_error("Error: InputStreamAST::solve() identifier not found: " + identifier.getValue()); 
+    ASTValue value = this->hashTable[identifier.getValue()];
+    if (std::holds_alternative<int>(value)) {
+      int input;
+      std::cin >> input;
+      this->hashTable[identifier.getValue()] = input;
+    } else {
+      std::string input;
+      std::cin >> input;
+      this->hashTable[identifier.getValue()] = input;
+    }
+  }
+  return 0;
+}
+
 /////////// OutputStreamAST
 ASTValue OutputStreamAST::solve() {
   int cnt = this->outputs.size() - 1;

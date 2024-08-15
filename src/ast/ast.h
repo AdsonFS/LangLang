@@ -49,6 +49,16 @@ private:
   std::vector<AST *> outputs;
 };
 
+
+class InputStreamAST : public AST {
+public:
+  InputStreamAST(std::vector<Token> identifiers) : identifiers(identifiers) {}
+  ASTValue solve() override;
+
+private:
+  std::vector<Token> identifiers;
+};
+
 class BinaryOperatorAST : public AST {
 public:
   BinaryOperatorAST(AST *left, AST *right, Token op)

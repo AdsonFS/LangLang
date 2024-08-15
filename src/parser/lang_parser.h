@@ -12,6 +12,7 @@ public:
   AST *numericExpression();
   AST *stringExpression();
   AST *outputStream();
+  AST *inputStream();
   AST *statementList();
   AST *statement();
   AST *variableDeclaration();

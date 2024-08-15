@@ -31,7 +31,7 @@ Token LexiScanner::nextToken() {
       else if (this->isParentheses(currentChar))
         return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
       else if (this->isAssignment(currentChar))
-          return Token(TokenType::TK_ASSIGNMENT, "=");
+        return Token(TokenType::TK_ASSIGNMENT, "=");
       else if (this->isUpperLetter(currentChar))
         state = 4;
       else if (this->isDigit(currentChar))
@@ -44,6 +44,9 @@ Token LexiScanner::nextToken() {
       } else if (currentChar == '>' && this->peekChar() == '>') {
         this->nextChar();
         return Token(TokenType::TK_OUTPUTSTREAM, ">>");
+      } else if (currentChar == '<' && this->peekChar() == '<') {
+        this->nextChar();
+        return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else
         throw std::runtime_error("Unknown Symbol: " + tokenValue);
       break;
