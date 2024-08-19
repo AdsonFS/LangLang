@@ -4,9 +4,10 @@ statement_list      : statement
 statement           : variableDeclaration SEMICOLON 
                     | outputStream SEMICOLON
                     | inputStream SEMICOLON                    
+                    | identifier
 
-
-variableDeclaration : NUMBER identifier = numericExpression
+variableDeclaration : FUNC identifier '{' statementList '}'
+                    | NUMBER identifier = numericExpression
                     | STRING identifier = stringExpression
 
 outputStream        : >> output outputStream*
@@ -21,5 +22,8 @@ numericExpression   : numericExpression: term ((PLUS|MINUS) term)*
 term                : factor ((DIV|MULT|MOD) factor)*
 factor              : (PLUS|MINUS)factor 
                     | NUMBER 
-                    | IDENTIFIER
+                    | identifier
                     | '(' numericExpression ')'
+
+identifier          : IDENTIFIER
+                    | IDENTIFIER ( )

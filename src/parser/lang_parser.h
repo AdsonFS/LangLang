@@ -16,6 +16,7 @@ public:
   AST *statementList();
   AST *statement();
   AST *variableDeclaration();
+  AST *statementFunction();
 
 private:
   LexiScanner &scanner;

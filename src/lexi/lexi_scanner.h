@@ -25,6 +25,7 @@ private:
   bool isCmpOperator(char c);
   bool isUpperLetter(char c);
   bool isLowerLetter(char c);
+  bool isCurlyBraces(char c);
   bool isDoubleQuotes(char c);
   bool isEOF();
 

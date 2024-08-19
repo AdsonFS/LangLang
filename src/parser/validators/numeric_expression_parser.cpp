@@ -34,9 +34,6 @@ AST *LangParser::factor() {
     return new IdentifierAST(token);
   }
 
-
-
-
   if (this->isPlusOrMinus()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
