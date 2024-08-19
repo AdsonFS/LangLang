@@ -4,12 +4,16 @@
 #include <string>
 
 enum TokenType {
-  /*TK_IDENTIFIER,*/
+  TK_IDENTIFIER,
   TK_STRING,
   TK_NUMBER,
   TK_OPERATOR,
   TK_PARENTHESES,
-  /*TK_RESERVED_WORD,*/
+  TK_INPUTSTREAM,
+  TK_OUTPUTSTREAM,
+  TK_RESERVED_WORD,
+  TK_ASSIGNMENT,
+  TK_CURLY_BRACES,
   /*TK_CMP_OPERATOR,*/
   /*TK_WHITESPACE,*/
   TK_SEMICOLON,
@@ -23,6 +27,7 @@ public:
   Token(TokenType type, std::string value);
   TokenType getType() { return this->type; }
   std::string getValue() { return this->value; }
+  std::string toString();
 private:
   TokenType type;
   std::string value;

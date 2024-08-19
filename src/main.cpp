@@ -7,7 +7,6 @@ void parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   try {
     parser.parser();
-    std::cout << "Success!!! :)\n\n";
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
   }
@@ -23,11 +22,12 @@ void tokens(LexiScanner &scanner) {
 }
 
 int main(int argc, char **argv) {
+  std::cout << "********** Running **********" << std::endl;
   std::string filename;
   if (argc > 1)
     filename = argv[1];
   else {
-    filename = "examples/integer.ll";
+    filename = "examples/main.ll";
     /*std::cout << "file not found\nPlease provide\n";*/
   }
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   file.open(filename);
   if (!file.is_open()) {
     std::cout << "Error: could not open file " << filename << std::endl;
-    throw std::runtime_error("Error: could not open file " + filename);
+    throw std::runtime_error("Error: could not read file " + filename);
   }
   std::string fileContent = std::string((std::istreambuf_iterator<char>(file)),
                                         std::istreambuf_iterator<char>());
