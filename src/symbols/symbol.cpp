@@ -20,9 +20,13 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name) {
 }
 
 void ScopedSymbolTable::update(std::string name, ASTValue value) {
-  if (this->symbols.find(name) != this->symbols.end())
+  if (this->symbols.find(name) != this->symbols.end()) {
+    if (this->symbols[name]->value.index() != value.index())
+      throw std::runtime_error(
+          "Error: ScopedSymbolTable::update() type mismatch: " + name);
     this->symbols[name]->value = value;
-  else
+
+  } else
     throw std::runtime_error(
         "Error: ScopedSymbolTable::update() name not found: " + name);
 }

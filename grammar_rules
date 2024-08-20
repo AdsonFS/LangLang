@@ -4,26 +4,26 @@ statement_list      : statement
 statement           : variableDeclaration SEMICOLON 
                     | outputStream SEMICOLON
                     | inputStream SEMICOLON                    
+                    | assignment
                     | identifier
 
 variableDeclaration : FUNC identifier '{' statementList '}'
-                    | NUMBER identifier = numericExpression
-                    | STRING identifier = stringExpression
+                    | (NUMBER|STRING) identifier = expression
 
 outputStream        : >> output outputStream*
-output              : stringExpression | numericExpression
+output              : expression 
 
 inputStream         : << identifier inputStream*
 
-stringExpression    : string (+ stringExpression)*
-string              : STRING
 
-numericExpression   : numericExpression: term ((PLUS|MINUS) term)*
+assignment          : identifier = expression
+
+
+expression          : expression: term ((PLUS|MINUS) term)*
 term                : factor ((DIV|MULT|MOD) factor)*
 factor              : (PLUS|MINUS)factor 
-                    | NUMBER 
+                    | NUMBER | STRING
                     | identifier
-                    | '(' numericExpression ')'
+                    | '(' expression ')'
 
 identifier          : IDENTIFIER
-                    | IDENTIFIER ( )

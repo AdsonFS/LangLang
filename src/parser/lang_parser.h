@@ -9,12 +9,12 @@ class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
   void parser();
-  AST *numericExpression();
-  AST *stringExpression();
-  AST *outputStream();
-  AST *inputStream();
-  AST *statementList();
   AST *statement();
+  AST *assignment();
+  AST *expression();
+  AST *inputStream();
+  AST *outputStream();
+  AST *statementList();
   AST *variableDeclaration();
   AST *statementFunction();
 
@@ -30,10 +30,6 @@ private:
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
 
-  // string expression
-  AST *string();
-
-  // numeric expression
   AST *term();
   AST *factor();
 };

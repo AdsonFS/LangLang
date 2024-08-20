@@ -1,6 +1,7 @@
 #include "ast.h"
 #include <iostream>
 #include <stdexcept>
+#include <variant>
 
 ScopedSymbolTable* AST::scope;
 /////////// AST
@@ -22,6 +23,12 @@ ASTValue FunctionAST::solve() {
   FuncSymbol *func =
       new FuncSymbol(this->identifier.getValue(), this->statements);
   this->scope->set(func);
+  return 0;
+}
+
+/////////// AssignmentVariableAST
+ASTValue AssignmentVariableAST::solve() {
+  this->scope->update(this->identifier.getValue(), this->value->solve());
   return 0;
 }
 
