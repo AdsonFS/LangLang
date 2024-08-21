@@ -26,14 +26,21 @@ AST *LangParser::statement() {
   case TK_IDENTIFIER:
     this->consume(Token(TK_IDENTIFIER, ""));
     if (this->token.getType() == TK_ASSIGNMENT) {
-        this->consume(Token(TK_ASSIGNMENT, ""));
-        node = new AssignmentVariableAST(token, this->expression());
-        this->consume(Token(TK_SEMICOLON, ""));
-        return node;
-    } else { // function call
-      node = new IdentifierAST(token);
+      this->consume(Token(TK_ASSIGNMENT, ""));
+      node = new AssignmentVariableAST(token, this->expression());
       this->consume(Token(TK_SEMICOLON, ""));
       return node;
+    } else if (this->token.getType() == TK_PARENTHESES &&
+               this->token.getValue() == "(") { // function call
+      node = new IdentifierAST(token);
+      this->consume(Token(TK_PARENTHESES, "("));
+      this->consume(Token(TK_PARENTHESES, ")"));
+
+      this->consume(Token(TK_SEMICOLON, ""));
+      return node;
+    } else {
+      throw std::runtime_error(
+          "Syntax error: expected ASSIGNMENT or SEMICOLON");
     }
   case TK_RESERVED_WORD:
     node = this->variableDeclaration();
@@ -56,5 +63,3 @@ AST *LangParser::statementFunction() {
   }
   return new StatementListAST(statements);
 }
-
-

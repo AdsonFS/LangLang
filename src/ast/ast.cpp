@@ -12,7 +12,7 @@ ASTValue AST::solve() {
 /////////// StatementListAST
 ASTValue StatementListAST::solve() {
   if (this->scope == nullptr)
-    this->scope = new ScopedSymbolTable();
+    this->scope = new ScopedSymbolTable("global");
   for (auto &statement : this->statements)
     statement->solve();
   return 0;
@@ -125,9 +125,10 @@ ASTValue UnaryOperatorAST::solve() {
 ASTValue IdentifierAST::solve() {
   ASTValue value = this->scope->getValue(this->token.getValue());
   if (std::holds_alternative<AST *>(value)) { // function call
-    this->scope = this->scope->newScope();
+    ScopedSymbolTable * currentScope = this->scope;
+    this->scope = this->scope->newScopeByContext(this->scope->getName() + this->token.getValue(), this->token.getValue());
     std::get<AST *>(value)->solve();
-    this->scope = this->scope->previousScope;
+    this->scope = currentScope;
     return 0;
   }
   return value;

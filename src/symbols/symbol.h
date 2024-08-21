@@ -32,20 +32,23 @@ public:
 
 class ScopedSymbolTable {
 public:
-  ScopedSymbolTable(ScopedSymbolTable *previousScope = nullptr) : previousScope(previousScope) {
+  ScopedSymbolTable(std::string scopeName, ScopedSymbolTable *previousScope = nullptr) : scopeName(scopeName), previousScope(previousScope) {
     this->set(new BuiltInTypeSymbol("NUMBER"));
     this->set(new BuiltInTypeSymbol("STRING"));
   }
+  std::string getName();
   void set(Symbol *symbol);
   void update(std::string name, ASTValue value);
   ASTValue getValue(std::string name);
   Symbol *getSymbol(std::string name);
   
-  ScopedSymbolTable *newScope() {
-    return new ScopedSymbolTable(this);
+  ScopedSymbolTable *newScopeByContext(std::string scopeName, std::string identifier);
+  ScopedSymbolTable *newScope(std::string scopeName) {
+    return new ScopedSymbolTable(scopeName, this);
   }
   ScopedSymbolTable *previousScope;
 private:
+  std::string scopeName;
   std::unordered_map<std::string, Symbol *> symbols;
 };
 
