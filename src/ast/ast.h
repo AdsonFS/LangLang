@@ -39,6 +39,17 @@ private:
   StatementListAST *statements;
 };
 
+class AssignmentVariableAST : public AST {
+public:
+  AssignmentVariableAST(Token identifier, AST *value)
+      : identifier(identifier), value(value) {}
+  ASTValue solve() override;
+
+private:
+  Token identifier;
+  AST *value;
+};
+
 class VariableDeclarationAST : public AST {
 public:
   VariableDeclarationAST(Token type, Token identifier, AST *value)

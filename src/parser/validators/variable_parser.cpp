@@ -13,11 +13,8 @@ AST *LangParser::variableDeclaration() {
 
   this->consume(Token(TokenType::TK_ASSIGNMENT, ""));
 
-  if (type.getValue() == "NUMBER")
+  if (type.getValue() == "NUMBER" || type.getValue() == "STRING")
     return new VariableDeclarationAST(type, identifier,
-                                      this->numericExpression());
-  if (type.getValue() == "STRING")
-    return new VariableDeclarationAST(type, identifier,
-                                      this->stringExpression());
+                                      this->expression());
   throw std::runtime_error("Syntax error: expected NUMBER or STRING");
 }
