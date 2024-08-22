@@ -28,6 +28,28 @@ private:
   std::vector<AST *> statements;
 };
 
+class ConditionalAST : public AST {
+public:
+  ConditionalAST(AST *left, Token op, AST *right)
+      : left(left), op(op), right(right) {}
+  ASTValue solve() override;
+private:
+  AST *left;
+  Token op;
+  AST *right;
+};
+
+class IfStatementAST : public AST {
+public:
+  IfStatementAST(ConditionalAST *condition, StatementListAST *ifStatements)
+      : condition(condition), ifStatements(ifStatements) {}
+  ASTValue solve() override;
+private:
+  ConditionalAST *condition;
+  StatementListAST *ifStatements;
+};
+
+
 class FunctionAST : public AST {
 public:
   FunctionAST(Token identifier, StatementListAST *statements)

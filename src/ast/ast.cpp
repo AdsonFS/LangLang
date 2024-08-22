@@ -18,6 +18,34 @@ ASTValue StatementListAST::solve() {
   return 0;
 }
 
+/////////// IfStatementAST
+ASTValue IfStatementAST::solve() {
+  if (std::get<int>(this->condition->solve())) {
+    this->scope = this->scope->newScope("if");
+    this->ifStatements->solve();
+    this->scope = this->scope->previousScope;
+  }
+  return 0;
+}
+
+/////////// ConditionalAST
+ASTValue ConditionalAST::solve() {
+  ASTValue leftValue = this->left->solve();
+  ASTValue rightValue = this->right->solve();
+  if (leftValue.index() != rightValue.index())
+    throw std::runtime_error(
+        "Error: ConditionalAST::solve() different types");
+  switch (this->op.getValue()[0]) {
+    case '<':
+      return leftValue < rightValue;
+    case '>':
+      return leftValue > rightValue;
+    default:
+      throw std::runtime_error(
+          "Error: ConditionalAST::solve() invalid operator");
+  }
+}
+
 /////////// FunctionAST
 ASTValue FunctionAST::solve() {
   FuncSymbol *func =

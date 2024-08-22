@@ -1,19 +1,25 @@
 statement_list      : statement
                     | statement statement_list
 
-statement           : variableDeclaration SEMICOLON 
-                    | outputStream SEMICOLON
-                    | inputStream SEMICOLON                    
+statement           : variable_declaration SEMICOLON 
+                    | if_statement
+                    | output_stream SEMICOLON
+                    | input_stream SEMICOLON                    
                     | assignment
                     | identifier
 
-variableDeclaration : FUNC identifier '{' statementList '}'
+
+if_statement        : IF '(' conditional ')' '{' statement_list '}'
+
+conditional         : expression ( < | > ) expression
+
+variable_declaration : FUNC identifier '{' statement_list '}'
                     | (NUMBER|STRING) identifier = expression
 
-outputStream        : >> output outputStream*
+output_stream        : >> output output_stream*
 output              : expression 
 
-inputStream         : << identifier inputStream*
+input_stream         : << identifier inputStream*
 
 
 assignment          : identifier = expression

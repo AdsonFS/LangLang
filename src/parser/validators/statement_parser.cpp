@@ -43,6 +43,9 @@ AST *LangParser::statement() {
           "Syntax error: expected ASSIGNMENT or SEMICOLON");
     }
   case TK_RESERVED_WORD:
+    if (token.getValue() == "IF") 
+      return this->ifStatement();
+    
     node = this->variableDeclaration();
     if (token.getValue() == "FUNC")
       this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
@@ -50,7 +53,7 @@ AST *LangParser::statement() {
       this->consume(Token(TK_SEMICOLON, ""));
     return node;
   default:
-    throw std::runtime_error("Syntax error: expected OUTPUTSTREAM");
+    throw std::runtime_error("Syntax error: expected OUTPUTSTREAM.");
   }
 }
 

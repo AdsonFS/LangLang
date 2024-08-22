@@ -12,9 +12,12 @@ void LangParser::parser() {
 Token LangParser::consume(Token expectedToken) {
   Token consumed = this->token;
   if (this->token.getType() != expectedToken.getType())
-    throw std::runtime_error("Syntax error: expected " + expectedToken.toString());
-  if (expectedToken.getValue() != "" && this->token.getValue() != expectedToken.getValue())
-    throw std::runtime_error("Syntax error: expected " + expectedToken.getValue());
+    throw std::runtime_error("Syntax error: expected " +
+                             expectedToken.toString());
+  if (expectedToken.getValue() != "" &&
+      this->token.getValue() != expectedToken.getValue())
+    throw std::runtime_error("Syntax error: expected " +
+                             expectedToken.getValue());
   this->token = this->scanner.nextToken();
   return consumed;
 }

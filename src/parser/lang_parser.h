@@ -13,6 +13,8 @@ public:
   AST *assignment();
   AST *expression();
   AST *inputStream();
+  AST *ifStatement();
+  AST *conditional();
   AST *outputStream();
   AST *statementList();
   AST *variableDeclaration();

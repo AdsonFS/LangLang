@@ -8,7 +8,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
 
   this->fileContent = fileContent;
   this->position = 0;
-  this->reservedWords = {"NUMBER", "STRING", "FUNC"};
+  this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF"};
 }
 
 Token LexiScanner::nextToken() {
@@ -34,6 +34,8 @@ Token LexiScanner::nextToken() {
         return Token(TokenType::TK_ASSIGNMENT, "=");
       else if (this->isCurlyBraces(currentChar))
         return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar));
+      else if (this->isCmpOperator(currentChar) && this->peekChar() != '>') 
+        return Token(TokenType::TK_COMPARATOR, std::string(1, currentChar));
       else if (this->isUpperLetter(currentChar))
         state = 4;
       else if (this->isDigit(currentChar))
@@ -105,7 +107,7 @@ bool LexiScanner::isOperator(char c) {
 }
 
 bool LexiScanner::isCmpOperator(char c) {
-  return c == '<' || c == '>' || c == '=' || c == '!';
+  return c == '<' || c == '>';
 }
 
 bool LexiScanner::isWhitespace(char c) {
