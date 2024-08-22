@@ -16,8 +16,9 @@ public:
   AST *conditional();
   AST *outputStream();
   AST *statementList();
-  AST *variableDeclaration();
+  AST *whileStatement();
   AST *statementFunction();
+  AST *variableDeclaration();
   AST *expression(bool isParenthesized = false);
   AST *logicalExpression(bool isParenthesized = false); 
 

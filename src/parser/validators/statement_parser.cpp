@@ -45,10 +45,12 @@ AST *LangParser::statement() {
   case TK_RESERVED_WORD:
     if (token.getValue() == "IF") 
       return this->ifStatement();
-    
+    if (token.getValue() == "WHILE")
+        return this->whileStatement();
     node = this->variableDeclaration();
     if (token.getValue() == "FUNC")
       this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
+
     else
       this->consume(Token(TK_SEMICOLON, ""));
     return node;

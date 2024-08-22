@@ -37,6 +37,17 @@ ASTValue IfStatementAST::solve() {
   return 0;
 }
 
+
+ASTValue WhileStatementAST::solve() {
+
+  while (ASTValueIsTrue(this->condition->solve())) {
+    this->scope = this->scope->newScope("if");
+    this->ifStatements->solve();
+    this->scope = this->scope->previousScope;
+  }
+  return 0;
+}
+
 /////////// ConditionalAST
 /*ASTValue ConditionalAST::solve() {*/
 /*  ASTValue leftValue = this->left->solve();*/
@@ -153,13 +164,14 @@ ASTValue BinaryOperatorAST::solve() {
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
   case '<':
-    if (this->isParenthesized)
+
+    /*if (this->isParenthesized)*/
       return leftValue < rightValue;
-    return leftValue < rightValue ? rightValue : 0;
+    /*return leftValue < rightValue ? rightValue : 0;*/
   case '>':
-    if (this->isParenthesized)
+    /*if (this->isParenthesized)*/
       return leftValue > rightValue;
-    return leftValue > rightValue ? rightValue : 0;
+    /*return leftValue > rightValue ? rightValue : 0;*/
     ;
   default:
     throw std::runtime_error(
