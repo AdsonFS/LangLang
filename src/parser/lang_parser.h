@@ -9,14 +9,18 @@ class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
   void parser();
-  AST *numericExpression();
-  AST *stringExpression();
-  AST *outputStream();
-  AST *inputStream();
-  AST *statementList();
   AST *statement();
-  AST *variableDeclaration();
+  AST *assignment();
+  AST *inputStream();
+  AST *ifStatement();
+  AST *conditional();
+  AST *outputStream();
+  AST *statementList();
+  AST *whileStatement();
   AST *statementFunction();
+  AST *variableDeclaration();
+  AST *expression(bool isParenthesized = false);
+  AST *logicalExpression(bool isParenthesized = false); 
 
 private:
   LexiScanner &scanner;
@@ -27,14 +31,13 @@ private:
 
   Token consume(Token expectedToken);
 
+  bool isComparator();
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
+  bool isLogicalOperator();
 
-  // string expression
-  AST *string();
-
-  // numeric expression
   AST *term();
+  AST *clause();
   AST *factor();
 };
 

@@ -27,6 +27,7 @@ private:
   bool isLowerLetter(char c);
   bool isCurlyBraces(char c);
   bool isDoubleQuotes(char c);
+  bool isLogicalOperator(char c1, char c2);
   bool isEOF();
 
   char nextChar();

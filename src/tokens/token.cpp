@@ -32,6 +32,8 @@ std::string Token::toString() {
       return "EOF";
     case TK_INPUTSTREAM:
       return "INPUTSTREAM";
+    case TK_CURLY_BRACES:
+      return "CURLY_BRACES";
     }
   return "";
 }

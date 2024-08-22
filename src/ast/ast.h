@@ -1,22 +1,21 @@
 #ifndef AST_H
 #define AST_H
 
+#include "../dependencies/dependencies.h"
 #include "../symbols/symbol.h"
 #include "../tokens/token.h"
-#include "../dependencies/dependencies.h"
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <variant>
 #include <vector>
 
-
 class AST {
 public:
   virtual ASTValue solve();
 
 protected:
-  static ScopedSymbolTable* scope;
+  static ScopedSymbolTable *scope;
 };
 
 class StatementListAST : public AST {
@@ -28,6 +27,28 @@ private:
   std::vector<AST *> statements;
 };
 
+class WhileStatementAST : public AST {
+public:
+  WhileStatementAST(AST *condition, StatementListAST *ifStatements)
+      : condition(condition), ifStatements(ifStatements) {}
+  ASTValue solve() override;
+
+private:
+  AST *condition;
+  StatementListAST *ifStatements;
+};
+
+class IfStatementAST : public AST {
+public:
+  IfStatementAST(AST *condition, StatementListAST *ifStatements)
+      : condition(condition), ifStatements(ifStatements) {}
+  ASTValue solve() override;
+
+private:
+  AST *condition;
+  StatementListAST *ifStatements;
+};
+
 class FunctionAST : public AST {
 public:
   FunctionAST(Token identifier, StatementListAST *statements)
@@ -37,6 +58,17 @@ public:
 private:
   Token identifier;
   StatementListAST *statements;
+};
+
+class AssignmentVariableAST : public AST {
+public:
+  AssignmentVariableAST(Token identifier, AST *value)
+      : identifier(identifier), value(value) {}
+  ASTValue solve() override;
+
+private:
+  Token identifier;
+  AST *value;
 };
 
 class VariableDeclarationAST : public AST {
@@ -71,14 +103,16 @@ private:
 
 class BinaryOperatorAST : public AST {
 public:
-  BinaryOperatorAST(AST *left, AST *right, Token op)
-      : left(left), right(right), op(op) {}
+  BinaryOperatorAST(AST *left, AST *right, Token op,
+                    bool isParenthesized = false)
+      : left(left), right(right), op(op), isParenthesized(isParenthesized) {}
   ASTValue solve() override;
 
 private:
   AST *left;
   AST *right;
   Token op;
+  bool isParenthesized;
 };
 
 class UnaryOperatorAST : public AST {
