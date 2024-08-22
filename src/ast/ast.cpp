@@ -1,6 +1,7 @@
 #include "ast.h"
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <variant>
 
 ScopedSymbolTable *AST::scope;
@@ -20,7 +21,12 @@ ASTValue StatementListAST::solve() {
 
 /////////// IfStatementAST
 ASTValue IfStatementAST::solve() {
-  if (std::get<int>(this->condition->solve())) {
+  ASTValue value = this->condition->solve();
+  bool condition = std::holds_alternative<int>(value)
+                       ? std::get<int>(value)
+                       : std::get<std::string>(value) != "";
+
+  if (condition) {
     this->scope = this->scope->newScope("if");
     this->ifStatements->solve();
     this->scope = this->scope->previousScope;

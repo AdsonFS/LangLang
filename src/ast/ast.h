@@ -38,15 +38,14 @@ private:
 /*  Token op;*/
 /*  AST *right;*/
 /*};*/
-class BinaryOperatorAST;
 class IfStatementAST : public AST {
 public:
 
-  IfStatementAST(BinaryOperatorAST *condition, StatementListAST *ifStatements)
+  IfStatementAST(AST *condition, StatementListAST *ifStatements)
       : condition(condition), ifStatements(ifStatements) {}
   ASTValue solve() override;
 private:
-  BinaryOperatorAST *condition;
+  AST *condition;
   StatementListAST *ifStatements;
 };
 

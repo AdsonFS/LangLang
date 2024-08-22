@@ -8,7 +8,8 @@ AST *LangParser::ifStatement() {
   this->consume(Token(TK_CURLY_BRACES, "{"));
   AST *statementList = this->statementList();
   this->consume(Token(TK_CURLY_BRACES, "}"));
-  return new IfStatementAST(dynamic_cast<BinaryOperatorAST*>(conditional),
+
+  return new IfStatementAST(conditional,
                             dynamic_cast<StatementListAST *>(statementList));
 }
 
