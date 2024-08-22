@@ -20,13 +20,16 @@ ASTValue StatementListAST::solve() {
 }
 
 /////////// IfStatementAST
+bool ASTValueIsTrue(ASTValue value) {
+  return std::holds_alternative<int>(value)
+             ? std::get<int>(value) != 0
+             : std::get<std::string>(value) != "";
+}
+
 ASTValue IfStatementAST::solve() {
   ASTValue value = this->condition->solve();
-  bool condition = std::holds_alternative<int>(value)
-                       ? std::get<int>(value)
-                       : std::get<std::string>(value) != "";
 
-  if (condition) {
+  if (ASTValueIsTrue(value)) {
     this->scope = this->scope->newScope("if");
     this->ifStatements->solve();
     this->scope = this->scope->previousScope;
@@ -138,6 +141,17 @@ ASTValue BinaryOperatorAST::solve() {
   case '%':
     return std::get<int>(leftValue) % std::get<int>(rightValue);
 
+  // logical operators
+  case '&':
+    if(this->op.getValue() == "&&")
+        return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
+    throw std::runtime_error(
+        "Error: BinaryOperatorAST::solve() invalid operator");
+  case '|':
+    if(this->op.getValue() == "||")
+        return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
+    throw std::runtime_error(
+        "Error: BinaryOperatorAST::solve() invalid operator");
   case '<':
     if (this->isParenthesized)
       return leftValue < rightValue;

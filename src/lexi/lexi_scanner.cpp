@@ -34,8 +34,13 @@ Token LexiScanner::nextToken() {
         return Token(TokenType::TK_ASSIGNMENT, "=");
       else if (this->isCurlyBraces(currentChar))
         return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar));
-      else if (this->isCmpOperator(currentChar) && this->peekChar() != '>') 
+      else if (this->isCmpOperator(currentChar) && this->peekChar() != '>')
         return Token(TokenType::TK_COMPARATOR, std::string(1, currentChar));
+      else if (this->isLogicalOperator(currentChar, this->peekChar()))
+        return Token(TokenType::TK_LOGICAL_OPERATOR,
+                     std::string(1, currentChar) +
+                         std::string(1, this->nextChar()));
+
       else if (this->isUpperLetter(currentChar))
         state = 4;
       else if (this->isDigit(currentChar))
@@ -106,12 +111,14 @@ bool LexiScanner::isOperator(char c) {
   return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
 }
 
-bool LexiScanner::isCmpOperator(char c) {
-  return c == '<' || c == '>';
-}
+bool LexiScanner::isCmpOperator(char c) { return c == '<' || c == '>'; }
 
 bool LexiScanner::isWhitespace(char c) {
   return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\0';
+}
+
+bool LexiScanner::isLogicalOperator(char c1, char c2) {
+  return (c1 == '&' && c2 == '&') || (c1 == '|' && c2 == '|');
 }
 
 bool LexiScanner::isCurlyBraces(char c) { return c == '{' || c == '}'; }

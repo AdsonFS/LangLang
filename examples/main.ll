@@ -1,7 +1,7 @@
 STRING name = "Adson";
 >> "Hello," >> name;
 
-IF ((name < "ZZZ")) {
+IF ((name < "ZZZ") && 1 < 2) {
   >> "True";
   STRING name = "<empty>";
   >> "IF: " >> name;

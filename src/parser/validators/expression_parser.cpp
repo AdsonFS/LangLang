@@ -1,6 +1,16 @@
 #include "../lang_parser.h"
 
 AST *LangParser::expression(bool isParenthesized) {
+  AST *node = this->logicalExpression();
+  while (this->isLogicalOperator()) {
+    Token opToken = this->token;
+    this->token = this->scanner.nextToken();
+    node = new BinaryOperatorAST(node, this->logicalExpression(), opToken, isParenthesized);
+  }
+  return node;
+}
+
+AST *LangParser::logicalExpression(bool isParenthesized) {
   AST *node = this->clause();
   while (this->isComparator()) {
     Token opToken = this->token;

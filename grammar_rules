@@ -1,34 +1,35 @@
-statement_list      : statement
-                    | statement statement_list
+statement_list        : statement
+                      | statement statement_list
 
-statement           : variable_declaration SEMICOLON 
-                    | if_statement
-                    | output_stream SEMICOLON
-                    | input_stream SEMICOLON                    
-                    | assignment
-                    | identifier
-
-
-if_statement        : IF '(' expression ')' '{' statement_list '}'
-
-variable_declaration : FUNC identifier '{' statement_list '}'
-                    | (NUMBER|STRING) identifier = expression
-
-output_stream        : >> output output_stream*
-output              : expression 
-
-input_stream         : << identifier inputStream*
+statement             : variable_declaration SEMICOLON 
+                      | if_statement
+                      | output_stream SEMICOLON
+                      | input_stream SEMICOLON                    
+                      | assignment
+                      | identifier
 
 
-assignment          : identifier = expression
+while_statement       : WHILE '(' expression ')' '{' statement_list '}'
+if_statement          : IF '(' expression ')' '{' statement_list '}'
+
+variable_declaration  : FUNC identifier '{' statement_list '}'
+                      | (NUMBER|STRING) identifier = expression
+
+output_stream         : >> output output_stream*
+output                : expression 
+
+input_stream          : << identifier inputStream*
 
 
-expression          : clause ((<|>) clause)*
-clause              : term ( PLUS|MINUS ) term
-term                : factor ((DIV|MULT|MOD) factor)*
-factor              : (PLUS|MINUS)factor 
-                    | NUMBER | STRING
-                    | identifier
-                    | '(' expression ')'
+assignment            : identifier = expression
 
-identifier          : IDENTIFIER
+expression            : logical_expression ((<|>) logical_expression)*
+logical_expression    : clause ((<|>) clause)*
+clause                : term ( PLUS|MINUS ) term
+term                  : factor ((DIV|MULT|MOD) factor)*
+factor                : (PLUS|MINUS)factor 
+                      | NUMBER | STRING
+                      | identifier
+                      | '(' expression ')'
+
+identifier            : IDENTIFIER

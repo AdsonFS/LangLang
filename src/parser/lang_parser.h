@@ -11,7 +11,6 @@ public:
   void parser();
   AST *statement();
   AST *assignment();
-  AST *expression(bool isParenthesized = false);
   AST *inputStream();
   AST *ifStatement();
   AST *conditional();
@@ -19,6 +18,8 @@ public:
   AST *statementList();
   AST *variableDeclaration();
   AST *statementFunction();
+  AST *expression(bool isParenthesized = false);
+  AST *logicalExpression(bool isParenthesized = false); 
 
 private:
   LexiScanner &scanner;
@@ -32,6 +33,7 @@ private:
   bool isComparator();
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
+  bool isLogicalOperator();
 
   AST *term();
   AST *clause();
