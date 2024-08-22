@@ -1,6 +1,12 @@
 STRING name = "Adson";
 >> "Hello," >> name;
 
+IF ((name < "ZZZ") && 1 < 2) {
+  >> "True";
+  STRING name = "<empty>";
+  >> "IF: " >> name;
+}
+
 FUNC func1 {
   NUMBER age = 12 + 8;
 

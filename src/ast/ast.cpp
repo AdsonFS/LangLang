@@ -1,9 +1,10 @@
 #include "ast.h"
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <variant>
 
-ScopedSymbolTable* AST::scope;
+ScopedSymbolTable *AST::scope;
 /////////// AST
 ASTValue AST::solve() {
   throw std::runtime_error("Error: AST::solve() not implemented");
@@ -17,6 +18,53 @@ ASTValue StatementListAST::solve() {
     statement->solve();
   return 0;
 }
+
+/////////// IfStatementAST
+bool ASTValueIsTrue(ASTValue value) {
+  return std::holds_alternative<int>(value)
+             ? std::get<int>(value) != 0
+             : std::get<std::string>(value) != "";
+}
+
+ASTValue IfStatementAST::solve() {
+  ASTValue value = this->condition->solve();
+
+  if (ASTValueIsTrue(value)) {
+    this->scope = this->scope->newScope("if");
+    this->ifStatements->solve();
+    this->scope = this->scope->previousScope;
+  }
+  return 0;
+}
+
+
+ASTValue WhileStatementAST::solve() {
+
+  while (ASTValueIsTrue(this->condition->solve())) {
+    this->scope = this->scope->newScope("if");
+    this->ifStatements->solve();
+    this->scope = this->scope->previousScope;
+  }
+  return 0;
+}
+
+/////////// ConditionalAST
+/*ASTValue ConditionalAST::solve() {*/
+/*  ASTValue leftValue = this->left->solve();*/
+/*  ASTValue rightValue = this->right->solve();*/
+/*  if (leftValue.index() != rightValue.index())*/
+/*    throw std::runtime_error(*/
+/*        "Error: ConditionalAST::solve() different types");*/
+/*  switch (this->op.getValue()[0]) {*/
+/*    case '<':*/
+/*      return leftValue < rightValue;*/
+/*    case '>':*/
+/*      return leftValue > rightValue;*/
+/*    default:*/
+/*      throw std::runtime_error(*/
+/*          "Error: ConditionalAST::solve() invalid operator");*/
+/*  }*/
+/*}*/
 
 /////////// FunctionAST
 ASTValue FunctionAST::solve() {
@@ -37,12 +85,12 @@ ASTValue VariableDeclarationAST::solve() {
   Token type = this->type;
   if (type.getValue() == "NUMBER")
     this->scope->set(new VarSymbol(this->identifier.getValue(),
-                                  this->scope->getSymbol("NUMBER"),
-                                  this->value->solve()));
+                                   this->scope->getSymbol("NUMBER"),
+                                   this->value->solve()));
   else if (type.getValue() == "STRING")
     this->scope->set(new VarSymbol(this->identifier.getValue(),
-                                  this->scope->getSymbol("STRING"),
-                                  this->value->solve()));
+                                   this->scope->getSymbol("STRING"),
+                                   this->value->solve()));
   else
     throw std::runtime_error(
         "Error: VariableDeclarationAST::solve() invalid type");
@@ -88,20 +136,43 @@ ASTValue OutputStreamAST::solve() {
 /////////// BinaryOperatorAST
 ASTValue BinaryOperatorAST::solve() {
   ASTValue leftValue = this->left->solve();
+  ASTValue rightValue = this->right->solve();
   switch (this->op.getValue()[0]) {
   case '+':
     if (std::holds_alternative<std::string>(leftValue))
       return std::get<std::string>(leftValue) +
              std::get<std::string>(right->solve());
-    return std::get<int>(leftValue) + std::get<int>(this->right->solve());
+    return std::get<int>(leftValue) + std::get<int>(rightValue);
   case '-':
-    return std::get<int>(leftValue) - std::get<int>(this->right->solve());
+    return std::get<int>(leftValue) - std::get<int>(rightValue);
   case '*':
-    return std::get<int>(leftValue) * std::get<int>(this->right->solve());
+    return std::get<int>(leftValue) * std::get<int>(rightValue);
   case '/':
-    return std::get<int>(leftValue) / std::get<int>(this->right->solve());
+    return std::get<int>(leftValue) / std::get<int>(rightValue);
   case '%':
-    return std::get<int>(leftValue) % std::get<int>(this->right->solve());
+    return std::get<int>(leftValue) % std::get<int>(rightValue);
+
+  // logical operators
+  case '&':
+    if(this->op.getValue() == "&&")
+        return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
+    throw std::runtime_error(
+        "Error: BinaryOperatorAST::solve() invalid operator");
+  case '|':
+    if(this->op.getValue() == "||")
+        return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
+    throw std::runtime_error(
+        "Error: BinaryOperatorAST::solve() invalid operator");
+  case '<':
+
+    /*if (this->isParenthesized)*/
+      return leftValue < rightValue;
+    /*return leftValue < rightValue ? rightValue : 0;*/
+  case '>':
+    /*if (this->isParenthesized)*/
+      return leftValue > rightValue;
+    /*return leftValue > rightValue ? rightValue : 0;*/
+    ;
   default:
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
@@ -125,8 +196,10 @@ ASTValue UnaryOperatorAST::solve() {
 ASTValue IdentifierAST::solve() {
   ASTValue value = this->scope->getValue(this->token.getValue());
   if (std::holds_alternative<AST *>(value)) { // function call
-    ScopedSymbolTable * currentScope = this->scope;
-    this->scope = this->scope->newScopeByContext(this->scope->getName() + this->token.getValue(), this->token.getValue());
+    ScopedSymbolTable *currentScope = this->scope;
+    this->scope = this->scope->newScopeByContext(this->scope->getName() +
+                                                     this->token.getValue(),
+                                                 this->token.getValue());
     std::get<AST *>(value)->solve();
     this->scope = currentScope;
     return 0;

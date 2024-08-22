@@ -12,9 +12,12 @@ void LangParser::parser() {
 Token LangParser::consume(Token expectedToken) {
   Token consumed = this->token;
   if (this->token.getType() != expectedToken.getType())
-    throw std::runtime_error("Syntax error: expected " + expectedToken.toString());
-  if (expectedToken.getValue() != "" && this->token.getValue() != expectedToken.getValue())
-    throw std::runtime_error("Syntax error: expected " + expectedToken.getValue());
+    throw std::runtime_error("Syntax error: expected " +
+                             expectedToken.toString());
+  if (expectedToken.getValue() != "" &&
+      this->token.getValue() != expectedToken.getValue())
+    throw std::runtime_error("Syntax error: expected " +
+                             expectedToken.getValue());
   this->token = this->scanner.nextToken();
   return consumed;
 }
@@ -27,6 +30,14 @@ void LangParser::semiColon() {
 void LangParser::eof() {
   if (this->scanner.nextToken().getType() != TokenType::TK_EOF)
     throw std::runtime_error("Syntax error: expected EOF");
+}
+
+bool LangParser::isLogicalOperator() {
+  return this->token.getType() == TokenType::TK_LOGICAL_OPERATOR;
+}
+
+bool LangParser::isComparator() {
+  return this->token.getType() == TokenType::TK_COMPARATOR;
 }
 
 bool LangParser::isPlusOrMinus() {
