@@ -9,9 +9,7 @@ statement           : variable_declaration SEMICOLON
                     | identifier
 
 
-if_statement        : IF '(' conditional ')' '{' statement_list '}'
-
-conditional         : expression ( < | > ) expression
+if_statement        : IF '(' expression ')' '{' statement_list '}'
 
 variable_declaration : FUNC identifier '{' statement_list '}'
                     | (NUMBER|STRING) identifier = expression
@@ -25,7 +23,8 @@ input_stream         : << identifier inputStream*
 assignment          : identifier = expression
 
 
-expression          : expression: term ((PLUS|MINUS) term)*
+expression          : clause ((<|>) clause)*
+clause              : term ( PLUS|MINUS ) term
 term                : factor ((DIV|MULT|MOD) factor)*
 factor              : (PLUS|MINUS)factor 
                     | NUMBER | STRING

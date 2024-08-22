@@ -28,24 +28,25 @@ private:
   std::vector<AST *> statements;
 };
 
-class ConditionalAST : public AST {
-public:
-  ConditionalAST(AST *left, Token op, AST *right)
-      : left(left), op(op), right(right) {}
-  ASTValue solve() override;
-private:
-  AST *left;
-  Token op;
-  AST *right;
-};
-
+/*class ConditionalAST : public AST {*/
+/*public:*/
+/*  ConditionalAST(AST *left, Token op, AST *right)*/
+/*      : left(left), op(op), right(right) {}*/
+/*  ASTValue solve() override;*/
+/*private:*/
+/*  AST *left;*/
+/*  Token op;*/
+/*  AST *right;*/
+/*};*/
+class BinaryOperatorAST;
 class IfStatementAST : public AST {
 public:
-  IfStatementAST(ConditionalAST *condition, StatementListAST *ifStatements)
+
+  IfStatementAST(BinaryOperatorAST *condition, StatementListAST *ifStatements)
       : condition(condition), ifStatements(ifStatements) {}
   ASTValue solve() override;
 private:
-  ConditionalAST *condition;
+  BinaryOperatorAST *condition;
   StatementListAST *ifStatements;
 };
 
@@ -104,14 +105,15 @@ private:
 
 class BinaryOperatorAST : public AST {
 public:
-  BinaryOperatorAST(AST *left, AST *right, Token op)
-      : left(left), right(right), op(op) {}
+  BinaryOperatorAST(AST *left, AST *right, Token op, bool  isParenthesized= false)
+      : left(left), right(right), op(op), isParenthesized(isParenthesized) {}
   ASTValue solve() override;
 
 private:
   AST *left;
   AST *right;
   Token op;
+  bool isParenthesized;
 };
 
 class UnaryOperatorAST : public AST {

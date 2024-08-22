@@ -11,7 +11,7 @@ public:
   void parser();
   AST *statement();
   AST *assignment();
-  AST *expression();
+  AST *expression(bool isParenthesized = false);
   AST *inputStream();
   AST *ifStatement();
   AST *conditional();
@@ -29,10 +29,12 @@ private:
 
   Token consume(Token expectedToken);
 
+  bool isComparator();
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
 
   AST *term();
+  AST *clause();
   AST *factor();
 };
 

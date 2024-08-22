@@ -1,6 +1,16 @@
 #include "../lang_parser.h"
 
-AST *LangParser::expression() {
+AST *LangParser::expression(bool isParenthesized) {
+  AST *node = this->clause();
+  while (this->isComparator()) {
+    Token opToken = this->token;
+    this->token = this->scanner.nextToken();
+    node = new BinaryOperatorAST(node, this->clause(), opToken, isParenthesized);
+  }
+  return node;
+}
+
+AST *LangParser::clause() {
   AST *node = this->term();
   while (this->isPlusOrMinus()) {
     Token opToken = this->token;
@@ -48,7 +58,7 @@ AST *LangParser::factor() {
   if (this->token.getType() == TK_PARENTHESES &&
       this->token.getValue() == "(") {
     this->token = this->scanner.nextToken();
-    AST *node = this->expression();
+    AST *node = this->expression(true);
     if (this->token.getType() != TK_PARENTHESES ||
         this->token.getValue() != ")")
       throw std::runtime_error("Expected ')' but got: " +
