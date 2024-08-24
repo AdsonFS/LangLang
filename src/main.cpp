@@ -4,15 +4,18 @@
 #include "tokens/token.h"
 #include <iostream>
 
-void parser(LexiScanner &scanner, Token &token) {
+int parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   try {
     parser.parser();
   } catch (LexicalError &e) {
     std::cout << e.what() << std::endl;
+    return 1;
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
+    return 1;
   }
+  return 0;
 }
 
 void tokens(LexiScanner &scanner) {
@@ -43,8 +46,6 @@ int main(int argc, char **argv) {
                                         std::istreambuf_iterator<char>());
   LexiScanner scanner(fileContent);
   Token token = Token(TokenType::TK_UNKNOWN, "");
-  parser(scanner, token);
+  return parser(scanner, token);
   /*tokens(scanner);*/
-
-  return 0;
 }
