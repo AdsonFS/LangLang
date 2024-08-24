@@ -1,4 +1,5 @@
 #include "../lexi/lexi_scanner.h"
+#include "../core/core.h"
 #include <string>
 
 LexiScanner::LexiScanner(std::string fileContent) {
@@ -7,7 +8,8 @@ LexiScanner::LexiScanner(std::string fileContent) {
     fileContent.push_back(10);
 
   this->fileContent = fileContent;
-  this->position = 0;
+  this->position = this->column = 0;
+  this->line = 1 + (fileContent[0] == '\n');
   this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF", "WHILE"};
 }
 
@@ -57,7 +59,7 @@ Token LexiScanner::nextToken() {
         this->nextChar();
         return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+        throw LexicalError(this->getLine(), this->line, this->column);
       break;
     case 1:
       if (this->isDoubleQuotes(currentChar)) {
@@ -69,7 +71,9 @@ Token LexiScanner::nextToken() {
         state = 2;
       else if (this->isLowerLetter(currentChar) ||
                this->isUpperLetter(currentChar))
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+
+        /*throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+        throw LexicalError(this->getLine(), this->line, this->column);
       else {
         this->backChar();
         return Token(TokenType::TK_NUMBER, tokenValue);
@@ -86,12 +90,15 @@ Token LexiScanner::nextToken() {
     case 4:
       if (this->isUpperLetter(currentChar))
         state = 4;
+      else if (!(currentChar == '(' || this->isWhitespace(currentChar)))
+        throw LexicalError(this->getLine(), this->line, this->column);
       else if (this->reservedWords.find(tokenValue) !=
                this->reservedWords.end()) {
         this->backChar();
         return Token(TokenType::TK_RESERVED_WORD, tokenValue);
       } else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+        throw LexicalError(this->getLine(), this->line, this->column);
+      /*throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
       break;
     }
     tokenValue.push_back(currentChar);
@@ -128,6 +135,9 @@ bool LexiScanner::isEOF() { return this->position >= this->fileContent.size(); }
 char LexiScanner::nextChar() {
   if (this->position >= this->fileContent.size())
     return '\0';
+  this->column =
+      this->fileContent[this->position] == '\n' ? 0 : this->column + 1;
+  this->line += this->fileContent[this->position + 1] == '\n';
   return this->fileContent[this->position++];
 }
 char LexiScanner::peekChar() {
@@ -138,6 +148,21 @@ char LexiScanner::peekChar() {
 bool LexiScanner::isParentheses(char c) { return c == '(' || c == ')'; }
 bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
 void LexiScanner::backChar() {
-  if (!this->isEOF())
-    this->position--;
+  if (this->isEOF())
+    return;
+  this->line -= this->fileContent[this->position] == '\n';
+  this->column =
+      this->fileContent[this->position - 1] == '\n' ? 0 : this->column - 1;
+  this->position--;
+}
+
+std::string LexiScanner::getLine() {
+  int start, end;
+  start = end = this->position;
+  while (start > 0 && this->fileContent[start - 1] != '\n')
+    --start;
+  while (this->fileContent[end + 1] != '\0' &&
+         this->fileContent[end + 1] != '\n')
+    ++end;
+  return this->fileContent.substr(start, end - start + 1).c_str();
 }

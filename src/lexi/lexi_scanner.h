@@ -12,9 +12,12 @@ public:
 
   std::set<std::string> reservedWords;
 private:
+  int line;
+  int column;
   int position;
-
   std::string fileContent;
+
+  std::string getLine();
   
   bool isDigit(char c);
   bool isOperator(char c);

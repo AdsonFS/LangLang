@@ -1,7 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
-#include "../dependencies/dependencies.h"
+#include "../core/core.h"
 #include "../symbols/symbol.h"
 #include "../tokens/token.h"
 #include <map>

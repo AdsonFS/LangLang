@@ -1,3 +1,4 @@
+#include "core/core.h"
 #include "lexi/lexi_scanner.h"
 #include "parser/lang_parser.h"
 #include "tokens/token.h"
@@ -7,6 +8,8 @@ void parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   try {
     parser.parser();
+  } catch (LexicalError &e) {
+    std::cout << e.what() << std::endl;
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
   }
@@ -22,7 +25,6 @@ void tokens(LexiScanner &scanner) {
 }
 
 int main(int argc, char **argv) {
-  std::cout << "********** Running **********" << std::endl;
   std::string filename;
   if (argc > 1)
     filename = argv[1];

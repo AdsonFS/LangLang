@@ -1,7 +1,7 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-#include "../dependencies/dependencies.h"
+#include "../core/core.h"
 #include <string>
 #include <unordered_map>
 

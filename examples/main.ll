@@ -1,3 +1,4 @@
+
 STRING name = "Adson";
 >> "Hello," >> name;
 
@@ -7,7 +8,7 @@ IF ((name < "ZZZ") && 1 < 2) {
   >> "IF: " >> name;
 }
 
-FUNC func1 {
+FUNC3 func1 {
   NUMBER age = 12 + 8;
 
   FUNC func2 {
