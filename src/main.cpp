@@ -9,10 +9,10 @@ int parser(LexiScanner &scanner, Token &token) {
   try {
     parser.parser();
   } catch (LexicalError &e) {
-    std::cout << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
     return 1;
   } catch (std::runtime_error &e) {
-    std::cout << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
     return 1;
   }
   return 0;
