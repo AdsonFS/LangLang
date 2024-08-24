@@ -1,6 +1,5 @@
 #include "../lexi/lexi_scanner.h"
 #include "../core/core.h"
-#include <iostream>
 #include <string>
 
 LexiScanner::LexiScanner(std::string fileContent) {
@@ -31,17 +30,10 @@ Token LexiScanner::getNextToken() {
     case 0:
       if (this->isEOF() && this->isWhitespace(currentChar))
         return Token(TokenType::TK_EOF, "EOF");
-      else if (currentChar == '/' && this->peekChar() == '*') {
-          currentChar = this->nextChar();
-          while(this->peekChar() != '\0') {
+      else if (currentChar == '<' && this->peekChar() == '>') {
+          while(currentChar != '\0' &&  currentChar != '\n') 
             currentChar = this->nextChar();
-            if (currentChar == '*' && this->peekChar() == '/') {
-              this->nextChar();
-              return Token(TokenType::TK_COMMENT, "");
-            }
-          }
-          throw LexicalError(this->getLine(), this->line, this->column, "Comment not closed");
-
+         return Token(TokenType::TK_COMMENT, ""); 
       } 
       else if (this->isWhitespace(currentChar))
         continue;

@@ -1,11 +1,9 @@
-/* comments
-  This is a test file
-  for the interpreter
-*/
+<> This is a comment
+<> This is another comment
+
 STRING name = "Adson";
 >> "Hello," >> name;
 
-/* This is a comment */
 IF ((name < "ZZZ") && 1 < 2) {
   >> "True";
   STRING name = "<empty>";
