@@ -1,5 +1,6 @@
 #include "../lexi/lexi_scanner.h"
 #include "../core/core.h"
+#include <iostream>
 #include <string>
 
 LexiScanner::LexiScanner(std::string fileContent) {
@@ -12,8 +13,14 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->line = 1 + (fileContent[0] == '\n');
   this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF", "WHILE"};
 }
-
 Token LexiScanner::nextToken() {
+  Token token = this->getNextToken();
+  while (token.getType() == TokenType::TK_COMMENT)
+    token = this->getNextToken();
+  return token;
+}
+
+Token LexiScanner::getNextToken() {
   int state = 0;
   char currentChar;
   std::string tokenValue = "";
@@ -24,6 +31,18 @@ Token LexiScanner::nextToken() {
     case 0:
       if (this->isEOF() && this->isWhitespace(currentChar))
         return Token(TokenType::TK_EOF, "EOF");
+      else if (currentChar == '/' && this->peekChar() == '*') {
+          currentChar = this->nextChar();
+          while(this->peekChar() != '\0') {
+            currentChar = this->nextChar();
+            if (currentChar == '*' && this->peekChar() == '/') {
+              this->nextChar();
+              return Token(TokenType::TK_COMMENT, "");
+            }
+          }
+          throw LexicalError(this->getLine(), this->line, this->column, "Comment not closed");
+
+      } 
       else if (this->isWhitespace(currentChar))
         continue;
       else if (this->isOperator(currentChar))

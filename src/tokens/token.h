@@ -20,6 +20,7 @@ enum TokenType {
   /*TK_WHITESPACE,*/
   TK_SEMICOLON,
   TK_UNKNOWN,
+  TK_COMMENT,
   TK_EOF
 };
 

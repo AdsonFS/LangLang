@@ -1,7 +1,11 @@
-
+/* comments
+  This is a test file
+  for the interpreter
+*/
 STRING name = "Adson";
 >> "Hello," >> name;
 
+/* This is a comment */
 IF ((name < "ZZZ") && 1 < 2) {
   >> "True";
   STRING name = "<empty>";
@@ -29,4 +33,4 @@ FUNC func2{
 }
 func2();
 func1();
->> name;
+>>name;

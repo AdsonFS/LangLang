@@ -17,6 +17,7 @@ private:
   int position;
   std::string fileContent;
 
+  Token getNextToken();
   std::string getLine();
   
   bool isDigit(char c);

@@ -21,11 +21,15 @@ private:
   std::string message;
 
 public:
-  explicit LexicalError(const std::string &token, int line, int column) {
+  explicit LexicalError(const std::string &token, int line, int column,
+                        std::string error = "Unknown symbol") {
     std::ostringstream oss;
-    oss << this->grey << "Lexical Error: " << this->red << "Unknown Symbol "
-        << this->reset << "on line " << line << ":" << column << std::endl
-        << std::setw(4) << line << " | " << token << std::endl << std::setw(4) << "" << " | " << std::string(column-1, ' ') << this->red << "^" << this->reset;
+    oss << this->grey << "Lexical Error: " << this->red << error
+        << " " << this->reset << "on line " << line << ":" << column
+        << std::endl
+        << std::setw(4) << line << " | " << token << std::endl
+        << std::setw(4) << "" << " | " << std::string(std::max(0, column - 1), ' ')
+        << this->red << "^" << this->reset;
     message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
