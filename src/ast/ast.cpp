@@ -5,6 +5,54 @@
 #include <variant>
 
 ScopedSymbolTable *AST::scope;
+
+/////////// ASTVisitor
+ASTValue AST::accept(ASTVisitor &visitor) { throw std::runtime_error("Error: AST::accept() not implemented"); }
+ASTValue StatementListAST::accept(ASTVisitor &visitor) {
+  return visitor.visitStatementList(this);
+}
+ASTValue WhileStatementAST::accept(ASTVisitor &visitor) {
+  return visitor.visitWhileStatement(this);
+}
+ASTValue IfStatementAST::accept(ASTVisitor &visitor) {
+  return visitor.visitIfStatement(this);
+}
+ASTValue FunctionAST::accept(ASTVisitor &visitor) {
+  return visitor.visitFunction(this);
+}
+ASTValue OutputStreamAST::accept(ASTVisitor &visitor) {
+  return visitor.visitOutputStream(this);
+}
+ASTValue InputStreamAST::accept(ASTVisitor &visitor) {
+  return visitor.visitInputStream(this);
+}
+ASTValue VariableDeclarationAST::accept(ASTVisitor &visitor) {
+  return visitor.visitVariableDeclaration(this);
+}
+ASTValue AssignmentVariableAST::accept(ASTVisitor &visitor) {
+  return visitor.visitAssignmentVariable(this);
+}
+ASTValue BinaryOperatorAST::accept(ASTVisitor &visitor) {
+  return visitor.visitBinaryOperatorExpr(this);
+}
+ASTValue UnaryOperatorAST::accept(ASTVisitor &visitor) {
+  return visitor.visitUnaryOperatorExpr(this);
+}
+ASTValue IdentifierAST::accept(ASTVisitor &visitor) {
+  return visitor.visitIdentifier(this);
+}
+ASTValue NumberAST::accept(ASTVisitor &visitor) {
+  return visitor.visitNumberExpr(this);
+}
+ASTValue StringAST::accept(ASTVisitor &visitor) {
+  return visitor.visitStringExpr(this);
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
 /////////// AST
 ASTValue AST::solve() {
   throw std::runtime_error("Error: AST::solve() not implemented");
@@ -36,7 +84,6 @@ ASTValue IfStatementAST::solve() {
   }
   return 0;
 }
-
 
 ASTValue WhileStatementAST::solve() {
 
@@ -154,23 +201,23 @@ ASTValue BinaryOperatorAST::solve() {
 
   // logical operators
   case '&':
-    if(this->op.getValue() == "&&")
-        return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
+    if (this->op.getValue() == "&&")
+      return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
   case '|':
-    if(this->op.getValue() == "||")
-        return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
+    if (this->op.getValue() == "||")
+      return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
   case '<':
 
     /*if (this->isParenthesized)*/
-      return leftValue < rightValue;
+    return leftValue < rightValue;
     /*return leftValue < rightValue ? rightValue : 0;*/
   case '>':
     /*if (this->isParenthesized)*/
-      return leftValue > rightValue;
+    return leftValue > rightValue;
     /*return leftValue > rightValue ? rightValue : 0;*/
     ;
   default:
