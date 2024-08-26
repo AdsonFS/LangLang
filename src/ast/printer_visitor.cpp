@@ -1,14 +1,14 @@
-#include "ast_printer.h"
+#include "printer_visitor.h"
 
-int ASTPrinter::indent = 0;
+int PrinterVisitor::indent = 0;
 
-void ASTPrinter::printIndent(int indent) {
+void PrinterVisitor::printIndent(int indent) {
   for (int i = 0; i < indent; i++)
     std::cout << "\t";
   std::cout << "-> ";
 }
 
-ASTValue ASTPrinter::visitStatementList(StatementListAST *expr) {
+ASTValue PrinterVisitor::visitStatementList(StatementListAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<StatementListAST>\n";
   for (auto &statement : expr->statements)
@@ -17,7 +17,7 @@ ASTValue ASTPrinter::visitStatementList(StatementListAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitWhileStatement(WhileStatementAST *expr) {
+ASTValue PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<WhileStatementAST>\n";
   this->printIndent(this->indent++);
@@ -29,7 +29,7 @@ ASTValue ASTPrinter::visitWhileStatement(WhileStatementAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitIfStatement(IfStatementAST *expr) {
+ASTValue PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<IfStatementAST>\n";
   this->printIndent(this->indent++);
@@ -41,7 +41,7 @@ ASTValue ASTPrinter::visitIfStatement(IfStatementAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitFunction(FunctionAST *expr) {
+ASTValue PrinterVisitor::visitFunction(FunctionAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<FunctionAST:" << expr->identifier.getValue() << ">\n";
   expr->statements->accept(*this);
@@ -49,7 +49,7 @@ ASTValue ASTPrinter::visitFunction(FunctionAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitOutputStream(OutputStreamAST *expr) {
+ASTValue PrinterVisitor::visitOutputStream(OutputStreamAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<OutputStreamAST>\n";
   for (auto &output : expr->outputs)
@@ -58,7 +58,7 @@ ASTValue ASTPrinter::visitOutputStream(OutputStreamAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitInputStream(InputStreamAST *expr) {
+ASTValue PrinterVisitor::visitInputStream(InputStreamAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<InputStreamAST>\n";
   for (auto &identifier : expr->identifiers) {
@@ -69,7 +69,7 @@ ASTValue ASTPrinter::visitInputStream(InputStreamAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitVariableDeclaration(VariableDeclarationAST *expr) {
+ASTValue PrinterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<VariableDeclarationAST:" << expr->identifier.getValue()
             << ">\n";
@@ -78,7 +78,7 @@ ASTValue ASTPrinter::visitVariableDeclaration(VariableDeclarationAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitAssignmentVariable(AssignmentVariableAST *expr) {
+ASTValue PrinterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<AssignmentVariableAST:" << expr->identifier.getValue()
             << ">\n";
@@ -87,7 +87,7 @@ ASTValue ASTPrinter::visitAssignmentVariable(AssignmentVariableAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
+ASTValue PrinterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<BinaryOperatorAST:" << expr->op.getValue() << ">\n";
   expr->left->accept(*this);
@@ -96,7 +96,7 @@ ASTValue ASTPrinter::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
+ASTValue PrinterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<UnaryOperatorAST:" << expr->op.getValue() << ">\n";
   expr->child->accept(*this);
@@ -104,19 +104,19 @@ ASTValue ASTPrinter::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   return 0;
 }
 
-ASTValue ASTPrinter::visitIdentifier(IdentifierAST *expr) {
+ASTValue PrinterVisitor::visitIdentifier(IdentifierAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<IdentifierAST:" << expr->token.getValue() << ">\n";
   return 0;
 }
 
-ASTValue ASTPrinter::visitNumberExpr(NumberAST *expr) {
+ASTValue PrinterVisitor::visitNumberExpr(NumberAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<NumberAST:" << expr->token.getValue() << ">\n";
   return 0;
 }
 
-ASTValue ASTPrinter::visitStringExpr(StringAST *expr) {
+ASTValue PrinterVisitor::visitStringExpr(StringAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<StringAST:" << expr->token.getValue() << ">\n";
   return 0;
