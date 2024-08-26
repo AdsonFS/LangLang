@@ -1,11 +1,11 @@
-#ifndef AST_PRINTER_H
-#define AST_PRINTER_H
+#ifndef PRINTER_VISITOR_H
+#define PRINTER_VISITOR_H
 
 #include "ast.h"
 #include "visitor.h"
 #include <iostream>
 
-class ASTPrinter : public ASTVisitor {
+class PrinterVisitor: public ASTVisitor {
 public:
   static int indent;
 private:
@@ -37,5 +37,5 @@ private:
 
   ASTValue visitStringExpr(StringAST *expr) override; 
 };
-#endif // !AST_PRINTER_H
-#define AST_PRINTER_H
+
+#endif // PRINTER_VISITOR_H

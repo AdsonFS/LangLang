@@ -1,5 +1,4 @@
 #include "lang_parser.h"
-#include "../ast/ast_printer.h"
 
 LangParser::LangParser(LexiScanner &_scanner, Token &_token)
     : scanner(_scanner), token(_token) {}
