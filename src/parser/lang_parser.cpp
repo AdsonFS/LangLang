@@ -1,12 +1,14 @@
 #include "lang_parser.h"
+#include "../ast/ast_printer.h"
 
 LangParser::LangParser(LexiScanner &_scanner, Token &_token)
     : scanner(_scanner), token(_token) {}
 
-void LangParser::parser() {
+AST* LangParser::parser() {
   this->token = this->scanner.nextToken();
-  this->statementList()->solve();
+  AST* ast = this->statementList();
   this->eof();
+  return ast;
 }
 
 Token LangParser::consume(Token expectedToken) {

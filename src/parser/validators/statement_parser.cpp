@@ -55,7 +55,7 @@ AST *LangParser::statement() {
       this->consume(Token(TK_SEMICOLON, ""));
     return node;
   default:
-    throw std::runtime_error("Syntax error: expected OUTPUTSTREAM.");
+    throw std::runtime_error("Syntax error: found " + token.getValue());
   }
 }
 

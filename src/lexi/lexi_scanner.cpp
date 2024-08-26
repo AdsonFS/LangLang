@@ -37,6 +37,13 @@ Token LexiScanner::getNextToken() {
       } 
       else if (this->isWhitespace(currentChar))
         continue;
+      else if (currentChar == '>' && this->peekChar() == '>') {
+        this->nextChar();
+        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
+      } else if (currentChar == '<' && this->peekChar() == '<') {
+        this->nextChar();
+        return Token(TokenType::TK_INPUTSTREAM, "<<");
+      } 
       else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
@@ -63,12 +70,6 @@ Token LexiScanner::getNextToken() {
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
-      } else if (currentChar == '>' && this->peekChar() == '>') {
-        this->nextChar();
-        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
-      } else if (currentChar == '<' && this->peekChar() == '<') {
-        this->nextChar();
-        return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else
         throw LexicalError(this->getLine(), this->line, this->column);
       break;
