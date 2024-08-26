@@ -1,3 +1,5 @@
+#include "ast/interpreter_visitor.h"
+#include "ast/printer_visitor.h"
 #include "core/core.h"
 #include "lexi/lexi_scanner.h"
 #include "parser/lang_parser.h"
@@ -7,7 +9,12 @@
 int parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   try {
-    parser.parser();
+    AST* ast = parser.parser();
+    PrinterVisitor printer;
+    ast->accept(printer);
+
+    InterpreterVisitor interpreter;
+    ast->accept(interpreter);
   } catch (LexicalError &e) {
     std::cout << e.what() << std::endl;
     return 1;

@@ -5,7 +5,7 @@ AST *LangParser::expression(bool isParenthesized) {
   while (this->isLogicalOperator()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
-    node = new BinaryOperatorAST(node, this->logicalExpression(), opToken, isParenthesized);
+    node = new BinaryOperatorAST(node, this->logicalExpression(), opToken);
   }
   return node;
 }
@@ -15,7 +15,7 @@ AST *LangParser::logicalExpression(bool isParenthesized) {
   while (this->isComparator()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
-    node = new BinaryOperatorAST(node, this->clause(), opToken, isParenthesized);
+    node = new BinaryOperatorAST(node, this->clause(), opToken);
   }
   return node;
 }

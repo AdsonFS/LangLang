@@ -1,8 +1,15 @@
 <> This is a comment
 <> This is another comment
 
-STRING name = "Adson";
+STRING name = "Adson" + " " + "Santos";
+<< name ;
 >> "Hello," >> name;
+
+NUMBER cnt = 10;
+WHILE (cnt > 0) {
+  >> cnt;
+  cnt = cnt - 2;
+}
 
 IF ((name < "ZZZ") && 1 < 2) {
   >> "True";
@@ -10,7 +17,7 @@ IF ((name < "ZZZ") && 1 < 2) {
   >> "IF: " >> name;
 }
 
-FUNC3 func1 {
+FUNC func1 {
   NUMBER age = 12 + 8;
 
   FUNC func2 {
