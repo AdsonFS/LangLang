@@ -31,20 +31,26 @@ Token LexiScanner::getNextToken() {
       if (this->isEOF() && this->isWhitespace(currentChar))
         return Token(TokenType::TK_EOF, "EOF");
       else if (currentChar == '<' && this->peekChar() == '>') {
-          while(currentChar != '\0' &&  currentChar != '\n') 
-            currentChar = this->nextChar();
-         return Token(TokenType::TK_COMMENT, ""); 
-      } 
-      else if (this->isWhitespace(currentChar))
+        while (currentChar != '\0' && currentChar != '\n')
+          currentChar = this->nextChar();
+        return Token(TokenType::TK_COMMENT, "");
+      } else if (this->isWhitespace(currentChar))
         continue;
+      else if (currentChar == '=' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "==");
+      } else if (currentChar == '!' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "!=");
+      }
+
       else if (currentChar == '>' && this->peekChar() == '>') {
         this->nextChar();
         return Token(TokenType::TK_OUTPUTSTREAM, ">>");
       } else if (currentChar == '<' && this->peekChar() == '<') {
         this->nextChar();
         return Token(TokenType::TK_INPUTSTREAM, "<<");
-      } 
-      else if (this->isOperator(currentChar))
+      } else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");

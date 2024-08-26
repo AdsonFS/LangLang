@@ -19,8 +19,9 @@ public:
   AST *whileStatement();
   AST *statementFunction();
   AST *variableDeclaration();
-  AST *expression(bool isParenthesized = false);
-  AST *logicalExpression(bool isParenthesized = false); 
+  AST *expression();
+  AST *equalityExpression();
+  AST *logicalExpression(); 
 
 private:
   LexiScanner &scanner;
@@ -35,6 +36,7 @@ private:
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
   bool isLogicalOperator();
+  bool isEqualityOperator();
 
   AST *term();
   AST *clause();

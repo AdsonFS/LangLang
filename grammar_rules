@@ -23,7 +23,8 @@ input_stream          : << identifier inputStream*
 
 assignment            : identifier = expression
 
-expression            : logical_expression ((<|>) logical_expression)*
+expression            : equality_expression (( == | != ) equality_expression)*
+equality_expression   : logical_expression ((<|>) logical_expression)*
 logical_expression    : clause ((<|>) clause)*
 clause                : term ( PLUS|MINUS ) term
 term                  : factor ((DIV|MULT|MOD) factor)*

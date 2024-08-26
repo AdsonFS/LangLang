@@ -33,6 +33,10 @@ void LangParser::eof() {
     throw std::runtime_error("Syntax error: expected EOF");
 }
 
+bool LangParser::isEqualityOperator() {
+  return this->token.getType() == TokenType::TK_EQUALITY_OPERATOR;
+} 
+
 bool LangParser::isLogicalOperator() {
   return this->token.getType() == TokenType::TK_LOGICAL_OPERATOR;
 }

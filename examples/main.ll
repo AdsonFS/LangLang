@@ -1,6 +1,10 @@
 <> This is a comment
 <> This is another comment
 
+IF (1 == 2 > 1) {
+  >> "True";
+}
+
 STRING name = "Adson" + " " + "Santos";
 << name ;
 >> "Hello," >> name;

@@ -129,7 +129,11 @@ ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
     return leftValue < rightValue;
   case '>':
     return leftValue > rightValue;
-    ;
+  case '=':
+    if(expr->op.getValue() == "==")
+      return leftValue == rightValue;
+    return leftValue != rightValue;
+
   default:
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
