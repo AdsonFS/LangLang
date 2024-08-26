@@ -1,7 +1,7 @@
 <> This is a comment
 <> This is another comment
 
-IF (1 == 2 > 1) {
+IF (2 != 2 > 1) {
   >> "True";
 }
 

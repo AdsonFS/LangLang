@@ -99,6 +99,16 @@ ASTValue InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr
 ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   ASTValue leftValue = expr->left->accept(*this);
   ASTValue rightValue = expr->right->accept(*this);
+  if(expr->op.getType() == TK_EQUALITY_OPERATOR) {
+    if(expr->op.getValue() == "==")
+      return leftValue == rightValue;
+    if(expr->op.getValue() == "!=")
+      return leftValue != rightValue;
+    throw std::runtime_error(
+        "Error: BinaryOperatorAST::solve() invalid operator");
+  }
+
+
   switch (expr->op.getValue()[0]) {
   case '+':
     if (std::holds_alternative<std::string>(leftValue))
@@ -129,11 +139,6 @@ ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
     return leftValue < rightValue;
   case '>':
     return leftValue > rightValue;
-  case '=':
-    if(expr->op.getValue() == "==")
-      return leftValue == rightValue;
-    return leftValue != rightValue;
-
   default:
     throw std::runtime_error(
         "Error: BinaryOperatorAST::solve() invalid operator");
