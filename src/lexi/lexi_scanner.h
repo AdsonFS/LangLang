@@ -11,6 +11,8 @@ public:
   Token nextToken();
 
   std::set<std::string> reservedWords;
+  std::string getLine();
+  std::pair<int, int> getPosition();
 private:
   int line;
   int column;
@@ -18,7 +20,6 @@ private:
   std::string fileContent;
 
   Token getNextToken();
-  std::string getLine();
   
   bool isDigit(char c);
   bool isOperator(char c);

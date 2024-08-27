@@ -1,12 +1,12 @@
 <> This is a comment
 <> This is another comment
 
-IF (2 != 2 > 1) {
+IF (2 && (2 != 2 > 1)) 
+    {
   >> "True";
 }
 
 STRING name = "Adson" + " " + "Santos";
-<< name ;
 >> "Hello," >> name;
 
 NUMBER cnt = 10;

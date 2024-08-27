@@ -4,6 +4,7 @@
 #include "../ast/ast.h"
 #include "../lexi/lexi_scanner.h"
 #include "../tokens/token.h"
+#include "../error/error.h"
 
 class LangParser {
 public:

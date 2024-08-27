@@ -1,5 +1,5 @@
 #include "../lexi/lexi_scanner.h"
-#include "../core/core.h"
+#include "../error/error.h"
 #include <string>
 
 LexiScanner::LexiScanner(std::string fileContent) {
@@ -43,7 +43,6 @@ Token LexiScanner::getNextToken() {
         this->nextChar();
         return Token(TokenType::TK_EQUALITY_OPERATOR, "!=");
       }
-
       else if (currentChar == '>' && this->peekChar() == '>') {
         this->nextChar();
         return Token(TokenType::TK_OUTPUTSTREAM, ">>");
@@ -172,6 +171,10 @@ void LexiScanner::backChar() {
   this->column =
       this->fileContent[this->position - 1] == '\n' ? 0 : this->column - 1;
   this->position--;
+}
+
+std::pair<int, int> LexiScanner::getPosition() {
+  return std::make_pair(this->line, this->column);
 }
 
 std::string LexiScanner::getLine() {
