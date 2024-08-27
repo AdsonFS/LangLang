@@ -33,8 +33,8 @@ public:
 class ScopedSymbolTable {
 public:
   ScopedSymbolTable(std::string scopeName, ScopedSymbolTable *previousScope = nullptr) : scopeName(scopeName), previousScope(previousScope) {
-    this->set(new BuiltInTypeSymbol("NUMBER"));
-    this->set(new BuiltInTypeSymbol("STRING"));
+    this->set(new BuiltInTypeSymbol("number"));
+    this->set(new BuiltInTypeSymbol("string"));
   }
   std::string getName();
   void set(Symbol *symbol);

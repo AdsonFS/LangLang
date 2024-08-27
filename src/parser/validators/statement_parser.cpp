@@ -43,12 +43,12 @@ AST *LangParser::statement() {
           "Syntax error: expected ASSIGNMENT or SEMICOLON");
     }
   case TK_RESERVED_WORD:
-    if (token.getValue() == "IF") 
+    if (token.getValue() == "if") 
       return this->ifStatement();
-    if (token.getValue() == "WHILE")
+    if (token.getValue() == "while")
         return this->whileStatement();
     node = this->variableDeclaration();
-    if (token.getValue() == "FUNC")
+    if (token.getValue() == "func")
       this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
 
     else

@@ -10,7 +10,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->fileContent = fileContent;
   this->position = this->column = 0;
   this->line = 1 + (fileContent[0] == '\n');
-  this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF", "WHILE"};
+  this->reservedWords = {"number", "string", "func", "if", "while"};
 }
 
 void LexiScanner::panicMode() {
@@ -72,8 +72,8 @@ Token LexiScanner::getNextToken() {
                      std::string(1, currentChar) +
                          std::string(1, this->nextChar()));
 
-      else if (this->isUpperLetter(currentChar))
-        state = 4;
+      /*else if (this->isUpperLetter(currentChar))*/
+        /*state = 4;*/
       else if (this->isDigit(currentChar))
         state = 2;
       else if (this->isLowerLetter(currentChar))
@@ -94,8 +94,6 @@ Token LexiScanner::getNextToken() {
         state = 2;
       else if (this->isLowerLetter(currentChar) ||
                this->isUpperLetter(currentChar))
-
-        /*throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
         throw LexicalError(this->getLine(), this->line, this->column);
       else {
         this->backChar();
@@ -107,22 +105,24 @@ Token LexiScanner::getNextToken() {
         state = 3;
       else {
         this->backChar();
+        if (this->reservedWords.find(tokenValue) != this->reservedWords.end())
+          return Token(TokenType::TK_RESERVED_WORD, tokenValue);
         return Token(TokenType::TK_IDENTIFIER, tokenValue);
       }
       break;
-    case 4:
-      if (this->isUpperLetter(currentChar))
-        state = 4;
-      else if (!(currentChar == '(' || this->isWhitespace(currentChar)))
-        throw LexicalError(this->getLine(), this->line, this->column);
-      else if (this->reservedWords.find(tokenValue) !=
-               this->reservedWords.end()) {
-        this->backChar();
-        return Token(TokenType::TK_RESERVED_WORD, tokenValue);
-      } else
-        throw LexicalError(this->getLine(), this->line, this->column);
+    /*case 4:*/
+    /*  if (this->isUpperLetter(currentChar))*/
+    /*    state = 4;*/
+    /*  else if (!(currentChar == '(' || this->isWhitespace(currentChar)))*/
+    /*    throw LexicalError(this->getLine(), this->line, this->column);*/
+    /*  else if (this->reservedWords.find(tokenValue) !=*/
+    /*           this->reservedWords.end()) {*/
+    /*    this->backChar();*/
+    /*    return Token(TokenType::TK_RESERVED_WORD, tokenValue);*/
+    /*  } else*/
+    /*    throw LexicalError(this->getLine(), this->line, this->column);*/
       /*throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
-      break;
+      /*break;*/
     }
     tokenValue.push_back(currentChar);
   }

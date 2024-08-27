@@ -77,13 +77,13 @@ ASTValue InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
 
 ASTValue InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   Token type = expr->type;
-  if (type.getValue() == "NUMBER")
+  if (type.getValue() == "number")
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                   this->scope->getSymbol("NUMBER"),
+                                   this->scope->getSymbol("number"),
                                    expr->value->accept(*this)));
-  else if (type.getValue() == "STRING")
+  else if (type.getValue() == "string")
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                   this->scope->getSymbol("STRING"),
+                                   this->scope->getSymbol("string"),
                                    expr->value->accept(*this)));
   else
     throw std::runtime_error(

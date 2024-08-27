@@ -13,12 +13,12 @@ public:
   void panicMode();
   std::string getLine();
   std::pair<int, int> getPosition();
-  std::set<std::string> reservedWords;
 private:
   int line;
   int column;
   int position;
   std::string fileContent;
+  std::set<std::string> reservedWords;
 
   Token getNextToken();
   

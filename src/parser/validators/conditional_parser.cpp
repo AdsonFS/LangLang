@@ -1,7 +1,7 @@
 #include "../lang_parser.h"
 
 AST *LangParser::ifStatement() {
-  this->consume(Token(TK_RESERVED_WORD, "IF"));
+  this->consume(Token(TK_RESERVED_WORD, "if"));
   this->consume(Token(TK_PARENTHESES, "("));
   AST *conditional = this->expression();
   this->consume(Token(TK_PARENTHESES, ")"));
@@ -13,7 +13,7 @@ AST *LangParser::ifStatement() {
                             dynamic_cast<StatementListAST *>(statementList));
 }
 AST *LangParser::whileStatement() {
-  this->consume(Token(TK_RESERVED_WORD, "WHILE"));
+  this->consume(Token(TK_RESERVED_WORD, "while"));
   this->consume(Token(TK_PARENTHESES, "("));
   AST *conditional = this->expression();
   this->consume(Token(TK_PARENTHESES, ")"));

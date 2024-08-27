@@ -1,43 +1,40 @@
 <> This is a comment
 <> This is another comment
 
-IF (2 && (2 != 2 > 1)) 
+if (2 && (2 != 2 > 1)) 
 {
-  STRIN string = "Hello";
+  string hello = "Hello";
   >> "True";
 }
-FUNC() {
-  > "Hello";
-}
-STRING name = "Adson" + " " + "Santos";
+string name = "Adson" + " " + "Santos";
 >> "Hello," >> name;
 
-NUMBER cnt = 10;
-WHILE (cnt > 0) {
+number cnt = 10;
+while (cnt > 0) {
   >> cnt;
   cnt = cnt - 2;
 }
 
-IF ((name < "ZZZ") && 1 < 2) {
+if ((name < "ZZZ") && 1 < 2) {
   >> "True";
-  STRING name = "<empty>";
+  string name = "<empty>";
   >> "IF: " >> name;
 }
 
-FUNC func1 {
-  NUMBER age = 12 + 8;
+func func1 {
+  number age = 12 + 8;
 
-  FUNC func2 {
-    NUMBER age = 1;
-    STRING name= "ss";
+  func func2 {
+    number age = 1;
+    string name= "ss";
     >> age >> name;
   }
   func2();
   >> "FUNC 1 ->" >>name>> age;
 }
 
-FUNC func2{
-  STRING name = "Santos";
+func func2{
+  string name = "Santos";
   >> (2 + 2) >> name >> ("Hello: " + (name));
   name = "Sr. " + name;
   >> "FUNC2:">>name;
