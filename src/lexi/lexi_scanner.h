@@ -9,10 +9,11 @@ class LexiScanner {
 public:
   LexiScanner(std::string fileContent);
   Token nextToken();
-
-  std::set<std::string> reservedWords;
+  
+  void panicMode();
   std::string getLine();
   std::pair<int, int> getPosition();
+  std::set<std::string> reservedWords;
 private:
   int line;
   int column;

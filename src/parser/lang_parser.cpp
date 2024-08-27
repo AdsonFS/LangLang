@@ -29,7 +29,7 @@ void LangParser::semiColon() {
 
 void LangParser::eof() {
   if (this->scanner.nextToken().getType() != TokenType::TK_EOF)
-    throw SyntaxError(this->scanner.getLine(), this->token.getValue(), this->scanner.getPosition(), "EOF");
+    throw SyntaxError(this->scanner.getLine(), this->token.getValue(), this->scanner.getPosition(), "a statement");
 }
 
 bool LangParser::isEqualityOperator() {

@@ -2,10 +2,13 @@
 <> This is another comment
 
 IF (2 && (2 != 2 > 1)) 
-    {
+{
+  STRIN string = "Hello";
   >> "True";
 }
-
+FUNC() {
+  > "Hello";
+}
 STRING name = "Adson" + " " + "Santos";
 >> "Hello," >> name;
 

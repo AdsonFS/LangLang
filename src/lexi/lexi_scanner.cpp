@@ -12,6 +12,12 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->line = 1 + (fileContent[0] == '\n');
   this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF", "WHILE"};
 }
+
+void LexiScanner::panicMode() {
+  while(!this->isWhitespace(this->nextChar()) && !this->isEOF());
+  while(this->nextToken().getType() != TokenType::TK_SEMICOLON && !this->isEOF()); 
+}
+
 Token LexiScanner::nextToken() {
   Token token = this->getNextToken();
   while (token.getType() == TokenType::TK_COMMENT)

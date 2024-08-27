@@ -9,19 +9,29 @@
 
 int parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
-  try {
-    AST* ast = parser.parser();
+  bool hasErrors = false;
+  AST *ast = nullptr;
+  while (1 < 2) {
+    try {
+      ast = parser.parser();
+    } catch (CoreError &e) {
+      hasErrors = true;
+      std::cout << e.what() << std::endl << std::endl;
+      scanner.panicMode();
+      continue;
+      /*return 1;*/
+    } catch (std::runtime_error &e) {
+      std::cout << e.what() << std::endl;
+      exit(1);
+    }
+    break;
+  }
+  if (!hasErrors) {
     PrinterVisitor printer;
     ast->accept(printer);
 
     InterpreterVisitor interpreter;
     ast->accept(interpreter);
-  } catch (CoreError &e) {
-    std::cout << e.what() << std::endl;
-    return 1;
-  } catch (std::runtime_error &e) {
-    std::cout << e.what() << std::endl;
-    return 1;
   }
   return 0;
 }
