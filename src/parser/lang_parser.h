@@ -20,6 +20,7 @@ public:
   AST *whileStatement();
   AST *statementFunction();
   AST *variableDeclaration();
+  AST *funcDeclaration();
   AST *expression();
   AST *equalityExpression();
   AST *logicalExpression(); 

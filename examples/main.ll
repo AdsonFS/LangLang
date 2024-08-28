@@ -7,9 +7,10 @@ if (2 && (2 != 2 > 1))
   >> "True";
 }
 var name -> string  := "Adson" + " " + "Santos";
+<< name << age;
 >> "Hello," >> name;
 
-var cnt -> number  := 10;
+var cnt -> number := 10;
 while (cnt > 0) {
   >> cnt;
   cnt := cnt - 2;
@@ -21,10 +22,10 @@ if ((name < "ZZZ") && 1 < 2) {
   >> "IF: " >> name;
 }
 
-var func1 -> () := {
+func func1 () -> {
   var age -> number  := 12 + 8;
 
-  var func2 -> ():=  {
+  func func2 () ->  {
     var age -> number  := 1;
     var name -> string := "ss";
     >> age >> name;
@@ -33,7 +34,7 @@ var func1 -> () := {
   >> "FUNC 1 ->" >>name>> age;
 }
 
-var func2 ->  ():= {
+func func2 () ->{
   var name -> string  := "Santos";
   >> (2 + 2) >> name >> ("Hello: " + (name));
   name := "Sr. " + name;
