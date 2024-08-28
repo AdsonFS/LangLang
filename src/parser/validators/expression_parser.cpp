@@ -81,10 +81,11 @@ AST *LangParser::factor() {
     AST *node = this->expression();
     if (this->token.getType() != TK_PARENTHESES ||
         this->token.getValue() != ")")
-      throw std::runtime_error("Expected ')' but got: " +
-                               this->token.getValue());
+      throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
+                        this->scanner.getPosition(), ")");
     this->token = this->scanner.nextToken();
     return node;
   }
-  throw std::runtime_error("Invalid expression");
+  throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
+                    this->scanner.getPosition(), "a factor");
 }

@@ -12,7 +12,8 @@ statement             : variable_declaration SEMICOLON
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
 if_statement          : 'if' '(' expression ')' '{' statement_list '}'
 
-variable_declaration  : 'var' identifier '->' ('string' | 'number') := (expression | '(' ')' '{' statement_list '}'
+variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
+func_declaration      : 'func' identifier '(' ')' ->  '{' statement_list '}'
 
 output_stream         : >> output output_stream*
 output                : expression 
