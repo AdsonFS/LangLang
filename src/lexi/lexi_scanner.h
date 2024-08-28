@@ -26,7 +26,6 @@ private:
   bool isOperator(char c);
   bool isSemicolon(char c);
   bool isWhitespace(char c);
-  bool isAssignment(char c);
   bool isParentheses(char c);
   bool isCmpOperator(char c);
   bool isUpperLetter(char c);

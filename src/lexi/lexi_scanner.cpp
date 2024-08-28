@@ -10,7 +10,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->fileContent = fileContent;
   this->position = this->column = 0;
   this->line = 1 + (fileContent[0] == '\n');
-  this->reservedWords = {"number", "string", "func", "if", "while"};
+  this->reservedWords = {"var", "func", "number", "string", "func", "if", "while"};
 }
 
 void LexiScanner::panicMode() {
@@ -42,6 +42,14 @@ Token LexiScanner::getNextToken() {
         return Token(TokenType::TK_COMMENT, "");
       } else if (this->isWhitespace(currentChar))
         continue;
+      else if (currentChar == '-' && this->peekChar() == '>') {
+        this->nextChar();
+        return Token(TokenType::TK_ARROW, "->");
+      }
+      else if (currentChar == ':' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_ASSIGNMENT, ":=");
+      }
       else if (currentChar == '=' && this->peekChar() == '=') {
         this->nextChar();
         return Token(TokenType::TK_EQUALITY_OPERATOR, "==");
@@ -61,8 +69,6 @@ Token LexiScanner::getNextToken() {
         return Token(TokenType::TK_SEMICOLON, ";");
       else if (this->isParentheses(currentChar))
         return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
-      else if (this->isAssignment(currentChar))
-        return Token(TokenType::TK_ASSIGNMENT, "=");
       else if (this->isCurlyBraces(currentChar))
         return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar));
       else if (this->isCmpOperator(currentChar) && this->peekChar() != '>')
@@ -152,7 +158,6 @@ bool LexiScanner::isLogicalOperator(char c1, char c2) {
 }
 
 bool LexiScanner::isCurlyBraces(char c) { return c == '{' || c == '}'; }
-bool LexiScanner::isAssignment(char c) { return c == '='; }
 bool LexiScanner::isEOF() { return this->position >= this->fileContent.size(); }
 
 char LexiScanner::nextChar() {

@@ -3,40 +3,40 @@
 
 if (2 && (2 != 2 > 1)) 
 {
-  string hello = "Hello";
+  var hello -> string  := "Hello";
   >> "True";
 }
-string name = "Adson" + " " + "Santos";
+var name -> string  := "Adson" + " " + "Santos";
 >> "Hello," >> name;
 
-number cnt = 10;
+var cnt -> number  := 10;
 while (cnt > 0) {
   >> cnt;
-  cnt = cnt - 2;
+  cnt := cnt - 2;
 }
 
 if ((name < "ZZZ") && 1 < 2) {
   >> "True";
-  string name = "<empty>";
+  var name -> string  := "<empty>";
   >> "IF: " >> name;
 }
 
-func func1 {
-  number age = 12 + 8;
+var func1 -> () := {
+  var age -> number  := 12 + 8;
 
-  func func2 {
-    number age = 1;
-    string name= "ss";
+  var func2 -> ():=  {
+    var age -> number  := 1;
+    var name -> string := "ss";
     >> age >> name;
   }
   func2();
   >> "FUNC 1 ->" >>name>> age;
 }
 
-func func2{
-  string name = "Santos";
+var func2 ->  ():= {
+  var name -> string  := "Santos";
   >> (2 + 2) >> name >> ("Hello: " + (name));
-  name = "Sr. " + name;
+  name := "Sr. " + name;
   >> "FUNC2:">>name;
   func1();
 }
