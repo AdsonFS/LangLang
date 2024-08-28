@@ -1,4 +1,5 @@
 #include "../lexi/lexi_scanner.h"
+#include "../error/error.h"
 #include <string>
 
 LexiScanner::LexiScanner(std::string fileContent) {
@@ -7,11 +8,24 @@ LexiScanner::LexiScanner(std::string fileContent) {
     fileContent.push_back(10);
 
   this->fileContent = fileContent;
-  this->position = 0;
-  this->reservedWords = {"NUMBER", "STRING", "FUNC", "IF", "WHILE"};
+  this->position = this->column = 0;
+  this->line = 1 + (fileContent[0] == '\n');
+  this->reservedWords = {"var", "func", "number", "string", "func", "if", "while"};
+}
+
+void LexiScanner::panicMode() {
+  while(!this->isWhitespace(this->nextChar()) && !this->isEOF());
+  while(this->nextToken().getType() != TokenType::TK_SEMICOLON && !this->isEOF()); 
 }
 
 Token LexiScanner::nextToken() {
+  Token token = this->getNextToken();
+  while (token.getType() == TokenType::TK_COMMENT)
+    token = this->getNextToken();
+  return token;
+}
+
+Token LexiScanner::getNextToken() {
   int state = 0;
   char currentChar;
   std::string tokenValue = "";
@@ -22,16 +36,39 @@ Token LexiScanner::nextToken() {
     case 0:
       if (this->isEOF() && this->isWhitespace(currentChar))
         return Token(TokenType::TK_EOF, "EOF");
-      else if (this->isWhitespace(currentChar))
+      else if (currentChar == '<' && this->peekChar() == '>') {
+        while (currentChar != '\0' && currentChar != '\n')
+          currentChar = this->nextChar();
+        return Token(TokenType::TK_COMMENT, "");
+      } else if (this->isWhitespace(currentChar))
         continue;
-      else if (this->isOperator(currentChar))
+      else if (currentChar == '-' && this->peekChar() == '>') {
+        this->nextChar();
+        return Token(TokenType::TK_ARROW, "->");
+      }
+      else if (currentChar == ':' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_ASSIGNMENT, ":=");
+      }
+      else if (currentChar == '=' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "==");
+      } else if (currentChar == '!' && this->peekChar() == '=') {
+        this->nextChar();
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "!=");
+      }
+      else if (currentChar == '>' && this->peekChar() == '>') {
+        this->nextChar();
+        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
+      } else if (currentChar == '<' && this->peekChar() == '<') {
+        this->nextChar();
+        return Token(TokenType::TK_INPUTSTREAM, "<<");
+      } else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");
       else if (this->isParentheses(currentChar))
         return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
-      else if (this->isAssignment(currentChar))
-        return Token(TokenType::TK_ASSIGNMENT, "=");
       else if (this->isCurlyBraces(currentChar))
         return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar));
       else if (this->isCmpOperator(currentChar) && this->peekChar() != '>')
@@ -41,8 +78,8 @@ Token LexiScanner::nextToken() {
                      std::string(1, currentChar) +
                          std::string(1, this->nextChar()));
 
-      else if (this->isUpperLetter(currentChar))
-        state = 4;
+      /*else if (this->isUpperLetter(currentChar))*/
+        /*state = 4;*/
       else if (this->isDigit(currentChar))
         state = 2;
       else if (this->isLowerLetter(currentChar))
@@ -50,14 +87,8 @@ Token LexiScanner::nextToken() {
       else if (this->isDoubleQuotes(currentChar)) {
         state = 1;
         continue;
-      } else if (currentChar == '>' && this->peekChar() == '>') {
-        this->nextChar();
-        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
-      } else if (currentChar == '<' && this->peekChar() == '<') {
-        this->nextChar();
-        return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+        throw LexicalError(this->getLine(), this->line, this->column);
       break;
     case 1:
       if (this->isDoubleQuotes(currentChar)) {
@@ -69,7 +100,7 @@ Token LexiScanner::nextToken() {
         state = 2;
       else if (this->isLowerLetter(currentChar) ||
                this->isUpperLetter(currentChar))
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
+        throw LexicalError(this->getLine(), this->line, this->column);
       else {
         this->backChar();
         return Token(TokenType::TK_NUMBER, tokenValue);
@@ -80,19 +111,24 @@ Token LexiScanner::nextToken() {
         state = 3;
       else {
         this->backChar();
+        if (this->reservedWords.find(tokenValue) != this->reservedWords.end())
+          return Token(TokenType::TK_RESERVED_WORD, tokenValue);
         return Token(TokenType::TK_IDENTIFIER, tokenValue);
       }
       break;
-    case 4:
-      if (this->isUpperLetter(currentChar))
-        state = 4;
-      else if (this->reservedWords.find(tokenValue) !=
-               this->reservedWords.end()) {
-        this->backChar();
-        return Token(TokenType::TK_RESERVED_WORD, tokenValue);
-      } else
-        throw std::runtime_error("Unknown Symbol: " + tokenValue);
-      break;
+    /*case 4:*/
+    /*  if (this->isUpperLetter(currentChar))*/
+    /*    state = 4;*/
+    /*  else if (!(currentChar == '(' || this->isWhitespace(currentChar)))*/
+    /*    throw LexicalError(this->getLine(), this->line, this->column);*/
+    /*  else if (this->reservedWords.find(tokenValue) !=*/
+    /*           this->reservedWords.end()) {*/
+    /*    this->backChar();*/
+    /*    return Token(TokenType::TK_RESERVED_WORD, tokenValue);*/
+    /*  } else*/
+    /*    throw LexicalError(this->getLine(), this->line, this->column);*/
+      /*throw std::runtime_error("Unknown Symbol: " + tokenValue);*/
+      /*break;*/
     }
     tokenValue.push_back(currentChar);
   }
@@ -122,12 +158,14 @@ bool LexiScanner::isLogicalOperator(char c1, char c2) {
 }
 
 bool LexiScanner::isCurlyBraces(char c) { return c == '{' || c == '}'; }
-bool LexiScanner::isAssignment(char c) { return c == '='; }
 bool LexiScanner::isEOF() { return this->position >= this->fileContent.size(); }
 
 char LexiScanner::nextChar() {
   if (this->position >= this->fileContent.size())
     return '\0';
+  this->column =
+      this->fileContent[this->position] == '\n' ? 0 : this->column + 1;
+  this->line += this->fileContent[this->position + 1] == '\n';
   return this->fileContent[this->position++];
 }
 char LexiScanner::peekChar() {
@@ -138,6 +176,25 @@ char LexiScanner::peekChar() {
 bool LexiScanner::isParentheses(char c) { return c == '(' || c == ')'; }
 bool LexiScanner::isDoubleQuotes(char c) { return c == '"'; }
 void LexiScanner::backChar() {
-  if (!this->isEOF())
-    this->position--;
+  if (this->isEOF())
+    return;
+  this->line -= this->fileContent[this->position] == '\n';
+  this->column =
+      this->fileContent[this->position - 1] == '\n' ? 0 : this->column - 1;
+  this->position--;
+}
+
+std::pair<int, int> LexiScanner::getPosition() {
+  return std::make_pair(this->line, this->column);
+}
+
+std::string LexiScanner::getLine() {
+  int start, end;
+  start = end = this->position;
+  while (start > 0 && this->fileContent[start - 1] != '\n')
+    --start;
+  while (this->fileContent[end + 1] != '\0' &&
+         this->fileContent[end + 1] != '\n')
+    ++end;
+  return this->fileContent.substr(start, end - start + 1).c_str();
 }

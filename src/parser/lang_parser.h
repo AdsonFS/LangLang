@@ -4,11 +4,12 @@
 #include "../ast/ast.h"
 #include "../lexi/lexi_scanner.h"
 #include "../tokens/token.h"
+#include "../error/error.h"
 
 class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
-  void parser();
+  AST* parser();
   AST *statement();
   AST *assignment();
   AST *inputStream();
@@ -19,8 +20,9 @@ public:
   AST *whileStatement();
   AST *statementFunction();
   AST *variableDeclaration();
-  AST *expression(bool isParenthesized = false);
-  AST *logicalExpression(bool isParenthesized = false); 
+  AST *expression();
+  AST *equalityExpression();
+  AST *logicalExpression(); 
 
 private:
   LexiScanner &scanner;
@@ -35,6 +37,7 @@ private:
   bool isPlusOrMinus();
   bool isMultOrDivOrMod();
   bool isLogicalOperator();
+  bool isEqualityOperator();
 
   AST *term();
   AST *clause();

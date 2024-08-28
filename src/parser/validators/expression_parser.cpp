@@ -1,21 +1,31 @@
 #include "../lang_parser.h"
 
-AST *LangParser::expression(bool isParenthesized) {
-  AST *node = this->logicalExpression();
-  while (this->isLogicalOperator()) {
+AST *LangParser::expression() {
+  AST *node = this->equalityExpression();
+  while (this->isEqualityOperator()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
-    node = new BinaryOperatorAST(node, this->logicalExpression(), opToken, isParenthesized);
+    node = new BinaryOperatorAST(node, this->equalityExpression(), opToken);
   }
   return node;
 }
 
-AST *LangParser::logicalExpression(bool isParenthesized) {
+AST *LangParser::equalityExpression() {
+  AST *node = this->logicalExpression();
+  while (this->isLogicalOperator()) {
+    Token opToken = this->token;
+    this->token = this->scanner.nextToken();
+    node = new BinaryOperatorAST(node, this->logicalExpression(), opToken);
+  }
+  return node;
+}
+
+AST *LangParser::logicalExpression() {
   AST *node = this->clause();
   while (this->isComparator()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
-    node = new BinaryOperatorAST(node, this->clause(), opToken, isParenthesized);
+    node = new BinaryOperatorAST(node, this->clause(), opToken);
   }
   return node;
 }
@@ -68,7 +78,7 @@ AST *LangParser::factor() {
   if (this->token.getType() == TK_PARENTHESES &&
       this->token.getValue() == "(") {
     this->token = this->scanner.nextToken();
-    AST *node = this->expression(true);
+    AST *node = this->expression();
     if (this->token.getType() != TK_PARENTHESES ||
         this->token.getValue() != ")")
       throw std::runtime_error("Expected ')' but got: " +

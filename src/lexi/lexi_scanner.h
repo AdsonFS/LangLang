@@ -9,18 +9,23 @@ class LexiScanner {
 public:
   LexiScanner(std::string fileContent);
   Token nextToken();
-
-  std::set<std::string> reservedWords;
+  
+  void panicMode();
+  std::string getLine();
+  std::pair<int, int> getPosition();
 private:
+  int line;
+  int column;
   int position;
-
   std::string fileContent;
+  std::set<std::string> reservedWords;
+
+  Token getNextToken();
   
   bool isDigit(char c);
   bool isOperator(char c);
   bool isSemicolon(char c);
   bool isWhitespace(char c);
-  bool isAssignment(char c);
   bool isParentheses(char c);
   bool isCmpOperator(char c);
   bool isUpperLetter(char c);

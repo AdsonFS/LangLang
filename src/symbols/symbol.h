@@ -1,7 +1,7 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-#include "../dependencies/dependencies.h"
+#include "../core/core.h"
 #include <string>
 #include <unordered_map>
 
@@ -33,8 +33,8 @@ public:
 class ScopedSymbolTable {
 public:
   ScopedSymbolTable(std::string scopeName, ScopedSymbolTable *previousScope = nullptr) : scopeName(scopeName), previousScope(previousScope) {
-    this->set(new BuiltInTypeSymbol("NUMBER"));
-    this->set(new BuiltInTypeSymbol("STRING"));
+    this->set(new BuiltInTypeSymbol("number"));
+    this->set(new BuiltInTypeSymbol("string"));
   }
   std::string getName();
   void set(Symbol *symbol);

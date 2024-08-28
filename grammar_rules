@@ -9,11 +9,10 @@ statement             : variable_declaration SEMICOLON
                       | identifier
 
 
-while_statement       : WHILE '(' expression ')' '{' statement_list '}'
-if_statement          : IF '(' expression ')' '{' statement_list '}'
+while_statement       : 'while' '(' expression ')' '{' statement_list '}'
+if_statement          : 'if' '(' expression ')' '{' statement_list '}'
 
-variable_declaration  : FUNC identifier '{' statement_list '}'
-                      | (NUMBER|STRING) identifier = expression
+variable_declaration  : 'var' identifier '->' ('string' | 'number') := (expression | '(' ')' '{' statement_list '}'
 
 output_stream         : >> output output_stream*
 output                : expression 
@@ -21,9 +20,10 @@ output                : expression
 input_stream          : << identifier inputStream*
 
 
-assignment            : identifier = expression
+assignment            : identifier := expression
 
-expression            : logical_expression ((<|>) logical_expression)*
+expression            : equality_expression (( == | != ) equality_expression)*
+equality_expression   : logical_expression ((<|>) logical_expression)*
 logical_expression    : clause ((<|>) clause)*
 clause                : term ( PLUS|MINUS ) term
 term                  : factor ((DIV|MULT|MOD) factor)*

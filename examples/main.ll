@@ -1,31 +1,45 @@
-STRING name = "Adson";
+<> This is a comment
+<> This is another comment
+
+if (2 && (2 != 2 > 1)) 
+{
+  var hello -> string  := "Hello";
+  >> "True";
+}
+var name -> string  := "Adson" + " " + "Santos";
 >> "Hello," >> name;
 
-IF ((name < "ZZZ") && 1 < 2) {
+var cnt -> number  := 10;
+while (cnt > 0) {
+  >> cnt;
+  cnt := cnt - 2;
+}
+
+if ((name < "ZZZ") && 1 < 2) {
   >> "True";
-  STRING name = "<empty>";
+  var name -> string  := "<empty>";
   >> "IF: " >> name;
 }
 
-FUNC func1 {
-  NUMBER age = 12 + 8;
+var func1 -> () := {
+  var age -> number  := 12 + 8;
 
-  FUNC func2 {
-    NUMBER age = 1;
-    STRING name= "ss";
+  var func2 -> ():=  {
+    var age -> number  := 1;
+    var name -> string := "ss";
     >> age >> name;
   }
   func2();
   >> "FUNC 1 ->" >>name>> age;
 }
 
-FUNC func2{
-  STRING name = "Santos";
+var func2 ->  ():= {
+  var name -> string  := "Santos";
   >> (2 + 2) >> name >> ("Hello: " + (name));
-  name = "Sr. " + name;
+  name := "Sr. " + name;
   >> "FUNC2:">>name;
   func1();
 }
 func2();
 func1();
->> name;
+>>name;

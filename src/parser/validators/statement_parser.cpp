@@ -43,19 +43,21 @@ AST *LangParser::statement() {
           "Syntax error: expected ASSIGNMENT or SEMICOLON");
     }
   case TK_RESERVED_WORD:
-    if (token.getValue() == "IF") 
+    if (token.getValue() == "if") 
       return this->ifStatement();
-    if (token.getValue() == "WHILE")
+    if (token.getValue() == "while")
         return this->whileStatement();
-    node = this->variableDeclaration();
-    if (token.getValue() == "FUNC")
-      this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
-
-    else
-      this->consume(Token(TK_SEMICOLON, ""));
-    return node;
+    if (token.getValue() == "var")
+      return this->variableDeclaration();
+    /*node = this->variableDeclaration();*/
+    /*if (token.getValue() == "func")*/
+    /*  this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));*/
+    /**/
+    /*else*/
+    /*  this->consume(Token(TK_SEMICOLON, ""));*/
+    /*return node;*/
   default:
-    throw std::runtime_error("Syntax error: expected OUTPUTSTREAM.");
+    throw std::runtime_error("Syntax error: found " + token.getValue());
   }
 }
 
