@@ -1,7 +1,10 @@
 #include "ast.h"
-#include <stdexcept>
+#include "../error/error.h"
+#include "visitor.h"
 
-ASTValue AST::accept(ASTVisitor &visitor) { throw std::runtime_error("Error: AST::accept() not implemented"); }
+ASTValue AST::accept(ASTVisitor &visitor) {
+  throw RuntimeError("not implemented");
+}
 ASTValue StatementListAST::accept(ASTVisitor &visitor) {
   return visitor.visitStatementList(this);
 }
@@ -41,3 +44,4 @@ ASTValue NumberAST::accept(ASTVisitor &visitor) {
 ASTValue StringAST::accept(ASTVisitor &visitor) {
   return visitor.visitStringExpr(this);
 }
+ASTValue NilAST::accept(ASTVisitor &visitor) { return visitor.visitNil(this); }

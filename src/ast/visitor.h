@@ -23,6 +23,8 @@ public:
   virtual ASTValue visitIdentifier(IdentifierAST *expr) = 0;
   virtual ASTValue visitNumberExpr(NumberAST *expr) = 0;
   virtual ASTValue visitStringExpr(StringAST *expr) = 0;
+
+  virtual ASTValue visitNil(NilAST *expr) = 0;
 };
 
 #endif // VISITOR_H

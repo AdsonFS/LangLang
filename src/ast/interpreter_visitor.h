@@ -37,6 +37,8 @@ private:
   ASTValue visitNumberExpr(NumberAST *expr) override; 
 
   ASTValue visitStringExpr(StringAST *expr) override; 
+
+  ASTValue visitNil(NilAST *expr) override;
 };
 
 #endif // INTERPRETER_VISITOR_H

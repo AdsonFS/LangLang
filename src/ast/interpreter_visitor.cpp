@@ -1,4 +1,5 @@
 #include "interpreter_visitor.h"
+#include "../error/error.h"
 
 ScopedSymbolTable *InterpreterVisitor::scope;
 
@@ -68,8 +69,7 @@ ASTValue InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
       std::cin >> input;
       this->scope->update(identifier.getValue(), input);
     } else {
-      throw std::runtime_error(
-          "Error: InputStreamAST::solve() invalid identifier");
+      throw RuntimeError("invalid identifier: " + identifier.getValue());
     }
   }
   return 0;
@@ -85,9 +85,7 @@ ASTValue InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *ex
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
                                    this->scope->getSymbol("string"),
                                    expr->value->accept(*this)));
-  else
-    throw std::runtime_error(
-        "Error: VariableDeclarationAST::solve() invalid type");
+  else throw RuntimeError("invalid type: " + type.getValue());
   return 0;
 }
 
@@ -104,8 +102,7 @@ ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
       return leftValue == rightValue;
     if(expr->op.getValue() == "!=")
       return leftValue != rightValue;
-    throw std::runtime_error(
-        "Error: BinaryOperatorAST::solve() invalid operator");
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
 
 
@@ -128,20 +125,17 @@ ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   case '&':
     if (expr->op.getValue() == "&&")
       return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
-    throw std::runtime_error(
-        "Error: BinaryOperatorAST::solve() invalid operator");
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   case '|':
     if (expr->op.getValue() == "||")
       return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
-    throw std::runtime_error(
-        "Error: BinaryOperatorAST::solve() invalid operator");
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   case '<':
     return leftValue < rightValue;
   case '>':
     return leftValue > rightValue;
   default:
-    throw std::runtime_error(
-        "Error: BinaryOperatorAST::solve() invalid operator");
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
 }
 
@@ -152,8 +146,7 @@ ASTValue InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   case '-':
     return -std::get<int>(expr->child->accept(*this));
   default:
-    throw std::runtime_error(
-        "Error: UnaryOperatorAST::solve() invalid operator");
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
 }
 
@@ -176,3 +169,5 @@ ASTValue InterpreterVisitor::visitNumberExpr(NumberAST * expr)
 { return std::stoi(expr->token.getValue()); }
 
 ASTValue InterpreterVisitor::visitStringExpr(StringAST * expr) { return expr->token.getValue(); }
+
+ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return expr; }

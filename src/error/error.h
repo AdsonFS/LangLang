@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <utility>
+
 class CoreError : public std::exception {
 protected:
   const std::string grey = "\033[97m";
@@ -26,7 +27,7 @@ public:
         << std::setw(4) << "" << " | "
         << std::string(std::max(0, column - 1), ' ') << this->red << "^"
         << this->reset;
-    message = oss.str();
+    this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
@@ -46,9 +47,21 @@ public:
         << std::setw(4) << "" << " | "
         << std::string(std::max(0, position.second - 1), ' ') << this->red
         << "^" << this->reset;
-    message = oss.str();
+    this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
 
+class RuntimeError : public CoreError {
+private:
+  std::string message;
+
+public:
+  explicit RuntimeError(const std::string &message) {
+    std::ostringstream oss;
+    oss << this->grey << "Runtime Error: " << this->reset << message << std::endl;
+    this->message = oss.str();
+  }
+  virtual const char *what() const noexcept override { return message.c_str(); }
+};
 #endif // ERROR_H

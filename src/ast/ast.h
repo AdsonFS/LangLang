@@ -12,7 +12,6 @@
 #include <variant>
 #include <vector>
 
-
 class AST {
 public:
   virtual ASTValue accept(ASTVisitor &visitor);
@@ -97,7 +96,7 @@ class BinaryOperatorAST : public AST {
 public:
   BinaryOperatorAST(AST *left, AST *right, Token op)
       : left(left), right(right), op(op) {}
-  ASTValue accept(ASTVisitor &visitor) override; 
+  ASTValue accept(ASTVisitor &visitor) override;
   AST *left;
   AST *right;
   Token op;
@@ -123,7 +122,7 @@ public:
 class NumberAST : public AST {
 public:
   NumberAST(Token token) : token(token) {}
-  ASTValue accept(ASTVisitor &visitor) override; 
+  ASTValue accept(ASTVisitor &visitor) override;
 
   Token token;
 };
@@ -134,6 +133,12 @@ public:
   ASTValue accept(ASTVisitor &visitor) override;
 
   Token token;
+};
+
+class NilAST : public AST {
+public:
+  NilAST() {};
+  ASTValue accept(ASTVisitor &visitor) override;
 };
 
 #endif // !AST_H

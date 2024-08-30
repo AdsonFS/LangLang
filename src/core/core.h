@@ -20,6 +20,7 @@ class UnaryOperatorAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;
+class NilAST;
 
 typedef std::variant<int, std::string, AST *> ASTValue;
 

@@ -36,6 +36,8 @@ private:
   ASTValue visitNumberExpr(NumberAST *expr) override; 
 
   ASTValue visitStringExpr(StringAST *expr) override; 
+
+  ASTValue visitNil(NilAST *expr) override; 
 };
 
 #endif // PRINTER_VISITOR_H

@@ -121,3 +121,9 @@ ASTValue PrinterVisitor::visitStringExpr(StringAST *expr) {
   std::cout << "<StringAST:" << expr->token.getValue() << ">\n";
   return 0;
 }
+
+ASTValue PrinterVisitor::visitNil(NilAST *expr) {
+  this->printIndent(this->indent);
+  std::cout << "<NilAST>\n";
+  return 0;
+}

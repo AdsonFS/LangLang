@@ -28,10 +28,13 @@ int parser(LexiScanner &scanner, Token &token) {
   }
   if (!hasErrors) {
     PrinterVisitor printer;
-    /*ast->accept(printer);*/
-
     InterpreterVisitor interpreter;
-    ast->accept(interpreter);
+    /*ast->accept(printer);*/
+    try {
+      ast->accept(interpreter);
+    } catch (CoreError &e) {
+      std::cout << e.what() << std::endl;
+    }
   }
   return 0;
 }

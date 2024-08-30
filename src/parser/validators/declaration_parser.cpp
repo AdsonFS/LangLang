@@ -6,11 +6,14 @@ AST *LangParser::variableDeclaration() {
   Token identifier = this->consume(Token(TokenType::TK_IDENTIFIER, ""));
   this->consume(Token(TokenType::TK_ARROW, "->"));
   Token type = this->consume(Token(TokenType::TK_RESERVED_WORD, ""));
-  this->consume(Token(TokenType::TK_ASSIGNMENT, ":="));
 
   AST *node;
   if (type.getValue() == "number" || type.getValue() == "string") {
-    node = new VariableDeclarationAST(type, identifier, this->expression());
+    if (this->token.getType() != TK_SEMICOLON) {
+      this->consume(Token(TokenType::TK_ASSIGNMENT, ":="));
+      node = new VariableDeclarationAST(type, identifier, this->expression());
+    } else
+      node = new VariableDeclarationAST(type, identifier, new NilAST());
     this->consume(Token(TokenType::TK_SEMICOLON, ""));
     return node;
   }

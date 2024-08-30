@@ -15,7 +15,7 @@ public:
 
 class BuiltInTypeSymbol : public Symbol {
 public:
-  BuiltInTypeSymbol(std::string name) : Symbol(name) {}
+  BuiltInTypeSymbol(std::string name, ASTValue value) : Symbol(name, nullptr, value) {}
 };
 
 class FuncSymbol : public Symbol {
@@ -33,8 +33,8 @@ public:
 class ScopedSymbolTable {
 public:
   ScopedSymbolTable(std::string scopeName, ScopedSymbolTable *previousScope = nullptr) : scopeName(scopeName), previousScope(previousScope) {
-    this->set(new BuiltInTypeSymbol("number"));
-    this->set(new BuiltInTypeSymbol("string"));
+    this->set(new BuiltInTypeSymbol("number", 0));
+    this->set(new BuiltInTypeSymbol("string", ""));
   }
   std::string getName();
   void set(Symbol *symbol);

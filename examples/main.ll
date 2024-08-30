@@ -1,16 +1,16 @@
 <> This is a comment
 <> This is another comment
 
+var cnt -> number;
 if (2 && (2 != 2 > 1)) 
 {
   var hello -> string  := "Hello";
   >> "True";
 }
 var name -> string  := "Adson" + " " + "Santos";
-<< name << age;
 >> "Hello," >> name;
 
-var cnt -> number := 10;
+cnt := 10;
 while (cnt > 0) {
   >> cnt;
   cnt := cnt - 2;
