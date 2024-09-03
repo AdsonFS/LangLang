@@ -8,6 +8,7 @@ ASTValue AST::accept(ASTVisitor &visitor) {
 ASTValue StatementListAST::accept(ASTVisitor &visitor) {
   return visitor.visitStatementList(this);
 }
+ASTValue BlockAST::accept(ASTVisitor &visitor) { return visitor.visitBLock(this); }
 ASTValue WhileStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitWhileStatement(this);
 }

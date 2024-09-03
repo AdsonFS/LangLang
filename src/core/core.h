@@ -9,6 +9,7 @@ class ASTVisitor;
 class AST;
 class StatementListAST;
 class WhileStatementAST;
+class BlockAST;
 class IfStatementAST;
 class FunctionAST;
 class OutputStreamAST;

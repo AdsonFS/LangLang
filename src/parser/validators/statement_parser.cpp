@@ -3,8 +3,8 @@
 AST *LangParser::statementList() {
   std::vector<AST *> statements;
   while (this->token.getType() != TK_EOF &&
-         (this->token.getType() != TK_CURLY_BRACES &&
-          this->token.getValue() != "}")) {
+         (!(this->token.getType() == TK_CURLY_BRACES &&
+          this->token.getValue() == "}"))) {
     AST *node = this->statement();
     statements.push_back(node);
   }
@@ -23,7 +23,9 @@ AST *LangParser::statement() {
     node = this->inputStream();
     this->consume(Token(TK_SEMICOLON, ""));
     return node;
-  /*case TK_IDENTIFIER:*/
+  case TK_CURLY_BRACES:
+    return this->block();
+    /*case TK_IDENTIFIER:*/
   /*  this->consume(Token(TK_IDENTIFIER, ""));*/
   /*  if (this->token.getType() == TK_ASSIGNMENT) {*/
   /*    this->consume(Token(TK_ASSIGNMENT, ""));*/
@@ -67,4 +69,19 @@ AST *LangParser::statementFunction() {
     statements.push_back(node);
   }
   return new StatementListAST(statements);
+}
+
+AST *LangParser::block() {
+  std::vector<AST *> statements;
+  this->consume(Token(TK_CURLY_BRACES, "{"));
+
+  while (this->token.getType() != TK_EOF &&
+         (this->token.getType() != TK_CURLY_BRACES &&
+          this->token.getValue() != "}")) {
+    AST *node = this->statement();
+    statements.push_back(node);
+  }
+  this->consume(Token(TK_CURLY_BRACES, "}"));
+
+  return new BlockAST(statements);
 }

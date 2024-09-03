@@ -6,6 +6,7 @@
 class ASTVisitor {
 public:
   virtual ASTValue visitStatementList(StatementListAST *expr) = 0;
+  virtual ASTValue visitBLock(BlockAST *expr) = 0;
 
   virtual ASTValue visitWhileStatement(WhileStatementAST *expr) = 0;
   virtual ASTValue visitIfStatement(IfStatementAST *expr) = 0;
