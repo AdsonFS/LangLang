@@ -112,12 +112,17 @@ InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
 }
 
 ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
-  ASTValue leftValue = expr->left->accept(*this);
-  if(expr->op.getType() == TK_LOGICAL_OPERATOR && expr->op.getValue() == "&&") {
-    if (!ASTValueIsTrue(leftValue))
-      return 0;
-    return expr->right->accept(*this);
+  if (expr->op.getType() == TK_LOGICAL_OPERATOR) {
+    if (expr->op.getValue() == "&&")
+      return ASTValueIsTrue(expr->left->accept(*this)) &&
+             ASTValueIsTrue(expr->right->accept(*this));
+    if (expr->op.getValue() == "||")
+      return ASTValueIsTrue(expr->left->accept(*this)) ||
+             ASTValueIsTrue(expr->right->accept(*this));
+    throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
+
+  ASTValue leftValue = expr->left->accept(*this);
   ASTValue rightValue = expr->right->accept(*this);
 
   if (expr->op.getType() == TK_EQUALITY_OPERATOR) {
@@ -143,15 +148,6 @@ ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   case '%':
     return std::get<int>(leftValue) % std::get<int>(rightValue);
 
-  // logical operators
-  case '&':
-    if (expr->op.getValue() == "&&")
-      return ASTValueIsTrue(leftValue) && ASTValueIsTrue(rightValue);
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
-  case '|':
-    if (expr->op.getValue() == "||")
-      return ASTValueIsTrue(leftValue) || ASTValueIsTrue(rightValue);
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
   case '<':
     return leftValue < rightValue;
   case '>':
