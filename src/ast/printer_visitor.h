@@ -17,6 +17,8 @@ private:
 
   ASTValue visitWhileStatement(WhileStatementAST *expr) override; 
 
+  ASTValue visitForStatement(ForStatementAST *expr) override; 
+
   ASTValue visitIfStatement(IfStatementAST *expr) override; 
 
   ASTValue visitFunction(FunctionAST *expr) override; 

@@ -2,6 +2,8 @@ statement_list        : statement
                       | statement statement_list
 
 statement             : variable_declaration SEMICOLON 
+                      | while_statement
+                      | for_statement
                       | if_statement
                       | output_stream SEMICOLON
                       | input_stream SEMICOLON                    
@@ -11,6 +13,9 @@ statement             : variable_declaration SEMICOLON
 
 
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
+for_statement         : 'for' '(' variable_declaration ';' expression ';' expression ')' '{' statement_list '}'
+                      | 'for' '(' expression ';' expression ';' expression ')' '{' statement_list '}'
+
 if_statement          : 'if' '(' expression ')' '{' statement_list '}'
                         ('else' '{' statement '}' 
 

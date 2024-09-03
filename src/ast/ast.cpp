@@ -12,6 +12,9 @@ ASTValue BlockAST::accept(ASTVisitor &visitor) { return visitor.visitBLock(this)
 ASTValue WhileStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitWhileStatement(this);
 }
+ASTValue ForStatementAST::accept(ASTVisitor &visitor) {
+  return visitor.visitForStatement(this);
+}
 ASTValue IfStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitIfStatement(this);
 }

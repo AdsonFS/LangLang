@@ -14,7 +14,6 @@ AST *LangParser::variableDeclaration() {
       node = new VariableDeclarationAST(type, identifier, this->expression());
     } else
       node = new VariableDeclarationAST(type, identifier, new NilAST());
-    this->consume(Token(TokenType::TK_SEMICOLON, ""));
     return node;
   }
   throw SyntaxError(this->scanner.getLine(), this->token.getValue(),

@@ -34,6 +34,17 @@ ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   return 0;
 }
 
+ASTValue InterpreterVisitor::visitForStatement(ForStatementAST *expr) {
+  this->scope = this->scope->newScope("for");
+  expr->initializer->accept(*this);
+  while (ASTValueIsTrue(expr->condition->accept(*this))) {
+    expr->statements->accept(*this);
+    expr->increment->accept(*this);
+  }
+  this->scope = this->scope->previousScope;
+  return 0;
+}
+
 ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
   ASTValue value = expr->condition->accept(*this);
   if (ASTValueIsTrue(value)) {

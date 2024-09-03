@@ -9,6 +9,7 @@ public:
   virtual ASTValue visitBLock(BlockAST *expr) = 0;
 
   virtual ASTValue visitWhileStatement(WhileStatementAST *expr) = 0;
+  virtual ASTValue visitForStatement(ForStatementAST *expr) = 0;
   virtual ASTValue visitIfStatement(IfStatementAST *expr) = 0;
   virtual ASTValue visitFunction(FunctionAST *expr) = 0;
 
