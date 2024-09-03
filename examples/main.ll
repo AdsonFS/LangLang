@@ -2,7 +2,7 @@ var cnt -> number;
 var age -> number;
 var name -> string;
 
-if (0)
+if (0 && cnt)
 {
   var cnt -> number;
   >> cnt := 10;

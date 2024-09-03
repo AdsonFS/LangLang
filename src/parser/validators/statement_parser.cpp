@@ -25,26 +25,6 @@ AST *LangParser::statement() {
     return node;
   case TK_CURLY_BRACES:
     return this->block();
-    /*case TK_IDENTIFIER:*/
-  /*  this->consume(Token(TK_IDENTIFIER, ""));*/
-  /*  if (this->token.getType() == TK_ASSIGNMENT) {*/
-  /*    this->consume(Token(TK_ASSIGNMENT, ""));*/
-  /*    node = new AssignmentVariableAST(token, this->expression());*/
-  /*    this->consume(Token(TK_SEMICOLON, ""));*/
-  /*    return node;*/
-  /*  } else if (this->token.getType() == TK_PARENTHESES &&*/
-  /*             this->token.getValue() == "(") { // function call*/
-  /*    node = new IdentifierAST(token);*/
-  /*    this->consume(Token(TK_PARENTHESES, "("));*/
-  /*    this->consume(Token(TK_PARENTHESES, ")"));*/
-  /**/
-  /*    this->consume(Token(TK_SEMICOLON, ""));*/
-  /*    return node;*/
-  /*  } else {*/
-  /*    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),*/
-  /*                      this->scanner.getPosition(),*/
-  /*                      "ASSIGNMENT or PARENTHESES");*/
-  /*  }*/
   case TK_RESERVED_WORD:
     if (token.getValue() == "if")
       return this->ifStatement();

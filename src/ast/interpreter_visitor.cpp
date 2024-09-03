@@ -113,7 +113,13 @@ InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
 
 ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   ASTValue leftValue = expr->left->accept(*this);
+  if(expr->op.getType() == TK_LOGICAL_OPERATOR && expr->op.getValue() == "&&") {
+    if (!ASTValueIsTrue(leftValue))
+      return 0;
+    return expr->right->accept(*this);
+  }
   ASTValue rightValue = expr->right->accept(*this);
+
   if (expr->op.getType() == TK_EQUALITY_OPERATOR) {
     if (expr->op.getValue() == "==")
       return leftValue == rightValue;
