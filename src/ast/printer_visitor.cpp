@@ -17,6 +17,15 @@ ASTValue PrinterVisitor::visitStatementList(StatementListAST *expr) {
   return 0;
 }
 
+ASTValue PrinterVisitor::visitBLock(BlockAST *expr) {
+  this->printIndent(this->indent++);
+  std::cout << "<BlockAST>\n";
+  for (auto &statement : expr->statements)
+    statement->accept(*this);
+  this->indent--;
+  return 0;
+}
+
 ASTValue PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<WhileStatementAST>\n";

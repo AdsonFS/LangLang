@@ -35,6 +35,14 @@ public:
   StatementListAST *ifStatements;
 };
 
+class BlockAST : public AST {
+public:
+  BlockAST(std::vector<AST *> statements) : statements(statements) {}
+  ASTValue accept(ASTVisitor &visitor) override;
+
+  std::vector<AST *> statements;
+};
+
 class IfStatementAST : public AST {
 public:
   IfStatementAST(AST *condition, StatementListAST *ifStatements)

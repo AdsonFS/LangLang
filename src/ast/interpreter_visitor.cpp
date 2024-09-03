@@ -16,6 +16,14 @@ ASTValue InterpreterVisitor::visitStatementList(StatementListAST *expr) {
   return 0;
 }
 
+ASTValue InterpreterVisitor::visitBLock(BlockAST *expr) {
+  this->scope = this->scope->newScope("block");
+  for (auto &statement : expr->statements)
+    statement->accept(*this);
+  this->scope = this->scope->previousScope;
+  return 0;
+}
+
 ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   while (ASTValueIsTrue(expr->condition->accept(*this))) {
     this->scope = this->scope->newScope("if");

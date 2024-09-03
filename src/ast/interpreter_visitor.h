@@ -14,6 +14,8 @@ private:
 
   ASTValue visitStatementList(StatementListAST *expr) override; 
 
+  ASTValue visitBLock(BlockAST *expr) override;
+
   ASTValue visitWhileStatement(WhileStatementAST *expr) override; 
 
   ASTValue visitIfStatement(IfStatementAST *expr) override; 

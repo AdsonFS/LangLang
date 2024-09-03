@@ -7,10 +7,12 @@ statement             : variable_declaration SEMICOLON
                       | input_stream SEMICOLON                    
                       | expression
                       | identifier
+                      | block
 
 
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
 if_statement          : 'if' '(' expression ')' '{' statement_list '}'
+block                 : '{' statement_list '}'
 
 variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
                       | 'var' identifier '->' ('string' | 'number');
