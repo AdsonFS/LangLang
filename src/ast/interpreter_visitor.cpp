@@ -10,7 +10,8 @@ bool InterpreterVisitor::ASTValueIsTrue(ASTValue value) {
 }
 
 ASTValue InterpreterVisitor::visitStatementList(StatementListAST *expr) {
-  if (this->scope == nullptr) this->scope = new ScopedSymbolTable("global");
+  if (this->scope == nullptr)
+    this->scope = new ScopedSymbolTable("global");
   for (auto &statement : expr->statements)
     statement->accept(*this);
   return 0;
@@ -35,17 +36,21 @@ ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
 
 ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
   ASTValue value = expr->condition->accept(*this);
-
   if (ASTValueIsTrue(value)) {
     this->scope = this->scope->newScope("if");
     expr->ifStatements->accept(*this);
+    this->scope = this->scope->previousScope;
+  } else if (expr->elseStatements != nullptr) {
+    this->scope = this->scope->newScope("else");
+    expr->elseStatements->accept(*this);
     this->scope = this->scope->previousScope;
   }
   return 0;
 }
 
 ASTValue InterpreterVisitor::visitFunction(FunctionAST *expr) {
-  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(), expr->statements);
+  FuncSymbol *func =
+      new FuncSymbol(expr->identifier.getValue(), expr->statements);
   this->scope->set(func);
   return 0;
 }
@@ -83,7 +88,8 @@ ASTValue InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
   return 0;
 }
 
-ASTValue InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
+ASTValue
+InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   Token type = expr->type;
   if (type.getValue() == "number")
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
@@ -93,11 +99,13 @@ ASTValue InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *ex
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
                                    this->scope->getSymbol("string"),
                                    expr->value->accept(*this)));
-  else throw RuntimeError("invalid type: " + type.getValue());
+  else
+    throw RuntimeError("invalid type: " + type.getValue());
   return 0;
 }
 
-ASTValue InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
+ASTValue
+InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   ASTValue value = expr->value->accept(*this);
   this->scope->update(expr->identifier.getValue(), value);
   return value;
@@ -106,14 +114,13 @@ ASTValue InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr
 ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   ASTValue leftValue = expr->left->accept(*this);
   ASTValue rightValue = expr->right->accept(*this);
-  if(expr->op.getType() == TK_EQUALITY_OPERATOR) {
-    if(expr->op.getValue() == "==")
+  if (expr->op.getType() == TK_EQUALITY_OPERATOR) {
+    if (expr->op.getValue() == "==")
       return leftValue == rightValue;
-    if(expr->op.getValue() == "!=")
+    if (expr->op.getValue() == "!=")
       return leftValue != rightValue;
     throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
-
 
   switch (expr->op.getValue()[0]) {
   case '+':
@@ -174,9 +181,12 @@ ASTValue InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
   return value;
 }
 
-ASTValue InterpreterVisitor::visitNumberExpr(NumberAST * expr) 
-{ return std::stoi(expr->token.getValue()); }
+ASTValue InterpreterVisitor::visitNumberExpr(NumberAST *expr) {
+  return std::stoi(expr->token.getValue());
+}
 
-ASTValue InterpreterVisitor::visitStringExpr(StringAST * expr) { return expr->token.getValue(); }
+ASTValue InterpreterVisitor::visitStringExpr(StringAST *expr) {
+  return expr->token.getValue();
+}
 
 ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return nullptr; }

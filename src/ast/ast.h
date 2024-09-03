@@ -45,12 +45,14 @@ public:
 
 class IfStatementAST : public AST {
 public:
-  IfStatementAST(AST *condition, StatementListAST *ifStatements)
-      : condition(condition), ifStatements(ifStatements) {}
+  IfStatementAST(AST *condition, StatementListAST *ifStatements,
+                 StatementListAST *elseStatements)
+      : condition(condition), ifStatements(ifStatements), elseStatements(elseStatements) {}
   ASTValue accept(ASTVisitor &visitor) override;
 
   AST *condition;
   StatementListAST *ifStatements;
+  StatementListAST *elseStatements;
 };
 
 class FunctionAST : public AST {
@@ -145,7 +147,7 @@ public:
 
 class NilAST : public AST {
 public:
-  NilAST() {};
+  NilAST(){};
   ASTValue accept(ASTVisitor &visitor) override;
 };
 

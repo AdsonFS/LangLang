@@ -12,6 +12,8 @@ statement             : variable_declaration SEMICOLON
 
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
 if_statement          : 'if' '(' expression ')' '{' statement_list '}'
+                        ('else' '{' statement '}' 
+
 block                 : '{' statement_list '}'
 
 variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression

@@ -47,6 +47,12 @@ ASTValue PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
   this->indent--;
   expr->ifStatements->accept(*this);
   this->indent--;
+  if (expr->elseStatements) {
+    this->printIndent(this->indent++);
+    std::cout << "<ElseStatement>\n";
+    expr->elseStatements->accept(*this);
+    this->indent--;
+  }
   return 0;
 }
 
