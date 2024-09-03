@@ -90,8 +90,9 @@ ASTValue InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *ex
 }
 
 ASTValue InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
-  this->scope->update(expr->identifier.getValue(), expr->value->accept(*this));
-  return 0;
+  ASTValue value = expr->value->accept(*this);
+  this->scope->update(expr->identifier.getValue(), value);
+  return value;
 }
 
 ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
@@ -170,4 +171,4 @@ ASTValue InterpreterVisitor::visitNumberExpr(NumberAST * expr)
 
 ASTValue InterpreterVisitor::visitStringExpr(StringAST * expr) { return expr->token.getValue(); }
 
-ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return expr; }
+ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return nullptr; }

@@ -5,7 +5,7 @@ statement             : variable_declaration SEMICOLON
                       | if_statement
                       | output_stream SEMICOLON
                       | input_stream SEMICOLON                    
-                      | assignment
+                      | expression
                       | identifier
 
 
@@ -22,9 +22,13 @@ output                : expression
 input_stream          : << identifier inputStream*
 
 
-assignment            : identifier := expression
 
-expression            : equality_expression (( == | != ) equality_expression)*
+expression            : assignment
+
+assignment            : identifier := assignment
+                      | equality_expression (( == | != ) equality_expression)*
+
+
 equality_expression   : logical_expression ((<|>) logical_expression)*
 logical_expression    : clause ((<|>) clause)*
 clause                : term ( PLUS|MINUS ) term
