@@ -2,15 +2,16 @@
 #define LANG_PARSER_H
 
 #include "../ast/ast.h"
+#include "../error/error.h"
 #include "../lexi/lexi_scanner.h"
 #include "../tokens/token.h"
-#include "../error/error.h"
 
 class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
-  AST* block();
-  AST* parser();
+  AST *block();
+  AST *parser();
+  AST *forStatement();
   AST *statement();
   AST *assignment();
   AST *inputStream();
@@ -24,7 +25,7 @@ public:
   AST *funcDeclaration();
   AST *expression();
   AST *equalityExpression();
-  AST *logicalExpression(); 
+  AST *logicalExpression();
 
 private:
   LexiScanner &scanner;

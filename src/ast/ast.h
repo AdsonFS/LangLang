@@ -35,6 +35,18 @@ public:
   StatementListAST *ifStatements;
 };
 
+class ForStatementAST : public AST {
+public:
+  ForStatementAST(AST* initializer, AST *condition, AST* increment, StatementListAST *ifStatements)
+      : initializer(initializer), condition(condition), increment(increment), statements(ifStatements) {}
+  ASTValue accept(ASTVisitor &visitor) override;
+
+  AST *initializer;
+  AST *condition;
+  AST *increment;
+  StatementListAST *statements;
+};
+
 class BlockAST : public AST {
 public:
   BlockAST(std::vector<AST *> statements) : statements(statements) {}
@@ -47,7 +59,8 @@ class IfStatementAST : public AST {
 public:
   IfStatementAST(AST *condition, StatementListAST *ifStatements,
                  StatementListAST *elseStatements)
-      : condition(condition), ifStatements(ifStatements), elseStatements(elseStatements) {}
+      : condition(condition), ifStatements(ifStatements),
+        elseStatements(elseStatements) {}
   ASTValue accept(ASTVisitor &visitor) override;
 
   AST *condition;

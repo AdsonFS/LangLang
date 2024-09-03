@@ -4,7 +4,7 @@ AST *LangParser::statementList() {
   std::vector<AST *> statements;
   while (this->token.getType() != TK_EOF &&
          (!(this->token.getType() == TK_CURLY_BRACES &&
-          this->token.getValue() == "}"))) {
+            this->token.getValue() == "}"))) {
     AST *node = this->statement();
     statements.push_back(node);
   }
@@ -30,8 +30,13 @@ AST *LangParser::statement() {
       return this->ifStatement();
     if (token.getValue() == "while")
       return this->whileStatement();
-    if (token.getValue() == "var")
-      return this->variableDeclaration();
+    if (token.getValue() == "for")
+      return this->forStatement();
+    if (token.getValue() == "var") {
+      node = this->variableDeclaration();
+      this->consume(Token(TK_SEMICOLON, ""));
+      return node;
+    }
     if (token.getValue() == "func")
       return this->funcDeclaration();
   default:

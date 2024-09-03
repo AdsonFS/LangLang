@@ -2,20 +2,10 @@ var cnt -> number;
 var age -> number;
 var name -> string;
 
->> "Hello" || "World";
-
-if (1 || cnt)
-{
-  var cnt -> number;
-  >> cnt := 10;
-} else {
-  var cnt -> number;
-  >> cnt := 80;
+for (var i -> number := 0; i < 10; i := i + 1) {
+  >> "Valor de i:" >> i;
 }
 
-if(0) {
-  >> "if";
+for (cnt := 1024; cnt > 0; cnt := cnt / 2) {
+  >> "Valor de cnt:" >> cnt;
 }
-
-cnt := age := 20;
->> cnt >> age >> "name: " + (name := "John");

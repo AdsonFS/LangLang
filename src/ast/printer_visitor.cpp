@@ -38,6 +38,24 @@ ASTValue PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   return 0;
 }
 
+ASTValue PrinterVisitor::visitForStatement(ForStatementAST *expr) {
+  this->printIndent(this->indent++);
+  std::cout << "<ForStatementAST>\n";
+  this->printIndent(this->indent++);
+  std::cout << "<Initializer>\n";
+  expr->initializer->accept(*this);
+  this->printIndent(this->indent);
+  std::cout << "<Condition>\n";
+  expr->condition->accept(*this);
+  this->printIndent(this->indent);
+  std::cout << "<Increment>\n";
+  expr->increment->accept(*this);
+  this->indent--;
+  expr->statements->accept(*this);
+  this->indent--;
+  return 0;
+}
+
 ASTValue PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<IfStatementAST>\n";

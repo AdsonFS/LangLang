@@ -33,3 +33,27 @@ AST *LangParser::whileStatement() {
   return new WhileStatementAST(conditional,
                                dynamic_cast<StatementListAST *>(statementList));
 }
+
+AST *LangParser::forStatement() {
+  AST* init, *conditional, *increment, *statementList;
+
+  this->consume(Token(TK_RESERVED_WORD, "for"));
+  this->consume(Token(TK_PARENTHESES, "("));
+  
+  if(this->match(Token(TK_RESERVED_WORD, "var")))
+    init = this->variableDeclaration();
+  else init = this->expression();
+  this->consume(Token(TK_SEMICOLON, ""));
+
+
+  conditional = this->expression();
+  this->consume(Token(TK_SEMICOLON, ""));
+  increment = this->expression();
+  this->consume(Token(TK_PARENTHESES, ")"));
+  this->consume(Token(TK_CURLY_BRACES, "{"));
+  statementList = this->statementList();
+  this->consume(Token(TK_CURLY_BRACES, "}"));
+
+  return new ForStatementAST(init, conditional, increment,
+                             dynamic_cast<StatementListAST *>(statementList));
+}
