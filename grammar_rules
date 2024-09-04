@@ -23,6 +23,7 @@ block                 : '{' statement_list '}'
 
 variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
                       | 'var' identifier '->' ('string' | 'number');
+
 func_declaration      : 'func' identifier '(' ')' ->  '{' statement_list '}'
 
 output_stream         : >> output output_stream*
@@ -44,7 +45,8 @@ clause                : term ( PLUS|MINUS ) term
 term                  : factor ((DIV|MULT|MOD) factor)*
 factor                : (PLUS|MINUS)factor 
                       | NUMBER | STRING
-                      | identifier
+                      | identifier | call
                       | '(' expression ')'
 
+call                  : identifier '(' ')'
 identifier            : IDENTIFIER

@@ -39,6 +39,7 @@ ASTValue BinaryOperatorAST::accept(ASTVisitor &visitor) {
 ASTValue UnaryOperatorAST::accept(ASTVisitor &visitor) {
   return visitor.visitUnaryOperatorExpr(this);
 }
+ASTValue CallAST::accept(ASTVisitor &visitor) { return visitor.visitCall(this); }
 ASTValue IdentifierAST::accept(ASTVisitor &visitor) {
   return visitor.visitIdentifier(this);
 }

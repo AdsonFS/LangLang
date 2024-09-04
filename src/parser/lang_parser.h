@@ -10,6 +10,7 @@ class LangParser {
 public:
   LangParser(LexiScanner &_scanner, Token &_token);
   AST *block();
+  AST *call();
   AST *parser();
   AST *forStatement();
   AST *statement();

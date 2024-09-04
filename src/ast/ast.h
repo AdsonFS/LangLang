@@ -134,6 +134,16 @@ public:
   Token op;
 };
 
+class CallAST : public AST {
+public:
+  CallAST(Token identifier, std::vector<AST *> arguments)
+      : identifier(identifier), arguments(arguments) {}
+  ASTValue accept(ASTVisitor &visitor) override;
+
+  Token identifier;
+  std::vector<AST *> arguments;
+};
+
 class IdentifierAST : public AST {
 public:
   IdentifierAST(Token token) : token(token) {}

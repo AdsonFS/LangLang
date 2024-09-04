@@ -36,6 +36,8 @@ private:
 
   ASTValue visitUnaryOperatorExpr(UnaryOperatorAST *expr) override; 
 
+  ASTValue visitCall(CallAST *expr) override;
+
   ASTValue visitIdentifier(IdentifierAST *expr) override; 
 
   ASTValue visitNumberExpr(NumberAST *expr) override; 

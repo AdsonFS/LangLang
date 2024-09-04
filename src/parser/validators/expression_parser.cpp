@@ -78,6 +78,12 @@ AST *LangParser::factor() {
   if (this->token.getType() == TK_IDENTIFIER) {
     Token token = this->token;
     this->token = this->scanner.nextToken();
+    if (this->match(Token(TK_PARENTHESES, "("))) {
+      std::vector<AST *> arguments;
+      this->consume(Token(TK_PARENTHESES, "("));
+      this->consume(Token(TK_PARENTHESES, ")"));
+      return new CallAST(token, arguments);
+    }
     return new IdentifierAST(token);
   }
 

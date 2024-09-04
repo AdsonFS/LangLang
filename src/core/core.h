@@ -19,6 +19,7 @@ class VariableDeclarationAST;
 class AssignmentVariableAST;
 class BinaryOperatorAST;
 class UnaryOperatorAST;
+class CallAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;

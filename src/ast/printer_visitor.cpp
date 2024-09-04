@@ -102,7 +102,8 @@ ASTValue PrinterVisitor::visitInputStream(InputStreamAST *expr) {
   return 0;
 }
 
-ASTValue PrinterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
+ASTValue
+PrinterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<VariableDeclarationAST:" << expr->identifier.getValue()
             << ">\n";
@@ -133,6 +134,15 @@ ASTValue PrinterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<UnaryOperatorAST:" << expr->op.getValue() << ">\n";
   expr->child->accept(*this);
+  this->indent--;
+  return 0;
+}
+
+ASTValue PrinterVisitor::visitCall(CallAST *expr) {
+  this->printIndent(this->indent++);
+  std::cout << "<CallAST:" << expr->identifier.getValue() << ">\n";
+  for (auto &argument : expr->arguments)
+    argument->accept(*this);
   this->indent--;
   return 0;
 }

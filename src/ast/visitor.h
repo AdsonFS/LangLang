@@ -22,6 +22,7 @@ public:
   virtual ASTValue visitBinaryOperatorExpr(BinaryOperatorAST *expr) = 0;
   virtual ASTValue visitUnaryOperatorExpr(UnaryOperatorAST *expr) = 0;
 
+  virtual ASTValue visitCall(CallAST *expr) = 0;
   virtual ASTValue visitIdentifier(IdentifierAST *expr) = 0;
   virtual ASTValue visitNumberExpr(NumberAST *expr) = 0;
   virtual ASTValue visitStringExpr(StringAST *expr) = 0;
