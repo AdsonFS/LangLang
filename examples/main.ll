@@ -1,9 +1,13 @@
-var cnt -> number;
+var cnt -> number := 0;
 var age -> number;
 var name -> string;
 
 func print() -> {
   >> "Hello World!";
+  cnt := cnt + 1;
+  if (cnt < 10) {
+    print();
+  }
 }
 
 for (var i -> number := 0; i < 10; i := i + 1) {
