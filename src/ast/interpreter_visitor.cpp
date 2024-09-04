@@ -179,18 +179,33 @@ ASTValue InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   }
 }
 
+
+ASTValue InterpreterVisitor::visitCall(CallAST *expr) {
+  ASTValue value = this->scope->getValue(expr->identifier.getValue());
+  if (!std::holds_alternative<AST *>(value))
+    throw RuntimeError("invalid function: " + expr->identifier.getValue());
+    
+  ScopedSymbolTable *currentScope = this->scope;
+  this->scope = this->scope->newScopeByContext(this->scope->getName() +
+                                                     expr->identifier.getValue(),
+                                                 expr->identifier.getValue());
+  std::get<AST *>(value)->accept(*this);
+  this->scope = currentScope;
+  return 0;
+}
+
 ASTValue InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
 
   ASTValue value = this->scope->getValue(expr->token.getValue());
-  if (std::holds_alternative<AST *>(value)) { // function call
-    ScopedSymbolTable *currentScope = this->scope;
-    this->scope = this->scope->newScopeByContext(this->scope->getName() +
-                                                     expr->token.getValue(),
-                                                 expr->token.getValue());
-    std::get<AST *>(value)->accept(*this);
-    this->scope = currentScope;
-    return 0;
-  }
+  /*if (std::holds_alternative<AST *>(value)) { // function call*/
+  /*  ScopedSymbolTable *currentScope = this->scope;*/
+  /*  this->scope = this->scope->newScopeByContext(this->scope->getName() +*/
+  /*                                                   expr->token.getValue(),*/
+  /*                                               expr->token.getValue());*/
+  /*  std::get<AST *>(value)->accept(*this);*/
+  /*  this->scope = currentScope;*/
+  /*  return 0;*/
+  /*}*/
   return value;
 }
 
