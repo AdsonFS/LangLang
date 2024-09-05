@@ -37,7 +37,9 @@ private:
   void eof();
 
   Token consume(Token expectedToken);
+  Token consume(TokenType expectedToken);
   bool match(Token expectedToken);
+  bool match(TokenType expectedToken);
 
   bool isComparator();
   bool isPlusOrMinus();

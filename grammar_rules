@@ -28,7 +28,7 @@ variable_declaration  : 'var' identifier '->' type := expression
 
 func_declaration      : 'func' identifier '(' ')' -> type? '{' statement_list '}'
 
-type                  : 'string' | 'number'
+type                  : 'string' | 'number' | '(' ')'
 output_stream         : >> output output_stream*
 output                : expression 
 

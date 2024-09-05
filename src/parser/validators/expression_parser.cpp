@@ -1,17 +1,15 @@
 #include "../lang_parser.h"
 
-AST *LangParser::expression() {
-  return this->assignment();
-}
+AST *LangParser::expression() { return this->assignment(); }
 
 AST *LangParser::assignment() {
   AST *node = this->equalityExpression();
-  if(this->token.getType() == TK_ASSIGNMENT) {
-    IdentifierAST *identifierAST = dynamic_cast<IdentifierAST*>(node);
-    if(identifierAST == nullptr) 
+  if (this->token.getType() == TK_ASSIGNMENT) {
+    IdentifierAST *identifierAST = dynamic_cast<IdentifierAST *>(node);
+    if (identifierAST == nullptr)
       throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
                         this->scanner.getPosition(), "an identifier");
-    this->consume(Token(TK_ASSIGNMENT, "")); 
+    this->consume(TK_ASSIGNMENT);
     return new AssignmentVariableAST(identifierAST->token, this->expression());
   }
   while (this->isEqualityOperator()) {

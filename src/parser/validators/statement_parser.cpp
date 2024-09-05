@@ -17,11 +17,11 @@ AST *LangParser::statement() {
   switch (token.getType()) {
   case TK_OUTPUTSTREAM:
     node = this->outputStream();
-    this->consume(Token(TK_SEMICOLON, ""));
+    this->consume(TK_SEMICOLON);
     return node;
   case TK_INPUTSTREAM:
     node = this->inputStream();
-    this->consume(Token(TK_SEMICOLON, ""));
+    this->consume(TK_SEMICOLON);
     return node;
   case TK_CURLY_BRACES:
     return this->block();
@@ -36,14 +36,14 @@ AST *LangParser::statement() {
       return this->returnStatement();
     if (token.getValue() == "var") {
       node = this->variableDeclaration();
-      this->consume(Token(TK_SEMICOLON, ""));
+      this->consume(TK_SEMICOLON);
       return node;
     }
     if (token.getValue() == "func")
       return this->funcDeclaration();
   default:
     node = this->expression();
-    this->consume(Token(TK_SEMICOLON, ""));
+    this->consume(TK_SEMICOLON);
     return node;
   }
 }
@@ -78,7 +78,7 @@ AST *LangParser::returnStatement() {
   AST* expression = new VoidAST();
   if (this->token.getType() != TK_SEMICOLON)
     expression = this->expression();
-  this->consume(Token(TK_SEMICOLON, ""));
+  this->consume(TK_SEMICOLON);
   return new ReturnAST(expression);
 }
 

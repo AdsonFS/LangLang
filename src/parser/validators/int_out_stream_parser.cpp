@@ -14,7 +14,7 @@ AST *LangParser::inputStream() {
   while (this->token.getType() == TK_INPUTSTREAM) {
     this->token = this->scanner.nextToken();
 
-    Token identifier = this->consume(Token(TokenType::TK_IDENTIFIER, ""));
+    Token identifier = this->consume(TokenType::TK_IDENTIFIER);
     identifiers.push_back(identifier);
   }
   return new InputStreamAST(identifiers);

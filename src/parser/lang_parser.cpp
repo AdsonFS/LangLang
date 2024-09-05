@@ -20,13 +20,24 @@ Token LangParser::consume(Token expectedToken) {
   return token;
 }
 
+Token LangParser::consume(TokenType expectedToken) {
+  Token token = this->token;
+  if (!this->match(expectedToken))
+    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
+                      this->scanner.getPosition(),
+                      Token(expectedToken, "").toString());
+  this->token = this->scanner.nextToken();
+  return token;
+}
+
 bool LangParser::match(Token expectedToken) {
   if (this->token.getType() != expectedToken.getType())
     return false;
-  if (expectedToken.getValue() != "" &&
-      this->token.getValue() != expectedToken.getValue())
-    return false;
-  return true;
+  return this->token.getValue() == expectedToken.getValue();
+}
+
+bool LangParser::match(TokenType expectedToken) {
+  return this->token.getType() == expectedToken;
 }
 
 void LangParser::semiColon() {

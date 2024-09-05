@@ -2,6 +2,7 @@ var cnt -> number := 0;
 var age -> number;
 var name -> string;
 
+
 name := "John";
 
 func printname() -> {
@@ -9,7 +10,6 @@ func printname() -> {
   return;
 }
 
-printname();
 func fat() -> number {
   cnt := cnt + 1;
   if (cnt > 5) {

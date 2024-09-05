@@ -43,11 +43,11 @@ AST *LangParser::forStatement() {
   if(this->match(Token(TK_RESERVED_WORD, "var")))
     init = this->variableDeclaration();
   else init = this->expression();
-  this->consume(Token(TK_SEMICOLON, ""));
+  this->consume(TK_SEMICOLON);
 
 
   conditional = this->expression();
-  this->consume(Token(TK_SEMICOLON, ""));
+  this->consume(TK_SEMICOLON);
   increment = this->expression();
   this->consume(Token(TK_PARENTHESES, ")"));
   this->consume(Token(TK_CURLY_BRACES, "{"));
