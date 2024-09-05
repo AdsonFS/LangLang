@@ -32,6 +32,8 @@ AST *LangParser::statement() {
       return this->whileStatement();
     if (token.getValue() == "for")
       return this->forStatement();
+    if (token.getValue() == "return")
+      return this->returnStatement();
     if (token.getValue() == "var") {
       node = this->variableDeclaration();
       this->consume(Token(TK_SEMICOLON, ""));
@@ -70,3 +72,11 @@ AST *LangParser::block() {
 
   return new BlockAST(statements);
 }
+
+AST *LangParser::returnStatement() {
+  this->consume(Token(TK_RESERVED_WORD, "return"));
+  /*AST *node = this->expression();*/
+  this->consume(Token(TK_SEMICOLON, ""));
+  return new ReturnAST();
+}
+

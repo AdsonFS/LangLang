@@ -1,6 +1,7 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include "../core/core.h"
 #include <exception>
 #include <iomanip>
 #include <string>
@@ -12,8 +13,16 @@ protected:
   const std::string red = "\033[31m";
   const std::string reset = "\033[0m";
 };
+class InternalError : public CoreError {};
+class ExternalError : public CoreError {};
 
-class LexicalError : public CoreError {
+class ReturnError : public InternalError {
+public:
+  explicit ReturnError(ASTValue value) : value(value) {}
+  ASTValue value;
+};
+
+class LexicalError : public ExternalError {
 private:
   std::string message;
 
@@ -32,7 +41,7 @@ public:
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
 
-class SyntaxError : public CoreError {
+class SyntaxError : public ExternalError {
 private:
   std::string message;
 
@@ -40,9 +49,9 @@ public:
   explicit SyntaxError(const std::string &section, const std::string &token,
                        std::pair<int, int> position, std::string expected) {
     std::ostringstream oss;
-    oss << this->grey << "Syntax Error: " << this->reset << "expected " << expected << ", found " << this->red << token
-        << this->reset << ", on line " << position.first << ":"
-        << position.second << std::endl
+    oss << this->grey << "Syntax Error: " << this->reset << "expected "
+        << expected << ", found " << this->red << token << this->reset
+        << ", on line " << position.first << ":" << position.second << std::endl
         << std::setw(4) << position.first << " | " << section << std::endl
         << std::setw(4) << "" << " | "
         << std::string(std::max(0, position.second - 1), ' ') << this->red
@@ -59,9 +68,11 @@ private:
 public:
   explicit RuntimeError(const std::string &message) {
     std::ostringstream oss;
-    oss << this->grey << "Runtime Error: " << this->reset << message << std::endl;
+    oss << this->grey << "Runtime Error: " << this->reset << message
+        << std::endl;
     this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
+
 #endif // ERROR_H

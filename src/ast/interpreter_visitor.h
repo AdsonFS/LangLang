@@ -16,13 +16,15 @@ private:
 
   ASTValue visitBLock(BlockAST *expr) override;
 
+  ASTValue visitReturn(ReturnAST *expr) override;
+
   ASTValue visitWhileStatement(WhileStatementAST *expr) override; 
 
   ASTValue visitForStatement(ForStatementAST *expr) override; 
 
   ASTValue visitIfStatement(IfStatementAST *expr) override; 
 
-  ASTValue visitFunction(FunctionAST *expr) override; 
+  ASTValue visitFunctionDeclaration(FunctionDeclarationAST *expr) override; 
 
   ASTValue visitOutputStream(OutputStreamAST *expr) override; 
 

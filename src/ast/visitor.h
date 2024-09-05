@@ -7,11 +7,12 @@ class ASTVisitor {
 public:
   virtual ASTValue visitStatementList(StatementListAST *expr) = 0;
   virtual ASTValue visitBLock(BlockAST *expr) = 0;
+  virtual ASTValue visitReturn(ReturnAST *expr) = 0;
 
   virtual ASTValue visitWhileStatement(WhileStatementAST *expr) = 0;
   virtual ASTValue visitForStatement(ForStatementAST *expr) = 0;
   virtual ASTValue visitIfStatement(IfStatementAST *expr) = 0;
-  virtual ASTValue visitFunction(FunctionAST *expr) = 0;
+  virtual ASTValue visitFunctionDeclaration(FunctionDeclarationAST *expr) = 0;
 
   virtual ASTValue visitOutputStream(OutputStreamAST *expr) = 0;
   virtual ASTValue visitInputStream(InputStreamAST *expr) = 0;

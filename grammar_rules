@@ -10,6 +10,7 @@ statement             : variable_declaration SEMICOLON
                       | expression
                       | identifier
                       | block
+                      | return
 
 
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
@@ -20,6 +21,7 @@ if_statement          : 'if' '(' expression ')' '{' statement_list '}'
                         ('else' '{' statement '}' 
 
 block                 : '{' statement_list '}'
+return                : 'return' expression ;
 
 variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
                       | 'var' identifier '->' ('string' | 'number');

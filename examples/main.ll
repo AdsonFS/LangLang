@@ -5,9 +5,10 @@ var name -> string;
 func print() -> {
   >> "Hello World!";
   cnt := cnt + 1;
-  if (cnt < 10) {
-    print();
+  if (cnt > 5) {
+    return; 
   }
+  print();
 }
 
 for (var i -> number := 0; i < 10; i := i + 1) {

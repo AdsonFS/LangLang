@@ -9,6 +9,7 @@ ASTValue StatementListAST::accept(ASTVisitor &visitor) {
   return visitor.visitStatementList(this);
 }
 ASTValue BlockAST::accept(ASTVisitor &visitor) { return visitor.visitBLock(this); }
+ASTValue ReturnAST::accept(ASTVisitor &visitor) { return visitor.visitReturn(this); }
 ASTValue WhileStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitWhileStatement(this);
 }
@@ -18,8 +19,8 @@ ASTValue ForStatementAST::accept(ASTVisitor &visitor) {
 ASTValue IfStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitIfStatement(this);
 }
-ASTValue FunctionAST::accept(ASTVisitor &visitor) {
-  return visitor.visitFunction(this);
+ASTValue FunctionDeclarationAST::accept(ASTVisitor &visitor) {
+  return visitor.visitFunctionDeclaration(this);
 }
 ASTValue OutputStreamAST::accept(ASTVisitor &visitor) {
   return visitor.visitOutputStream(this);

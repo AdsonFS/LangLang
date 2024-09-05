@@ -11,6 +11,7 @@ public:
   LangParser(LexiScanner &_scanner, Token &_token);
   AST *block();
   AST *call();
+  AST *returnStatement();
   AST *parser();
   AST *forStatement();
   AST *statement();

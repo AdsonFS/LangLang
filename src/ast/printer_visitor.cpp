@@ -26,6 +26,14 @@ ASTValue PrinterVisitor::visitBLock(BlockAST *expr) {
   return 0;
 }
 
+ASTValue PrinterVisitor::visitReturn(ReturnAST *expr) {
+  this->printIndent(this->indent++);
+  std::cout << "<ReturnAST>\n";
+  /*expr->value->accept(*this);*/
+  this->indent--;
+  return 0;
+}
+
 ASTValue PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   this->printIndent(this->indent++);
   std::cout << "<WhileStatementAST>\n";
@@ -74,9 +82,9 @@ ASTValue PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
   return 0;
 }
 
-ASTValue PrinterVisitor::visitFunction(FunctionAST *expr) {
+ASTValue PrinterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   this->printIndent(this->indent++);
-  std::cout << "<FunctionAST:" << expr->identifier.getValue() << ">\n";
+  std::cout << "<FunctionDeclarationAST:" << expr->identifier.getValue() << ">\n";
   expr->statements->accept(*this);
   this->indent--;
   return 0;

@@ -37,8 +37,10 @@ public:
 
 class ForStatementAST : public AST {
 public:
-  ForStatementAST(AST* initializer, AST *condition, AST* increment, StatementListAST *ifStatements)
-      : initializer(initializer), condition(condition), increment(increment), statements(ifStatements) {}
+  ForStatementAST(AST *initializer, AST *condition, AST *increment,
+                  StatementListAST *ifStatements)
+      : initializer(initializer), condition(condition), increment(increment),
+        statements(ifStatements) {}
   ASTValue accept(ASTVisitor &visitor) override;
 
   AST *initializer;
@@ -55,6 +57,15 @@ public:
   std::vector<AST *> statements;
 };
 
+class ReturnAST : public AST {
+public:
+  ReturnAST() {}
+  /*ReturnAST(AST *value) : value(value) {}*/
+  ASTValue accept(ASTVisitor &visitor) override;
+
+  /*AST *value;*/
+};
+
 class IfStatementAST : public AST {
 public:
   IfStatementAST(AST *condition, StatementListAST *ifStatements,
@@ -68,9 +79,9 @@ public:
   StatementListAST *elseStatements;
 };
 
-class FunctionAST : public AST {
+class FunctionDeclarationAST : public AST {
 public:
-  FunctionAST(Token identifier, StatementListAST *statements)
+  FunctionDeclarationAST(Token identifier, StatementListAST *statements)
       : identifier(identifier), statements(statements) {}
   ASTValue accept(ASTVisitor &visitor) override;
 

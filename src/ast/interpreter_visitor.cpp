@@ -25,6 +25,11 @@ ASTValue InterpreterVisitor::visitBLock(BlockAST *expr) {
   return 0;
 }
 
+ASTValue InterpreterVisitor::visitReturn(ReturnAST *expr) {
+  /*ASTValue value = expr->value->accept(*this);*/
+  throw ReturnError(nullptr);
+}
+
 ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   while (ASTValueIsTrue(expr->condition->accept(*this))) {
     this->scope = this->scope->newScope("if");
@@ -59,7 +64,8 @@ ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
   return 0;
 }
 
-ASTValue InterpreterVisitor::visitFunction(FunctionAST *expr) {
+ASTValue
+InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   FuncSymbol *func =
       new FuncSymbol(expr->identifier.getValue(), expr->statements);
   this->scope->set(func);
@@ -179,17 +185,21 @@ ASTValue InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   }
 }
 
-
 ASTValue InterpreterVisitor::visitCall(CallAST *expr) {
   ASTValue value = this->scope->getValue(expr->identifier.getValue());
   if (!std::holds_alternative<AST *>(value))
     throw RuntimeError("invalid function: " + expr->identifier.getValue());
-    
+
   ScopedSymbolTable *currentScope = this->scope;
   this->scope = this->scope->newScopeByContext(this->scope->getName() +
-                                                     expr->identifier.getValue(),
-                                                 expr->identifier.getValue());
-  std::get<AST *>(value)->accept(*this);
+                                                   expr->identifier.getValue(),
+                                               expr->identifier.getValue());
+  try {
+    std::get<AST *>(value)->accept(*this);
+  } catch (ReturnError &e) {
+    this->scope = currentScope;
+    return 0;
+  }
   this->scope = currentScope;
   return 0;
 }

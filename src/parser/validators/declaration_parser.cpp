@@ -27,7 +27,7 @@ AST *LangParser::funcDeclaration() {
   this->consume(Token(TokenType::TK_PARENTHESES, ")"));
   this->consume(Token(TokenType::TK_ARROW, "->"));
   this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
-  AST *node = new FunctionAST(
+  AST *node = new FunctionDeclarationAST(
       identifier, dynamic_cast<StatementListAST *>(this->statementList()));
   this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
   return node;
