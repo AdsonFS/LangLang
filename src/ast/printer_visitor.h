@@ -45,6 +45,8 @@ private:
 
   ASTValue visitStringExpr(StringAST *expr) override; 
 
+  ASTValue visitVoid(VoidAST *expr) override;
+
   ASTValue visitNil(NilAST *expr) override; 
 };
 

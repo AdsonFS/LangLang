@@ -84,7 +84,8 @@ ASTValue PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
 
 ASTValue PrinterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   this->printIndent(this->indent++);
-  std::cout << "<FunctionDeclarationAST:" << expr->identifier.getValue() << ">\n";
+  std::cout << "<FunctionDeclarationAST:" << expr->identifier.getValue() << " -> "
+    << expr->type << ">\n";
   expr->statements->accept(*this);
   this->indent--;
   return 0;
@@ -170,6 +171,12 @@ ASTValue PrinterVisitor::visitNumberExpr(NumberAST *expr) {
 ASTValue PrinterVisitor::visitStringExpr(StringAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<StringAST:" << expr->token.getValue() << ">\n";
+  return 0;
+}
+
+ASTValue PrinterVisitor::visitVoid(VoidAST *expr) {
+  this->printIndent(this->indent);
+  std::cout << "<VoidAST>\n";
   return 0;
 }
 

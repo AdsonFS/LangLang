@@ -24,8 +24,18 @@ class CallAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;
+class VoidAST;
 class NilAST;
 
-typedef std::variant<int, std::string, AST *> ASTValue;
+class VoidValue {
+public:
+  bool operator!=(const VoidValue &rhs) const { return false; }
+  bool operator==(const VoidValue &rhs) const { return false; }
+  bool operator<(const VoidValue &rhs) const { return false; }
+  bool operator>(const VoidValue &rhs) const { return false; }
+};
+
+typedef std::variant<int, std::string, VoidValue, AST *> ASTValue;
+bool isSameASTValueType(const ASTValue &a, ASTValue &b);
 
 #endif // CORE_H

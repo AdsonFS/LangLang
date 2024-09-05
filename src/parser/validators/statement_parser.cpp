@@ -75,8 +75,10 @@ AST *LangParser::block() {
 
 AST *LangParser::returnStatement() {
   this->consume(Token(TK_RESERVED_WORD, "return"));
-  /*AST *node = this->expression();*/
+  AST* expression = new VoidAST();
+  if (this->token.getType() != TK_SEMICOLON)
+    expression = this->expression();
   this->consume(Token(TK_SEMICOLON, ""));
-  return new ReturnAST();
+  return new ReturnAST(expression);
 }
 

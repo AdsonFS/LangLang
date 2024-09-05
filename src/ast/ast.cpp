@@ -50,4 +50,5 @@ ASTValue NumberAST::accept(ASTVisitor &visitor) {
 ASTValue StringAST::accept(ASTVisitor &visitor) {
   return visitor.visitStringExpr(this);
 }
+ASTValue VoidAST::accept(ASTVisitor &visitor) { return visitor.visitVoid(this); }
 ASTValue NilAST::accept(ASTVisitor &visitor) { return visitor.visitNil(this); }

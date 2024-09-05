@@ -59,11 +59,10 @@ public:
 
 class ReturnAST : public AST {
 public:
-  ReturnAST() {}
-  /*ReturnAST(AST *value) : value(value) {}*/
+  ReturnAST(AST *value) : value(value) {}
   ASTValue accept(ASTVisitor &visitor) override;
 
-  /*AST *value;*/
+  AST *value;
 };
 
 class IfStatementAST : public AST {
@@ -81,11 +80,12 @@ public:
 
 class FunctionDeclarationAST : public AST {
 public:
-  FunctionDeclarationAST(Token identifier, StatementListAST *statements)
-      : identifier(identifier), statements(statements) {}
+  FunctionDeclarationAST(Token identifier, std::string type, StatementListAST *statements)
+      : identifier(identifier), type(type), statements(statements) {}
   ASTValue accept(ASTVisitor &visitor) override;
 
   Token identifier;
+  std::string type;
   StatementListAST *statements;
 };
 
@@ -177,6 +177,12 @@ public:
   ASTValue accept(ASTVisitor &visitor) override;
 
   Token token;
+};
+
+class VoidAST : public AST {
+public:
+  VoidAST(){};
+  ASTValue accept(ASTVisitor &visitor) override;
 };
 
 class NilAST : public AST {

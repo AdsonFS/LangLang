@@ -23,11 +23,12 @@ if_statement          : 'if' '(' expression ')' '{' statement_list '}'
 block                 : '{' statement_list '}'
 return                : 'return' expression ;
 
-variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
-                      | 'var' identifier '->' ('string' | 'number');
+variable_declaration  : 'var' identifier '->' type := expression
+                      | 'var' identifier '->' type;
 
-func_declaration      : 'func' identifier '(' ')' ->  '{' statement_list '}'
+func_declaration      : 'func' identifier '(' ')' -> type? '{' statement_list '}'
 
+type                  : 'string' | 'number'
 output_stream         : >> output output_stream*
 output                : expression 
 

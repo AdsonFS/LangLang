@@ -36,7 +36,7 @@ void ScopedSymbolTable::update(std::string name, ASTValue value) {
   ScopedSymbolTable *scope =
       this->newScopeByContext(this->scopeName, name)->previousScope;
   if (scope->symbols.find(name) != scope->symbols.end()) {
-    if (scope->symbols[name]->type->value.index() != value.index())
+    if (!isSameASTValueType(scope->symbols[name]->type->value, value))
       throw RuntimeError("type mismatch: " + name);
     scope->symbols[name]->value = value;
 

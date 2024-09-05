@@ -29,7 +29,7 @@ int parser(LexiScanner &scanner, Token &token) {
   if (!hasErrors) {
     PrinterVisitor printer;
     InterpreterVisitor interpreter;
-    /*ast->accept(printer);*/
+    ast->accept(printer);
     try {
       ast->accept(interpreter);
     } catch (CoreError &e) {

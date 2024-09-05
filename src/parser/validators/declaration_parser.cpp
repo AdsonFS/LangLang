@@ -26,9 +26,14 @@ AST *LangParser::funcDeclaration() {
   this->consume(Token(TokenType::TK_PARENTHESES, "("));
   this->consume(Token(TokenType::TK_PARENTHESES, ")"));
   this->consume(Token(TokenType::TK_ARROW, "->"));
+
+  std::string type = "func";
+  if(!this->match(Token(TokenType::TK_CURLY_BRACES, "{"))) 
+    type = this->consume(Token(TokenType::TK_RESERVED_WORD, "")).getValue();
+
   this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
   AST *node = new FunctionDeclarationAST(
-      identifier, dynamic_cast<StatementListAST *>(this->statementList()));
+      identifier, type, dynamic_cast<StatementListAST *>(this->statementList()));
   this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
   return node;
 }

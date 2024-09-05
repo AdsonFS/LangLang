@@ -28,6 +28,7 @@ public:
   virtual ASTValue visitNumberExpr(NumberAST *expr) = 0;
   virtual ASTValue visitStringExpr(StringAST *expr) = 0;
 
+  virtual ASTValue visitVoid(VoidAST *expr) = 0;
   virtual ASTValue visitNil(NilAST *expr) = 0;
 };
 

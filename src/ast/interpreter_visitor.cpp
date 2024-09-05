@@ -26,8 +26,8 @@ ASTValue InterpreterVisitor::visitBLock(BlockAST *expr) {
 }
 
 ASTValue InterpreterVisitor::visitReturn(ReturnAST *expr) {
-  /*ASTValue value = expr->value->accept(*this);*/
-  throw ReturnError(nullptr);
+  ASTValue value = expr->value->accept(*this);
+  throw ReturnError(value);
 }
 
 ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
@@ -67,7 +67,9 @@ ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
 ASTValue
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   FuncSymbol *func =
-      new FuncSymbol(expr->identifier.getValue(), expr->statements);
+      new FuncSymbol(expr->identifier.getValue(),
+                      this->scope->getSymbol(expr->type),
+                     expr->statements);
   this->scope->set(func);
   return 0;
 }
@@ -78,8 +80,10 @@ ASTValue InterpreterVisitor::visitOutputStream(OutputStreamAST *expr) {
     ASTValue outputValue = output->accept(*this);
     if (std::holds_alternative<std::string>(outputValue))
       std::cout << std::get<std::string>(outputValue);
-    else
+    else if (std::holds_alternative<int>(outputValue))
       std::cout << std::get<int>(outputValue);
+    else
+      throw RuntimeError("invalid output: ");
     if (cnt--)
       std::cout << " ";
   }
@@ -108,16 +112,9 @@ ASTValue InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
 ASTValue
 InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   Token type = expr->type;
-  if (type.getValue() == "number")
     this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                   this->scope->getSymbol("number"),
+                                   this->scope->getSymbol(type.getValue()),
                                    expr->value->accept(*this)));
-  else if (type.getValue() == "string")
-    this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                   this->scope->getSymbol("string"),
-                                   expr->value->accept(*this)));
-  else
-    throw RuntimeError("invalid type: " + type.getValue());
   return 0;
 }
 
@@ -198,24 +195,16 @@ ASTValue InterpreterVisitor::visitCall(CallAST *expr) {
     std::get<AST *>(value)->accept(*this);
   } catch (ReturnError &e) {
     this->scope = currentScope;
-    return 0;
+    if (!isSameASTValueType(this->scope->getSymbol(expr->identifier.getValue())->type->value, e.value))
+      throw RuntimeError("type mismatch: " + expr->identifier.getValue());
+    return e.value;
   }
   this->scope = currentScope;
-  return 0;
+  return nullptr;
 }
 
 ASTValue InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
-
   ASTValue value = this->scope->getValue(expr->token.getValue());
-  /*if (std::holds_alternative<AST *>(value)) { // function call*/
-  /*  ScopedSymbolTable *currentScope = this->scope;*/
-  /*  this->scope = this->scope->newScopeByContext(this->scope->getName() +*/
-  /*                                                   expr->token.getValue(),*/
-  /*                                               expr->token.getValue());*/
-  /*  std::get<AST *>(value)->accept(*this);*/
-  /*  this->scope = currentScope;*/
-  /*  return 0;*/
-  /*}*/
   return value;
 }
 
@@ -227,4 +216,5 @@ ASTValue InterpreterVisitor::visitStringExpr(StringAST *expr) {
   return expr->token.getValue();
 }
 
+ASTValue InterpreterVisitor::visitVoid(VoidAST *expr) { return VoidValue(); }
 ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return nullptr; }
