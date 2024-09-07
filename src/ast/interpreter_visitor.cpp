@@ -1,58 +1,53 @@
 #include "interpreter_visitor.h"
+#include "../core/lang_object.h"
 #include "../error/error.h"
+#include <iostream>
 
 ScopedSymbolTable *InterpreterVisitor::scope;
 
-bool InterpreterVisitor::ASTValueIsTrue(ASTValue value) {
-  return std::holds_alternative<int>(value)
-             ? std::get<int>(value) != 0
-             : std::get<std::string>(value) != "";
-}
-
-ASTValue InterpreterVisitor::visitStatementList(StatementListAST *expr) {
+ASTValue *InterpreterVisitor::visitStatementList(StatementListAST *expr) {
   if (this->scope == nullptr)
     this->scope = new ScopedSymbolTable("global");
   for (auto &statement : expr->statements)
     statement->accept(*this);
-  return 0;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitBLock(BlockAST *expr) {
+ASTValue *InterpreterVisitor::visitBLock(BlockAST *expr) {
   this->scope = this->scope->newScope("block");
   for (auto &statement : expr->statements)
     statement->accept(*this);
   this->scope = this->scope->previousScope;
-  return 0;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitReturn(ReturnAST *expr) {
-  ASTValue value = expr->value->accept(*this);
-  throw ReturnError(value);
+ASTValue *InterpreterVisitor::visitReturn(ReturnAST *expr) {
+  throw ReturnError(expr->value->accept(*this));
 }
 
-ASTValue InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
-  while (ASTValueIsTrue(expr->condition->accept(*this))) {
+ASTValue *InterpreterVisitor::visitWhileStatement(WhileStatementAST *expr) {
+  while (expr->condition->accept(*this)->isTrue()) {
     this->scope = this->scope->newScope("if");
     expr->ifStatements->accept(*this);
     this->scope = this->scope->previousScope;
   }
-  return 0;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitForStatement(ForStatementAST *expr) {
+ASTValue *InterpreterVisitor::visitForStatement(ForStatementAST *expr) {
   this->scope = this->scope->newScope("for");
   expr->initializer->accept(*this);
-  while (ASTValueIsTrue(expr->condition->accept(*this))) {
+  while (expr->condition->accept(*this)->isTrue()) {
     expr->statements->accept(*this);
     expr->increment->accept(*this);
   }
   this->scope = this->scope->previousScope;
-  return 0;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
-  ASTValue value = expr->condition->accept(*this);
-  if (ASTValueIsTrue(value)) {
+ASTValue *InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
+  ASTValue *value = expr->condition->accept(*this);
+  if (value->isTrue()) {
     this->scope = this->scope->newScope("if");
     expr->ifStatements->accept(*this);
     this->scope = this->scope->previousScope;
@@ -61,160 +56,146 @@ ASTValue InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
     expr->elseStatements->accept(*this);
     this->scope = this->scope->previousScope;
   }
-  return 0;
+  return new LangNil();
 }
 
-ASTValue
+ASTValue *
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
-  FuncSymbol *func =
-      new FuncSymbol(expr->identifier.getValue(),
-                      this->scope->getSymbol(expr->type),
-                     expr->statements);
+  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(),
+                                    this->scope->getSymbol(expr->type),
+                                    new LangFunction(expr->statements));
   this->scope->set(func);
-  return 0;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitOutputStream(OutputStreamAST *expr) {
+ASTValue *InterpreterVisitor::visitOutputStream(OutputStreamAST *expr) {
   int cnt = expr->outputs.size() - 1;
   for (auto &output : expr->outputs) {
-    ASTValue outputValue = output->accept(*this);
-    if (std::holds_alternative<std::string>(outputValue))
-      std::cout << std::get<std::string>(outputValue);
-    else if (std::holds_alternative<int>(outputValue))
-      std::cout << std::get<int>(outputValue);
-    else
-      throw RuntimeError("invalid output: ");
-    if (cnt--)
-      std::cout << " ";
+    ASTValue *outputValue = output->accept(*this);
+    std::cout << *outputValue << (cnt-- ? " " : "");
   }
   std::cout << std::endl;
-  return (int)expr->outputs.size();
+  /*return (int)expr->outputs.size();*/
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
+ASTValue *InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
   for (auto &identifier : expr->identifiers) {
-    ASTValue value = this->scope->getValue(identifier.getValue());
-    if (std::holds_alternative<int>(value)) {
-      int input;
-      std::cin >> input;
-      this->scope->update(identifier.getValue(), input);
-    } else if (std::holds_alternative<std::string>(value)) {
-      std::string input;
-      std::cin >> input;
-      this->scope->update(identifier.getValue(), input);
-    } else {
-      throw RuntimeError("invalid identifier: " + identifier.getValue());
-    }
+    ASTValue *value = this->scope->getValue(identifier.getValue());
+    std::cin >> *value;
   }
-  return 0;
+  return new LangNil();
 }
 
-ASTValue
+ASTValue *
 InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   Token type = expr->type;
-    this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                   this->scope->getSymbol(type.getValue()),
-                                   expr->value->accept(*this)));
-  return 0;
+  this->scope->set(new VarSymbol(expr->identifier.getValue(),
+                                 this->scope->getSymbol(type.getValue()),
+                                 expr->value->accept(*this)));
+  return new LangNil();
 }
 
-ASTValue
+ASTValue *
 InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
-  ASTValue value = expr->value->accept(*this);
-  this->scope->update(expr->identifier.getValue(), value);
-  return value;
+  ASTValue *value = expr->value->accept(*this);
+  return this->scope->update(expr->identifier.getValue(), value);
 }
 
-ASTValue InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
+ASTValue *InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
+  // TODO
   if (expr->op.getType() == TK_LOGICAL_OPERATOR) {
     if (expr->op.getValue() == "&&")
-      return ASTValueIsTrue(expr->left->accept(*this)) &&
-             ASTValueIsTrue(expr->right->accept(*this));
+      return new LangBoolean(expr->left->accept(*this)->isTrue() &&
+                             expr->right->accept(*this)->isTrue());
     if (expr->op.getValue() == "||")
-      return ASTValueIsTrue(expr->left->accept(*this)) ||
-             ASTValueIsTrue(expr->right->accept(*this));
+      return new LangBoolean(expr->left->accept(*this)->isTrue() ||
+                             expr->right->accept(*this)->isTrue());
     throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
 
-  ASTValue leftValue = expr->left->accept(*this);
-  ASTValue rightValue = expr->right->accept(*this);
+  ASTValue *leftValue = expr->left->accept(*this);
+  ASTValue *rightValue = expr->right->accept(*this);
 
   if (expr->op.getType() == TK_EQUALITY_OPERATOR) {
     if (expr->op.getValue() == "==")
-      return leftValue == rightValue;
+      return *leftValue == *rightValue;
     if (expr->op.getValue() == "!=")
-      return leftValue != rightValue;
+      return *leftValue != *rightValue;
     throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
 
   switch (expr->op.getValue()[0]) {
   case '+':
-    if (std::holds_alternative<std::string>(leftValue))
-      return std::get<std::string>(leftValue) +
-             std::get<std::string>(rightValue);
-    return std::get<int>(leftValue) + std::get<int>(rightValue);
+    return *leftValue + *rightValue;
   case '-':
-    return std::get<int>(leftValue) - std::get<int>(rightValue);
+    return *leftValue - *rightValue;
   case '*':
-    return std::get<int>(leftValue) * std::get<int>(rightValue);
+    return *leftValue * *rightValue;
   case '/':
-    return std::get<int>(leftValue) / std::get<int>(rightValue);
+    return *leftValue / *rightValue;
   case '%':
-    return std::get<int>(leftValue) % std::get<int>(rightValue);
+    return *leftValue % *rightValue;
 
   case '<':
-    return leftValue < rightValue;
+    return *leftValue < *rightValue;
   case '>':
-    return leftValue > rightValue;
+    return *leftValue > *rightValue;
   default:
     throw RuntimeError("invalid operator: " + expr->op.getValue());
   }
+  throw RuntimeError("invalid operator: " + expr->op.getValue());
 }
 
-ASTValue InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
+ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   switch (expr->op.getValue()[0]) {
   case '+':
-    return std::get<int>(expr->child->accept(*this));
+    return expr->child->accept(*this);
   case '-':
-    return -std::get<int>(expr->child->accept(*this));
-  default:
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
+    return -(*expr->child->accept(*this));
   }
+  throw RuntimeError("invalid operator: " + expr->op.getValue());
 }
 
-ASTValue InterpreterVisitor::visitCall(CallAST *expr) {
-  ASTValue value = this->scope->getValue(expr->identifier.getValue());
-  if (!std::holds_alternative<AST *>(value))
-    throw RuntimeError("invalid function: " + expr->identifier.getValue());
+ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
+  // TODO
+  ASTValue *value = this->scope->getValue(expr->identifier.getValue());
+  LangFunction *func = dynamic_cast<LangFunction *>(value);
+
+  if (func == nullptr)
+    throw RuntimeError("invalid function..: " + expr->identifier.getValue());
 
   ScopedSymbolTable *currentScope = this->scope;
   this->scope = this->scope->newScopeByContext(this->scope->getName() +
                                                    expr->identifier.getValue(),
                                                expr->identifier.getValue());
   try {
-    std::get<AST *>(value)->accept(*this);
+    func->getValue()->accept(*this);
   } catch (ReturnError &e) {
     this->scope = currentScope;
-    if (!isSameASTValueType(this->scope->getSymbol(expr->identifier.getValue())->type->value, e.value))
+    if (!LangObject::isSameType(
+            this->scope->getSymbol(expr->identifier.getValue())->type->value,
+            e.value))
       throw RuntimeError("type mismatch: " + expr->identifier.getValue());
     return e.value;
   }
   this->scope = currentScope;
-  return nullptr;
+  return new LangNil();
 }
 
-ASTValue InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
-  ASTValue value = this->scope->getValue(expr->token.getValue());
-  return value;
+ASTValue *InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
+  return this->scope->getValue(expr->token.getValue());
 }
 
-ASTValue InterpreterVisitor::visitNumberExpr(NumberAST *expr) {
-  return std::stoi(expr->token.getValue());
+ASTValue *InterpreterVisitor::visitNumberExpr(NumberAST *expr) {
+  return new LangNumber(std::stoi(expr->token.getValue()));
 }
 
-ASTValue InterpreterVisitor::visitStringExpr(StringAST *expr) {
-  return expr->token.getValue();
+ASTValue *InterpreterVisitor::visitStringExpr(StringAST *expr) {
+  return new LangString(expr->token.getValue());
 }
 
-ASTValue InterpreterVisitor::visitVoid(VoidAST *expr) { return VoidValue(); }
-ASTValue InterpreterVisitor::visitNil(NilAST *expr) { return nullptr; }
+ASTValue *InterpreterVisitor::visitVoid(VoidAST *expr) {
+  return new LangVoid();
+}
+ASTValue *InterpreterVisitor::visitNil(NilAST *expr) { return new LangNil(); }

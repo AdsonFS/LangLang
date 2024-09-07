@@ -3,6 +3,7 @@
 
 #include <string>
 #include <variant>
+#include "lang_object.h"
 
 class ASTVisitor;
 
@@ -27,15 +28,6 @@ class StringAST;
 class VoidAST;
 class NilAST;
 
-class VoidValue {
-public:
-  bool operator!=(const VoidValue &rhs) const { return false; }
-  bool operator==(const VoidValue &rhs) const { return false; }
-  bool operator<(const VoidValue &rhs) const { return false; }
-  bool operator>(const VoidValue &rhs) const { return false; }
-};
-
-typedef std::variant<int, std::string, VoidValue, AST *> ASTValue;
-bool isSameASTValueType(const ASTValue &a, ASTValue &b);
+typedef LangObject ASTValue;
 
 #endif // CORE_H
