@@ -1,7 +1,6 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#include "../core/core.h"
 #include <exception>
 #include <iomanip>
 #include <string>
@@ -16,10 +15,12 @@ protected:
 class InternalError : public CoreError {};
 class ExternalError : public CoreError {};
 
+class LangObject;
+typedef LangObject ASTValue;
 class ReturnError : public InternalError {
 public:
-  explicit ReturnError(ASTValue value) : value(value) {}
-  ASTValue value;
+  explicit ReturnError(ASTValue *value) : value(value) {}
+  ASTValue *value;
 };
 
 class LexicalError : public ExternalError {
