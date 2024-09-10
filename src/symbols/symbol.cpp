@@ -1,8 +1,21 @@
 #include "symbol.h"
 #include "../error/error.h"
-#include <iostream>
 
 std::string ScopedSymbolTable::getName() { return this->scopeName; }
+
+bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
+  if (typeid(*lhs) != typeid(*rhs))
+    return false;
+  if (typeid(*lhs) == typeid(LangFunction)) {
+    LangFunction *lhsFunc = dynamic_cast<LangFunction *>(lhs);
+    LangFunction *rhsFunc = dynamic_cast<LangFunction *>(rhs);
+
+    if (lhsFunc->getReturnType() == nullptr || rhsFunc->getReturnType() == nullptr)
+      return true;
+    return isSameType(lhsFunc->getReturnType(), rhsFunc->getReturnType());
+  }
+  return true;
+}
 
 ScopedSymbolTable *
 ScopedSymbolTable::newScopeByContext(std::string scopeName,
@@ -29,21 +42,25 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name) {
       return currentScope->symbols[name];
     currentScope = currentScope->previousScope;
   }
-  return nullptr;
+  throw RuntimeError("name not found: " + name);
+  /*return nullptr;*/
 }
 
 ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value) {
   // TODO
   ScopedSymbolTable *scope =
       this->newScopeByContext(this->scopeName, name)->previousScope;
-  if (scope->symbols.find(name) != scope->symbols.end()) {
-    if (!LangObject::isSameType(scope->symbols[name]->type->value, value))
-      throw RuntimeError("type mismatch...: " + name);
-    scope->symbols[name]->value = value;
-
-  } else
+  if (scope->symbols.find(name) == scope->symbols.end())
     throw RuntimeError("name not found: " + name);
-  return value;
+
+  if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {
+    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value);
+    
+    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value))
+      throw RuntimeError("type mismatch...: " + name);
+  } else if (!this->isSameType(scope->symbols[name]->value, value))
+    throw RuntimeError("type mismatch...: " + name);
+  return scope->symbols[name]->value = value;
 }
 
 ASTValue *ScopedSymbolTable::getValue(std::string name) {

@@ -84,8 +84,8 @@ ASTValue* PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
 
 ASTValue* PrinterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   this->printIndent(this->indent++);
-  std::cout << "<FunctionDeclarationAST:" << expr->identifier.getValue() << " -> "
-    << expr->type << ">\n";
+  std::cout << "<FunctionDeclarationAST:" << expr->identifier.getValue() << ">\n";
+    /*<< expr->type << ">\n";*/
   expr->statements->accept(*this);
   this->indent--;
   return new LangNil();

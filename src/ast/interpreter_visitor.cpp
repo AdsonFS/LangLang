@@ -61,9 +61,21 @@ ASTValue *InterpreterVisitor::visitIfStatement(IfStatementAST *expr) {
 
 ASTValue *
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
-  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(),
-                                    this->scope->getSymbol(expr->type),
-                                    new LangFunction(expr->statements));
+
+  ASTValue *type = nullptr;
+  while (!expr->types.empty()) {
+    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue())->value;
+    if (type == nullptr)
+      type = t;
+    else if (typeid(*t) != typeid(LangFunction))
+      throw RuntimeError("type mismatch: " + expr->identifier.getValue());
+    else type = new LangFunction(nullptr, type);
+    expr->types.pop();
+  }
+
+  FuncSymbol *func =
+      new FuncSymbol(expr->identifier.getValue(),
+                     new LangFunction(expr->statements, type));
   this->scope->set(func);
   return new LangNil();
 }
@@ -89,10 +101,23 @@ ASTValue *InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
 
 ASTValue *
 InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
-  Token type = expr->type;
-  this->scope->set(new VarSymbol(expr->identifier.getValue(),
-                                 this->scope->getSymbol(type.getValue()),
-                                 expr->value->accept(*this)));
+  ASTValue *value = expr->value->accept(*this);
+
+  ASTValue *type = nullptr;
+  while (!expr->types.empty()) {
+    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue())->value;
+    if (type == nullptr)
+      type = t;
+    else if (typeid(*t) != typeid(LangFunction))
+      throw RuntimeError("type mismatch: " + expr->identifier.getValue());
+    else type = new LangFunction(nullptr, type);
+    expr->types.pop();
+  }
+
+  if (dynamic_cast<LangNil *>(value) != nullptr)
+    value = new LangNil(type);
+
+  this->scope->set(new VarSymbol(expr->identifier.getValue(), value));
   return new LangNil();
 }
 
@@ -169,18 +194,16 @@ ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
   this->scope = this->scope->newScopeByContext(this->scope->getName() +
                                                    expr->identifier.getValue(),
                                                expr->identifier.getValue());
+  ASTValue *returnValue = new LangVoid();
   try {
     func->getValue()->accept(*this);
   } catch (ReturnError &e) {
-    this->scope = currentScope;
-    if (!LangObject::isSameType(
-            this->scope->getSymbol(expr->identifier.getValue())->type->value,
-            e.value))
-      throw RuntimeError("type mismatch: " + expr->identifier.getValue());
-    return e.value;
+    returnValue = e.value;
   }
   this->scope = currentScope;
-  return new LangNil();
+  if (!scope->isSameType(func->getReturnType(), returnValue))
+    throw RuntimeError("invalid return type: " + expr->identifier.getValue());
+  return returnValue;
 }
 
 ASTValue *InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
