@@ -7,6 +7,7 @@
 #include "visitor.h"
 #include <iostream>
 #include <map>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -14,13 +15,13 @@
 
 class AST {
 public:
-  virtual ASTValue* accept(ASTVisitor &visitor);
+  virtual ASTValue *accept(ASTVisitor &visitor);
 };
 
 class StatementListAST : public AST {
 public:
   StatementListAST(std::vector<AST *> statements) : statements(statements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<AST *> statements;
 };
@@ -29,7 +30,7 @@ class WhileStatementAST : public AST {
 public:
   WhileStatementAST(AST *condition, StatementListAST *ifStatements)
       : condition(condition), ifStatements(ifStatements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   AST *condition;
   StatementListAST *ifStatements;
@@ -41,7 +42,7 @@ public:
                   StatementListAST *ifStatements)
       : initializer(initializer), condition(condition), increment(increment),
         statements(ifStatements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   AST *initializer;
   AST *condition;
@@ -52,7 +53,7 @@ public:
 class BlockAST : public AST {
 public:
   BlockAST(std::vector<AST *> statements) : statements(statements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<AST *> statements;
 };
@@ -60,7 +61,7 @@ public:
 class ReturnAST : public AST {
 public:
   ReturnAST(AST *value) : value(value) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   AST *value;
 };
@@ -71,7 +72,7 @@ public:
                  StatementListAST *elseStatements)
       : condition(condition), ifStatements(ifStatements),
         elseStatements(elseStatements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   AST *condition;
   StatementListAST *ifStatements;
@@ -80,19 +81,20 @@ public:
 
 class FunctionDeclarationAST : public AST {
 public:
-  FunctionDeclarationAST(Token identifier, std::string type, StatementListAST *statements)
-      : identifier(identifier), type(type), statements(statements) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  FunctionDeclarationAST(Token identifier, std::stack<Token> types,
+                         StatementListAST *statements)
+      : identifier(identifier), types(types), statements(statements) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
 
+  std::stack<Token> types;
   Token identifier;
-  std::string type;
   StatementListAST *statements;
 };
 
 class OutputStreamAST : public AST {
 public:
   OutputStreamAST(std::vector<AST *> outputs) : outputs(outputs) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<AST *> outputs;
 };
@@ -100,18 +102,18 @@ public:
 class InputStreamAST : public AST {
 public:
   InputStreamAST(std::vector<Token> identifiers) : identifiers(identifiers) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<Token> identifiers;
 };
 
 class VariableDeclarationAST : public AST {
 public:
-  VariableDeclarationAST(Token type, Token identifier, AST *value)
-      : type(type), identifier(identifier), value(value) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  VariableDeclarationAST(std::stack<Token> types, Token identifier, AST *value)
+      : types(types), identifier(identifier), value(value) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
 
-  Token type;
+  std::stack<Token> types;
   Token identifier;
   AST *value;
 };
@@ -120,7 +122,7 @@ class AssignmentVariableAST : public AST {
 public:
   AssignmentVariableAST(Token identifier, AST *value)
       : identifier(identifier), value(value) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   Token identifier;
   AST *value;
@@ -130,7 +132,7 @@ class BinaryOperatorAST : public AST {
 public:
   BinaryOperatorAST(AST *left, AST *right, Token op)
       : left(left), right(right), op(op) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
   AST *left;
   AST *right;
   Token op;
@@ -139,7 +141,7 @@ public:
 class UnaryOperatorAST : public AST {
 public:
   UnaryOperatorAST(AST *child, Token op) : child(child), op(op) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   AST *child;
   Token op;
@@ -149,7 +151,7 @@ class CallAST : public AST {
 public:
   CallAST(Token identifier, std::vector<AST *> arguments)
       : identifier(identifier), arguments(arguments) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   Token identifier;
   std::vector<AST *> arguments;
@@ -158,7 +160,7 @@ public:
 class IdentifierAST : public AST {
 public:
   IdentifierAST(Token token) : token(token) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   Token token;
 };
@@ -166,7 +168,7 @@ public:
 class NumberAST : public AST {
 public:
   NumberAST(Token token) : token(token) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   Token token;
 };
@@ -174,7 +176,7 @@ public:
 class StringAST : public AST {
 public:
   StringAST(Token token) : token(token) {}
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 
   Token token;
 };
@@ -182,13 +184,13 @@ public:
 class VoidAST : public AST {
 public:
   VoidAST(){};
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 };
 
 class NilAST : public AST {
 public:
   NilAST(){};
-  ASTValue* accept(ASTVisitor &visitor) override;
+  ASTValue *accept(ASTVisitor &visitor) override;
 };
 
 #endif // !AST_H

@@ -10,7 +10,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->fileContent = fileContent;
   this->position = this->column = 0;
   this->line = 1 + (fileContent[0] == '\n');
-  this->reservedWords = {"var", "func", "number", "string", "return", "if", "else", "while", "for"};
+  this->reservedWords = {"void", "var", "func", "number", "string", "return", "if", "else", "while", "for"};
 }
 
 void LexiScanner::panicMode() {
