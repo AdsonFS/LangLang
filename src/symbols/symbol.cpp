@@ -18,9 +18,10 @@ bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
 }
 
 ScopedSymbolTable *
-ScopedSymbolTable::newScopeByContext(std::string scopeName,
+ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context, 
+                                    std::string scopeName,
                                      std::string identifier) {
-  ScopedSymbolTable *currentScope = this;
+  ScopedSymbolTable *currentScope = context;
   while (currentScope != nullptr) {
     if (currentScope->symbols.find(identifier) != currentScope->symbols.end())
       return new ScopedSymbolTable(scopeName, currentScope);
@@ -48,9 +49,13 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name) {
 
 ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value) {
   // TODO
-  ScopedSymbolTable *scope =
-      this->newScopeByContext(this->scopeName, name)->previousScope;
-  if (scope->symbols.find(name) == scope->symbols.end())
+  ScopedSymbolTable *scope = this;
+  while (scope != nullptr) {
+    if (scope->symbols.find(name) != scope->symbols.end())
+      break;
+    scope = scope->previousScope;
+  }
+  if (scope == nullptr)
     throw RuntimeError("name not found: " + name);
 
   if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {

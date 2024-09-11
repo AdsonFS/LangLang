@@ -1,16 +1,36 @@
-var cnt -> number := 0;
-var age -> number;
-var name -> string := "John";
-var print -> func -> void;
+var a -> string := "global";
 
-func printname() -> func -> void {
-  >> "Name:" >> name;
-  func pp() -> void {
-    >> "Name:" >> name;
-    return;
+{
+  func show() -> void {
+    >> a;
   }
-  return pp;
+  show();
+  var a -> string := "block";
+  show();
 }
-printname();
 
+var ccc -> number := 0;
+func show() -> void {
+  ccc := ccc + 1;
+  var a -> string := "function";
+  >> a;
+  if (ccc < 2) {
+    show();
+  }
+  >> a;
+  a := "function2";
+}
+show();
 
+func counter() -> func -> void {
+  var i -> number := 0;
+  func count() -> void {
+    i := i + 1;
+    >> i;
+  }
+
+  return count;
+}
+
+var cc -> func ->  void; 
+cc := counter();

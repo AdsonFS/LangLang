@@ -69,13 +69,13 @@ InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
       type = t;
     else if (typeid(*t) != typeid(LangFunction))
       throw RuntimeError("type mismatch: " + expr->identifier.getValue());
-    else type = new LangFunction(nullptr, type);
+    else
+      type = new LangFunction(nullptr, type);
     expr->types.pop();
   }
 
-  FuncSymbol *func =
-      new FuncSymbol(expr->identifier.getValue(),
-                     new LangFunction(expr->statements, type));
+  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(), this->scope,
+                                    new LangFunction(expr->statements, type));
   this->scope->set(func);
   return new LangNil();
 }
@@ -110,14 +110,16 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
       type = t;
     else if (typeid(*t) != typeid(LangFunction))
       throw RuntimeError("type mismatch: " + expr->identifier.getValue());
-    else type = new LangFunction(nullptr, type);
+    else
+      type = new LangFunction(nullptr, type);
     expr->types.pop();
   }
 
   if (dynamic_cast<LangNil *>(value) != nullptr)
     value = new LangNil(type);
 
-  this->scope->set(new VarSymbol(expr->identifier.getValue(), value));
+  this->scope->set(
+      new VarSymbol(expr->identifier.getValue(), this->scope, value));
   return new LangNil();
 }
 
@@ -191,9 +193,7 @@ ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
     throw RuntimeError("invalid function..: " + expr->identifier.getValue());
 
   ScopedSymbolTable *currentScope = this->scope;
-  this->scope = this->scope->newScopeByContext(this->scope->getName() +
-                                                   expr->identifier.getValue(),
-                                               expr->identifier.getValue());
+  this->scope = this->scope->getSymbol(expr->identifier.getValue())->context->newScope("function");
   ASTValue *returnValue = new LangVoid();
   try {
     func->getValue()->accept(*this);
