@@ -20,7 +20,7 @@ int parser(LexiScanner &scanner, Token &token) {
       std::cout << e.what() << std::endl << std::endl;
       scanner.panicMode();
       continue;
-      /*return 1;*/
+
     } catch (std::runtime_error &e) {
       std::cout << e.what() << std::endl;
       exit(1);
@@ -38,6 +38,7 @@ int parser(LexiScanner &scanner, Token &token) {
       interpreter.setJumpTable(SemanticVisitor::getJumpTable());
       ast->accept(interpreter);
     } catch (CoreError &e) {
+      /*return 1;*/
       std::cout << e.what() << std::endl;
     }
   }

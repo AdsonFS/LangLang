@@ -62,6 +62,20 @@ public:
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
 
+class SemanticError : public CoreError{
+private:
+  std::string message;
+
+public:
+  explicit SemanticError(const std::string &message) {
+    std::ostringstream oss;
+    oss << this->grey << "Semantic Error: " << this->reset << message;
+        
+    this->message = oss.str();
+  }
+  virtual const char *what() const noexcept override { return message.c_str(); }
+};
+
 class RuntimeError : public CoreError {
 private:
   std::string message;

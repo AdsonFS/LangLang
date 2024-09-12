@@ -83,11 +83,10 @@ SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
                      new LangFunction(expr->statements, type, this->scope));
   this->scope->set(func);
 
-
   ScopedSymbolTable *currentScope = this->scope;
 
   this->scope = currentScope->newScope("functionin");
-  expr->statements->accept(*this);  
+  expr->statements->accept(*this);
 
   this->scope = currentScope;
   return new LangNil();
@@ -135,8 +134,10 @@ ASTValue *
 SemanticVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   ASTValue *value = expr->value->accept(*this);
   std::string name = expr->identifier.getValue();
-  
+
   jumpTable[expr] = ScopedSymbolTable::jumpTo(name, this->scope);
+  if (jumpTable[expr] == -1)
+    throw SemanticError("Variable " + name + " not declared");
 
   return new LangNil();
 }
@@ -153,12 +154,18 @@ ASTValue *SemanticVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
 }
 
 ASTValue *SemanticVisitor::visitCall(CallAST *expr) {
-  jumpTable[expr] = ScopedSymbolTable::jumpTo(expr->identifier.getValue(), this->scope);
+  jumpTable[expr] =
+      ScopedSymbolTable::jumpTo(expr->identifier.getValue(), this->scope);
+  if (jumpTable[expr] == -1)
+    throw SemanticError("Function " + expr->identifier.getValue() + " not declared");
   return new LangNil();
 }
 
 ASTValue *SemanticVisitor::visitIdentifier(IdentifierAST *expr) {
-  jumpTable[expr] = ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
+  jumpTable[expr] =
+      ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
+  if (jumpTable[expr] == -1)
+    throw SemanticError("Variable " + expr->token.getValue() + " not declared");
   return new LangNil();
 }
 
@@ -170,7 +177,5 @@ ASTValue *SemanticVisitor::visitStringExpr(StringAST *expr) {
   return new LangString(expr->token.getValue());
 }
 
-ASTValue *SemanticVisitor::visitVoid(VoidAST *expr) {
-  return new LangVoid();
-}
+ASTValue *SemanticVisitor::visitVoid(VoidAST *expr) { return new LangVoid(); }
 ASTValue *SemanticVisitor::visitNil(NilAST *expr) { return new LangNil(); }

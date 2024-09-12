@@ -1,5 +1,4 @@
 var a -> string := "global";
-
 {
   func show() -> void {
     >> a;
