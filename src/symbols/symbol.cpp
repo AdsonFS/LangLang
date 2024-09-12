@@ -3,6 +3,17 @@
 
 std::string ScopedSymbolTable::getName() { return this->scopeName; }
 
+int ScopedSymbolTable::jumpTo(std::string name, ScopedSymbolTable *scope) {
+  int jumps = 0;
+  ScopedSymbolTable *currentScope = scope;
+  while (currentScope != nullptr) {
+    if (currentScope->symbols.find(name) != currentScope->symbols.end())
+      return jumps;
+    jumps++;
+    currentScope = currentScope->previousScope;
+  }
+  return -1;
+}
 bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
   if (typeid(*lhs) != typeid(*rhs))
     return false;
@@ -36,26 +47,22 @@ void ScopedSymbolTable::set(Symbol *symbol) {
   this->symbols[symbol->name] = symbol;
 }
 
-Symbol *ScopedSymbolTable::getSymbol(std::string name) {
+Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
   ScopedSymbolTable *currentScope = this;
-  while (currentScope != nullptr) {
-    if (currentScope->symbols.find(name) != currentScope->symbols.end())
-      return currentScope->symbols[name];
-    currentScope = currentScope->previousScope;
-  }
-  throw RuntimeError("name not found: " + name);
-  /*return nullptr;*/
+  
+  while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
+  
+  if (currentScope == nullptr || currentScope->symbols.find(name) == currentScope->symbols.end())
+    throw RuntimeError("name not found: " + name);
+  return currentScope->symbols[name];
 }
 
-ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value) {
+ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {
   // TODO
   ScopedSymbolTable *scope = this;
-  while (scope != nullptr) {
-    if (scope->symbols.find(name) != scope->symbols.end())
-      break;
-    scope = scope->previousScope;
-  }
-  if (scope == nullptr)
+  while (scope != nullptr && jumps--) scope = scope->previousScope;
+  
+  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())
     throw RuntimeError("name not found: " + name);
 
   if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {
@@ -68,9 +75,9 @@ ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value) {
   return scope->symbols[name]->value = value;
 }
 
-ASTValue *ScopedSymbolTable::getValue(std::string name) {
+ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
   // Todo
-  Symbol *symbol = this->getSymbol(name);
+  Symbol *symbol = this->getSymbol(name, jumps);
   if (symbol == nullptr)
     throw RuntimeError("name not found: " + name);
   if (dynamic_cast<LangNil *>(symbol->value) != nullptr)

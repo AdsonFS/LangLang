@@ -9,6 +9,7 @@
 class AST;
 class LangBoolean;
 class LangFunction;
+class ScopedSymbolTable;
 
 class LangObject {
 private:
@@ -67,16 +68,18 @@ public:
 
 class LangFunction : public LangObject {
 public:
-  LangFunction(AST *value, LangObject *returnType)
-      : value(value), returnType(returnType) {}
+  LangFunction(AST *value, LangObject *returnType, ScopedSymbolTable *scope)
+      : value(value), returnType(returnType), scope(scope) {}
   void setValue(AST *value) { this->value = value; }
   AST *getValue() { return value; }
   LangObject *getReturnType() { return returnType; }
+  ScopedSymbolTable *getScope() { return scope; }
 
 private:
   bool isTrue() const override { return true; }
   void toString(std::ostream &os) const override;
   AST *value;
+  ScopedSymbolTable *scope;
   LangObject *returnType;
 };
 

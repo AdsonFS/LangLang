@@ -1,5 +1,6 @@
 #include "ast/interpreter_visitor.h"
 #include "ast/printer_visitor.h"
+#include "ast/semantic_visitor.h"
 #include "core/core.h"
 #include "error/error.h"
 #include "lexi/lexi_scanner.h"
@@ -28,9 +29,13 @@ int parser(LexiScanner &scanner, Token &token) {
   }
   if (!hasErrors) {
     PrinterVisitor printer;
+    SemanticVisitor semantic;
     InterpreterVisitor interpreter;
     ast->accept(printer);
     try {
+      ast->accept(semantic);
+
+      interpreter.setJumpTable(SemanticVisitor::getJumpTable());
       ast->accept(interpreter);
     } catch (CoreError &e) {
       std::cout << e.what() << std::endl;

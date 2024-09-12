@@ -101,10 +101,10 @@ public:
 
 class InputStreamAST : public AST {
 public:
-  InputStreamAST(std::vector<Token> identifiers) : identifiers(identifiers) {}
+  InputStreamAST(std::vector<IdentifierAST> identifiers) : identifiers(identifiers) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::vector<Token> identifiers;
+  std::vector<IdentifierAST> identifiers;
 };
 
 class VariableDeclarationAST : public AST {

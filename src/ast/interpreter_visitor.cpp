@@ -4,6 +4,7 @@
 #include <iostream>
 
 ScopedSymbolTable *InterpreterVisitor::scope;
+std::unordered_map<AST *, int> InterpreterVisitor::jumpTable;
 
 ASTValue *InterpreterVisitor::visitStatementList(StatementListAST *expr) {
   if (this->scope == nullptr)
@@ -64,18 +65,18 @@ InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
 
   ASTValue *type = nullptr;
   while (!expr->types.empty()) {
-    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue())->value;
+    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue(), 0)->value;
     if (type == nullptr)
       type = t;
     else if (typeid(*t) != typeid(LangFunction))
       throw RuntimeError("type mismatch: " + expr->identifier.getValue());
     else
-      type = new LangFunction(nullptr, type);
+      type = new LangFunction(nullptr, type, this->scope);
     expr->types.pop();
   }
 
-  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(), this->scope,
-                                    new LangFunction(expr->statements, type));
+  FuncSymbol *func = new FuncSymbol(expr->identifier.getValue(),
+                                    new LangFunction(expr->statements, type, this->scope));
   this->scope->set(func);
   return new LangNil();
 }
@@ -93,7 +94,7 @@ ASTValue *InterpreterVisitor::visitOutputStream(OutputStreamAST *expr) {
 
 ASTValue *InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
   for (auto &identifier : expr->identifiers) {
-    ASTValue *value = this->scope->getValue(identifier.getValue());
+    ASTValue *value = identifier.accept(*this);
     std::cin >> *value;
   }
   return new LangNil();
@@ -105,13 +106,13 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
 
   ASTValue *type = nullptr;
   while (!expr->types.empty()) {
-    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue())->value;
+    ASTValue *t = this->scope->getSymbol(expr->types.top().getValue(), 0)->value;
     if (type == nullptr)
       type = t;
     else if (typeid(*t) != typeid(LangFunction))
       throw RuntimeError("type mismatch: " + expr->identifier.getValue());
     else
-      type = new LangFunction(nullptr, type);
+      type = new LangFunction(nullptr, type, this->scope);
     expr->types.pop();
   }
 
@@ -119,14 +120,14 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
     value = new LangNil(type);
 
   this->scope->set(
-      new VarSymbol(expr->identifier.getValue(), this->scope, value));
+      new VarSymbol(expr->identifier.getValue(), value));
   return new LangNil();
 }
 
 ASTValue *
 InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   ASTValue *value = expr->value->accept(*this);
-  return this->scope->update(expr->identifier.getValue(), value);
+  return this->scope->update(expr->identifier.getValue(), value, this->jumpTable[expr]);
 }
 
 ASTValue *InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
@@ -186,17 +187,18 @@ ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
 
 ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
   // TODO
-  ASTValue *value = this->scope->getValue(expr->identifier.getValue());
+  ASTValue *value = this->scope->getValue(expr->identifier.getValue(), this->jumpTable[expr]);
   LangFunction *func = dynamic_cast<LangFunction *>(value);
 
   if (func == nullptr)
     throw RuntimeError("invalid function..: " + expr->identifier.getValue());
 
   ScopedSymbolTable *currentScope = this->scope;
-  this->scope = this->scope->getSymbol(expr->identifier.getValue())->context->newScope("function");
+  this->scope = func->getScope()->newScope("functioncall");
   ASTValue *returnValue = new LangVoid();
   try {
     func->getValue()->accept(*this);
+
   } catch (ReturnError &e) {
     returnValue = e.value;
   }
@@ -207,7 +209,7 @@ ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
 }
 
 ASTValue *InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {
-  return this->scope->getValue(expr->token.getValue());
+  return this->scope->getValue(expr->token.getValue(), this->jumpTable[expr]);
 }
 
 ASTValue *InterpreterVisitor::visitNumberExpr(NumberAST *expr) {

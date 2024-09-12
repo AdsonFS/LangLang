@@ -9,19 +9,6 @@ var a -> string := "global";
   show();
 }
 
-var ccc -> number := 0;
-func show() -> void {
-  ccc := ccc + 1;
-  var a -> string := "function";
-  >> a;
-  if (ccc < 2) {
-    show();
-  }
-  >> a;
-  a := "function2";
-}
-show();
-
 func counter() -> func -> void {
   var i -> number := 0;
   func count() -> void {
@@ -32,5 +19,8 @@ func counter() -> func -> void {
   return count;
 }
 
-var cc -> func ->  void; 
+var cc -> func -> void; 
 cc := counter();
+cc();
+cc();
+cc();

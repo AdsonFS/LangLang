@@ -105,7 +105,7 @@ ASTValue* PrinterVisitor::visitInputStream(InputStreamAST *expr) {
   std::cout << "<InputStreamAST>\n";
   for (auto &identifier : expr->identifiers) {
     this->printIndent(this->indent);
-    std::cout << "<IdentifierAST:" << identifier.getValue() << ">\n";
+    std::cout << "<IdentifierAST:" << identifier.token.getValue() << ">\n";
   }
   this->indent--;
   return new LangNil();

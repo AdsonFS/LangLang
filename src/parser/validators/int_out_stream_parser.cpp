@@ -10,12 +10,12 @@ AST *LangParser::outputStream() {
 }
 
 AST *LangParser::inputStream() {
-  std::vector<Token> identifiers;
+  std::vector<IdentifierAST> identifiers;
   while (this->token.getType() == TK_INPUTSTREAM) {
     this->token = this->scanner.nextToken();
 
     Token identifier = this->consume(TokenType::TK_IDENTIFIER);
-    identifiers.push_back(identifier);
+    identifiers.push_back(IdentifierAST(identifier));
   }
   return new InputStreamAST(identifiers);
 }

@@ -1,20 +1,21 @@
-#ifndef INTERPRETER_VISITOR_H
-#define INTERPRETER_VISITOR_H
+#ifndef SEMANTIC_VISITOR_H
+#define SEMANTIC_VISITOR_H
 
 #include "ast.h"
 #include "visitor.h"
 #include <iostream>
+#include <unordered_map>
 
-class InterpreterVisitor: public ASTVisitor {
+class SemanticVisitor: public ASTVisitor {
 public:
-  static void setJumpTable(std::unordered_map<AST*, int> jumpTable) {
-    InterpreterVisitor::jumpTable = jumpTable;
+  
+  static std::unordered_map<AST*, int> getJumpTable() {
+    return jumpTable;
   }
-protected:
 private:
   static ScopedSymbolTable *scope;
   static std::unordered_map<AST*, int> jumpTable;
-
+  
   ASTValue* visitStatementList(StatementListAST *expr) override; 
 
   ASTValue* visitBLock(BlockAST *expr) override;
@@ -54,4 +55,4 @@ private:
   ASTValue* visitNil(NilAST *expr) override;
 };
 
-#endif // INTERPRETER_VISITOR_H
+#endif // SEMANTIC_VISITOR_H
