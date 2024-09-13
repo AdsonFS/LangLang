@@ -49,7 +49,7 @@ public:
                                     new LangFunction(nullptr, new LangVoid(), this)));
   }
   std::string getName();
-  void set(Symbol *symbol);
+  bool set(Symbol *symbol);
   ASTValue *update(std::string name, ASTValue *value, int jumps);
   ASTValue *getValue(std::string name, int jumps);
   Symbol *getSymbol(std::string name, int jumps);

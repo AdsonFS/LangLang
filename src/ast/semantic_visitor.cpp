@@ -83,7 +83,8 @@ SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   FuncSymbol *func =
       new FuncSymbol(expr->identifier.getValue(),
                      new LangFunction(expr->statements, type, this->scope));
-  this->scope->set(func);
+  if(!this->scope->set(func))
+    throw SemanticError("Function " + expr->identifier.getValue() + " already declared");
 
   ScopedSymbolTable *currentScope = this->scope;
 
@@ -134,7 +135,8 @@ SemanticVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   if (dynamic_cast<LangNil *>(value) != nullptr)
     value = new LangNil(type);
 
-  this->scope->set(new VarSymbol(expr->identifier.getValue(), value));
+  if(!this->scope->set(new VarSymbol(expr->identifier.getValue(), value)))
+    throw SemanticError("Variable " + expr->identifier.getValue() + " already declared");
   return new LangNil();
 }
 

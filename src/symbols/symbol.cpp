@@ -42,10 +42,11 @@ ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context,
   throw RuntimeError("name not found: " + identifier);
 }
 
-void ScopedSymbolTable::set(Symbol *symbol) {
+bool ScopedSymbolTable::set(Symbol *symbol) {
   if (this->symbols.find(symbol->name) != this->symbols.end())
-    throw RuntimeError("name already declared: " + symbol->name);
+    return false;
   this->symbols[symbol->name] = symbol;
+  return true;
 }
 
 Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
