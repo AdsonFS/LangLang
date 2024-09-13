@@ -53,7 +53,7 @@ public:
   ASTValue *update(std::string name, ASTValue *value, int jumps);
   ASTValue *getValue(std::string name, int jumps);
   Symbol *getSymbol(std::string name, int jumps);
-  bool isSameType(ASTValue *lhs, ASTValue *rhs);
+  static bool isSameType(ASTValue *lhs, ASTValue *rhs);
   static int jumpTo(std::string name, ScopedSymbolTable *scope);
 
   static ScopedSymbolTable *newScopeByContext(ScopedSymbolTable *context,

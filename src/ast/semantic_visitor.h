@@ -5,6 +5,7 @@
 #include "visitor.h"
 #include <iostream>
 #include <unordered_map>
+#include "../core/lang_object.h"
 
 class SemanticVisitor: public ASTVisitor {
 public:
@@ -13,6 +14,8 @@ public:
     return jumpTable;
   }
 private:
+  static LangObject* currentReturnType;
+  static LangObject* currentFunctionType;
   static ScopedSymbolTable *scope;
   static std::unordered_map<AST*, int> jumpTable;
   

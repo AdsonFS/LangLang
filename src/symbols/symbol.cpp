@@ -15,6 +15,7 @@ int ScopedSymbolTable::jumpTo(std::string name, ScopedSymbolTable *scope) {
   return -1;
 }
 bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
+  if(lhs == nullptr || rhs == nullptr) return false;
   if (typeid(*lhs) != typeid(*rhs))
     return false;
   if (typeid(*lhs) == typeid(LangFunction)) {
@@ -76,7 +77,6 @@ ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps
 }
 
 ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
-  // Todo
   Symbol *symbol = this->getSymbol(name, jumps);
   if (symbol == nullptr)
     throw RuntimeError("name not found: " + name);

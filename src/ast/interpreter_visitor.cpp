@@ -2,6 +2,7 @@
 #include "../core/lang_object.h"
 #include "../error/error.h"
 #include <iostream>
+#include <ostream>
 
 ScopedSymbolTable *InterpreterVisitor::scope;
 std::unordered_map<AST *, int> InterpreterVisitor::jumpTable;
@@ -127,6 +128,7 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
 ASTValue *
 InterpreterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   ASTValue *value = expr->value->accept(*this);
+
   return this->scope->update(expr->identifier.getValue(), value, this->jumpTable[expr]);
 }
 
@@ -203,8 +205,9 @@ ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
     returnValue = e.value;
   }
   this->scope = currentScope;
-  if (!scope->isSameType(func->getReturnType(), returnValue))
-    throw RuntimeError("invalid return type: " + expr->identifier.getValue());
+
+  /*if (!ScopedSymbolTable::isSameType(func->getReturnType(), returnValue))*/
+    /*throw RuntimeError("invalid return type: " + expr->identifier.getValue());*/
   return returnValue;
 }
 
