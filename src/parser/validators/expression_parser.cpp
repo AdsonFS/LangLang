@@ -1,7 +1,17 @@
 #include "../lang_parser.h"
 
-AST *LangParser::expression() {
+AST *LangParser::expression() { return this->assignment(); }
+
+AST *LangParser::assignment() {
   AST *node = this->equalityExpression();
+  if (this->token.getType() == TK_ASSIGNMENT) {
+    IdentifierAST *identifierAST = dynamic_cast<IdentifierAST *>(node);
+    if (identifierAST == nullptr)
+      throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
+                        this->scanner.getPosition(), "an identifier");
+    this->consume(TK_ASSIGNMENT);
+    return new AssignmentVariableAST(identifierAST->token, this->expression());
+  }
   while (this->isEqualityOperator()) {
     Token opToken = this->token;
     this->token = this->scanner.nextToken();
@@ -66,6 +76,12 @@ AST *LangParser::factor() {
   if (this->token.getType() == TK_IDENTIFIER) {
     Token token = this->token;
     this->token = this->scanner.nextToken();
+    if (this->match(Token(TK_PARENTHESES, "("))) {
+      std::vector<AST *> arguments;
+      this->consume(Token(TK_PARENTHESES, "("));
+      this->consume(Token(TK_PARENTHESES, ")"));
+      return new CallAST(token, arguments);
+    }
     return new IdentifierAST(token);
   }
 

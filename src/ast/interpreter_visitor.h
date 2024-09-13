@@ -7,36 +7,51 @@
 
 class InterpreterVisitor: public ASTVisitor {
 public:
+  static void setJumpTable(std::unordered_map<AST*, int> jumpTable) {
+    InterpreterVisitor::jumpTable = jumpTable;
+  }
 protected:
 private:
   static ScopedSymbolTable *scope;
-  bool ASTValueIsTrue(ASTValue value);
+  static std::unordered_map<AST*, int> jumpTable;
 
-  ASTValue visitStatementList(StatementListAST *expr) override; 
+  ASTValue* visitStatementList(StatementListAST *expr) override; 
 
-  ASTValue visitWhileStatement(WhileStatementAST *expr) override; 
+  ASTValue* visitBLock(BlockAST *expr) override;
 
-  ASTValue visitIfStatement(IfStatementAST *expr) override; 
+  ASTValue* visitReturn(ReturnAST *expr) override;
 
-  ASTValue visitFunction(FunctionAST *expr) override; 
+  ASTValue* visitWhileStatement(WhileStatementAST *expr) override; 
 
-  ASTValue visitOutputStream(OutputStreamAST *expr) override; 
+  ASTValue* visitForStatement(ForStatementAST *expr) override; 
 
-  ASTValue visitInputStream(InputStreamAST *expr) override; 
+  ASTValue* visitIfStatement(IfStatementAST *expr) override; 
+
+  ASTValue* visitFunctionDeclaration(FunctionDeclarationAST *expr) override; 
+
+  ASTValue* visitOutputStream(OutputStreamAST *expr) override; 
+
+  ASTValue* visitInputStream(InputStreamAST *expr) override; 
   
-  ASTValue visitVariableDeclaration(VariableDeclarationAST *expr) override; 
+  ASTValue* visitVariableDeclaration(VariableDeclarationAST *expr) override; 
 
-  ASTValue visitAssignmentVariable(AssignmentVariableAST *expr) override; 
+  ASTValue* visitAssignmentVariable(AssignmentVariableAST *expr) override; 
 
-  ASTValue visitBinaryOperatorExpr(BinaryOperatorAST *expr) override; 
+  ASTValue* visitBinaryOperatorExpr(BinaryOperatorAST *expr) override; 
 
-  ASTValue visitUnaryOperatorExpr(UnaryOperatorAST *expr) override; 
+  ASTValue* visitUnaryOperatorExpr(UnaryOperatorAST *expr) override; 
 
-  ASTValue visitIdentifier(IdentifierAST *expr) override; 
+  ASTValue* visitCall(CallAST *expr) override;
 
-  ASTValue visitNumberExpr(NumberAST *expr) override; 
+  ASTValue* visitIdentifier(IdentifierAST *expr) override; 
 
-  ASTValue visitStringExpr(StringAST *expr) override; 
+  ASTValue* visitNumberExpr(NumberAST *expr) override; 
+
+  ASTValue* visitStringExpr(StringAST *expr) override; 
+
+  ASTValue* visitVoid(VoidAST *expr) override;
+
+  ASTValue* visitNil(NilAST *expr) override;
 };
 
 #endif // INTERPRETER_VISITOR_H

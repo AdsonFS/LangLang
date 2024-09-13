@@ -1,58 +1,86 @@
 #include "symbol.h"
-#include <stdexcept>
+#include "../error/error.h"
 
 std::string ScopedSymbolTable::getName() { return this->scopeName; }
 
+int ScopedSymbolTable::jumpTo(std::string name, ScopedSymbolTable *scope) {
+  int jumps = 0;
+  ScopedSymbolTable *currentScope = scope;
+  while (currentScope != nullptr) {
+    if (currentScope->symbols.find(name) != currentScope->symbols.end())
+      return jumps;
+    jumps++;
+    currentScope = currentScope->previousScope;
+  }
+  return -1;
+}
+bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
+  if(lhs == nullptr || rhs == nullptr) return false;
+  if (typeid(*lhs) != typeid(*rhs))
+    return false;
+  if (typeid(*lhs) == typeid(LangFunction)) {
+    LangFunction *lhsFunc = dynamic_cast<LangFunction *>(lhs);
+    LangFunction *rhsFunc = dynamic_cast<LangFunction *>(rhs);
+
+    if (lhsFunc->getReturnType() == nullptr || rhsFunc->getReturnType() == nullptr)
+      return true;
+    return isSameType(lhsFunc->getReturnType(), rhsFunc->getReturnType());
+  }
+  return true;
+}
+
 ScopedSymbolTable *
-ScopedSymbolTable::newScopeByContext(std::string scopeName,
+ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context, 
+                                    std::string scopeName,
                                      std::string identifier) {
-  ScopedSymbolTable *currentScope = this;
+  ScopedSymbolTable *currentScope = context;
   while (currentScope != nullptr) {
     if (currentScope->symbols.find(identifier) != currentScope->symbols.end())
       return new ScopedSymbolTable(scopeName, currentScope);
     currentScope = currentScope->previousScope;
   }
-  throw std::runtime_error(
-      "Error: ScopedSymbolTable::newScopeByContext() name not found: " +
-      identifier);
+  throw RuntimeError("name not found: " + identifier);
 }
 
 void ScopedSymbolTable::set(Symbol *symbol) {
   if (this->symbols.find(symbol->name) != this->symbols.end())
-    throw std::runtime_error(
-        "Error: ScopedSymbolTable::set() name already declared: " +
-        symbol->name);
+    throw RuntimeError("name already declared: " + symbol->name);
   this->symbols[symbol->name] = symbol;
 }
 
-Symbol *ScopedSymbolTable::getSymbol(std::string name) {
+Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
   ScopedSymbolTable *currentScope = this;
-  while (currentScope != nullptr) {
-    if (currentScope->symbols.find(name) != currentScope->symbols.end())
-      return currentScope->symbols[name];
-    currentScope = currentScope->previousScope;
-  }
-  return nullptr;
+  
+  while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
+  
+  if (currentScope == nullptr || currentScope->symbols.find(name) == currentScope->symbols.end())
+    throw RuntimeError("name not found: " + name);
+  return currentScope->symbols[name];
 }
 
-void ScopedSymbolTable::update(std::string name, ASTValue value) {
-  ScopedSymbolTable *scope =
-      this->newScopeByContext(this->scopeName, name)->previousScope;
-  if (scope->symbols.find(name) != scope->symbols.end()) {
-    if (scope->symbols[name]->value.index() != value.index())
-      throw std::runtime_error(
-          "Error: ScopedSymbolTable::update() type mismatch: " + name);
-    scope->symbols[name]->value = value;
+ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {
+  // TODO
+  ScopedSymbolTable *scope = this;
+  while (scope != nullptr && jumps--) scope = scope->previousScope;
+  
+  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())
+    throw RuntimeError("name not found: " + name);
 
-  } else
-    throw std::runtime_error(
-        "Error: ScopedSymbolTable::update() name not found: " + name);
+  if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {
+    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value);
+    
+    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value))
+      throw RuntimeError("type mismatch...: " + name);
+  } else if (!this->isSameType(scope->symbols[name]->value, value))
+    throw RuntimeError("type mismatch...: " + name);
+  return scope->symbols[name]->value = value;
 }
 
-ASTValue ScopedSymbolTable::getValue(std::string name) {
-  Symbol *symbol = this->getSymbol(name);
-  if (symbol != nullptr)
-    return symbol->value;
-  throw std::runtime_error(
-      "Error: ScopedSymbolTable::getValue() name not found: " + name);
+ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
+  Symbol *symbol = this->getSymbol(name, jumps);
+  if (symbol == nullptr)
+    throw RuntimeError("name not found: " + name);
+  if (dynamic_cast<LangNil *>(symbol->value) != nullptr)
+    throw RuntimeError("variable not initialized: " + name);
+  return symbol->value;
 }

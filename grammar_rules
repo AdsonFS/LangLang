@@ -2,35 +2,54 @@ statement_list        : statement
                       | statement statement_list
 
 statement             : variable_declaration SEMICOLON 
+                      | while_statement
+                      | for_statement
                       | if_statement
                       | output_stream SEMICOLON
                       | input_stream SEMICOLON                    
-                      | assignment
+                      | expression
                       | identifier
+                      | block
+                      | return
 
 
 while_statement       : 'while' '(' expression ')' '{' statement_list '}'
+for_statement         : 'for' '(' variable_declaration ';' expression ';' expression ')' '{' statement_list '}'
+                      | 'for' '(' expression ';' expression ';' expression ')' '{' statement_list '}'
+
 if_statement          : 'if' '(' expression ')' '{' statement_list '}'
+                        ('else' '{' statement '}' 
 
-variable_declaration  : 'var' identifier '->' ('string' | 'number') := expression
-func_declaration      : 'func' identifier '(' ')' ->  '{' statement_list '}'
+block                 : '{' statement_list '}'
+return                : 'return' expression ;
 
+variable_declaration  : 'var' identifier '->' type := expression
+                      | 'var' identifier '->' type;
+
+func_declaration      : 'func' identifier '(' ')' -> type? '{' statement_list '}'
+
+type                  : 'string' | 'number' | void | '(' ')' -> type?
 output_stream         : >> output output_stream*
 output                : expression 
 
 input_stream          : << identifier inputStream*
 
 
-assignment            : identifier := expression
 
-expression            : equality_expression (( == | != ) equality_expression)*
+expression            : assignment
+
+assignment            : identifier := assignment
+                      | equality_expression (( == | != ) equality_expression)*
+
+
 equality_expression   : logical_expression ((<|>) logical_expression)*
 logical_expression    : clause ((<|>) clause)*
 clause                : term ( PLUS|MINUS ) term
 term                  : factor ((DIV|MULT|MOD) factor)*
 factor                : (PLUS|MINUS)factor 
                       | NUMBER | STRING
-                      | identifier
+                      | identifier | call
                       | '(' expression ')'
 
+call                  : identifier '(' ')'
 identifier            : IDENTIFIER

@@ -3,24 +3,31 @@
 
 #include <string>
 #include <variant>
+#include "lang_object.h"
 
 class ASTVisitor;
 
 class AST;
 class StatementListAST;
 class WhileStatementAST;
+class ForStatementAST;
+class BlockAST;
+class ReturnAST;
 class IfStatementAST;
-class FunctionAST;
+class FunctionDeclarationAST;
 class OutputStreamAST;
 class InputStreamAST;
 class VariableDeclarationAST;
 class AssignmentVariableAST;
 class BinaryOperatorAST;
 class UnaryOperatorAST;
+class CallAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;
+class VoidAST;
+class NilAST;
 
-typedef std::variant<int, std::string, AST *> ASTValue;
+typedef LangObject ASTValue;
 
 #endif // CORE_H

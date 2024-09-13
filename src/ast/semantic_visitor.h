@@ -1,16 +1,24 @@
-#ifndef PRINTER_VISITOR_H
-#define PRINTER_VISITOR_H
+#ifndef SEMANTIC_VISITOR_H
+#define SEMANTIC_VISITOR_H
 
 #include "ast.h"
 #include "visitor.h"
 #include <iostream>
+#include <unordered_map>
+#include "../core/lang_object.h"
 
-class PrinterVisitor: public ASTVisitor {
+class SemanticVisitor: public ASTVisitor {
 public:
-  static int indent;
+  
+  static std::unordered_map<AST*, int> getJumpTable() {
+    return jumpTable;
+  }
 private:
-  void printIndent(int indent);
-
+  static LangObject* currentReturnType;
+  static LangObject* currentFunctionType;
+  static ScopedSymbolTable *scope;
+  static std::unordered_map<AST*, int> jumpTable;
+  
   ASTValue* visitStatementList(StatementListAST *expr) override; 
 
   ASTValue* visitBLock(BlockAST *expr) override;
@@ -47,7 +55,7 @@ private:
 
   ASTValue* visitVoid(VoidAST *expr) override;
 
-  ASTValue* visitNil(NilAST *expr) override; 
+  ASTValue* visitNil(NilAST *expr) override;
 };
 
-#endif // PRINTER_VISITOR_H
+#endif // SEMANTIC_VISITOR_H
