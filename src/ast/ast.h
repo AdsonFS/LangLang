@@ -7,6 +7,7 @@
 #include "visitor.h"
 #include <iostream>
 #include <map>
+#include <queue>
 #include <stack>
 #include <string>
 #include <unordered_map>
@@ -79,6 +80,19 @@ public:
   StatementListAST *elseStatements;
 };
 
+class ClassDeclarationAST : public AST {
+public:
+  ClassDeclarationAST(Token identifier,
+                      std::vector<VariableDeclarationAST *> variables,
+                      std::vector<FunctionDeclarationAST *> methods)
+      : identifier(identifier), variables(variables), methods(methods) {}
+
+  ASTValue *accept(ASTVisitor &visitor) override;
+  Token identifier;
+  std::vector<VariableDeclarationAST *> variables;
+  std::vector<FunctionDeclarationAST *> methods;
+};
+
 class FunctionDeclarationAST : public AST {
 public:
   FunctionDeclarationAST(Token identifier, std::stack<Token> types,
@@ -101,7 +115,8 @@ public:
 
 class InputStreamAST : public AST {
 public:
-  InputStreamAST(std::vector<IdentifierAST> identifiers) : identifiers(identifiers) {}
+  InputStreamAST(std::vector<IdentifierAST> identifiers)
+      : identifiers(identifiers) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<IdentifierAST> identifiers;
@@ -120,11 +135,11 @@ public:
 
 class AssignmentVariableAST : public AST {
 public:
-  AssignmentVariableAST(Token identifier, AST *value)
-      : identifier(identifier), value(value) {}
+  AssignmentVariableAST(AST *leftReference, AST *value)
+      : leftReference(leftReference), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  Token identifier;
+  AST *leftReference;
   AST *value;
 };
 
@@ -155,6 +170,14 @@ public:
 
   Token identifier;
   std::vector<AST *> arguments;
+};
+
+class PropertyChainAST : public AST {
+public:
+  PropertyChainAST(std::vector<AST *> accesses) : accesses(accesses) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+
+  std::vector<AST *> accesses;
 };
 
 class IdentifierAST : public AST {

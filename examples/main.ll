@@ -1,11 +1,3 @@
-var i -> number := 0;
-
-func add() -> number {
-  return 1+1;
-}
-var r -> number := 12;
-r := 23;
-
 func counter() -> func -> void {
   var i -> number := 0;
   func count() -> void {
@@ -15,10 +7,32 @@ func counter() -> func -> void {
 
   return count;
 }
+
 var cc -> func -> void;
-var dd -> func -> func -> void;
+var dd -> func -> void;
 counter();
-dd := counter();
 cc := counter();
 dd := cc;
 cc();
+cc();
+cc();
+dd();
+dd();
+dd();
+
+var x -> number := 5;
+
+class person {
+  var age -> number := 12 + x;
+  var name -> string := "John";
+
+  func print() -> void {
+    >> "Hello";
+  }
+}
+
+var p -> person := person();
+p.print();
+
+var lout -> func -> void := p.print;
+lout();

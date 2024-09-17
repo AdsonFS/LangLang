@@ -10,7 +10,7 @@ LexiScanner::LexiScanner(std::string fileContent) {
   this->fileContent = fileContent;
   this->position = this->column = 0;
   this->line = 1 + (fileContent[0] == '\n');
-  this->reservedWords = {"void", "var", "func", "number", "string", "return", "if", "else", "while", "for"};
+  this->reservedWords = {"class", "void", "var", "func", "number", "string", "return", "if", "else", "while", "for"};
 }
 
 void LexiScanner::panicMode() {
@@ -65,6 +65,8 @@ Token LexiScanner::getNextToken() {
         return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
+      else if (currentChar == '.')
+        return Token(TokenType::TK_DOT, ".");
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";");
       else if (this->isParentheses(currentChar))

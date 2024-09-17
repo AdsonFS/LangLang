@@ -34,6 +34,8 @@ AST *LangParser::statement() {
       return this->forStatement();
     if (token.getValue() == "return")
       return this->returnStatement();
+    if (token.getValue() == "class")
+      return this->classDeclaration();
     if (token.getValue() == "var") {
       node = this->variableDeclaration();
       this->consume(TK_SEMICOLON);

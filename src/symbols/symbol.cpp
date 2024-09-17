@@ -14,8 +14,12 @@ int ScopedSymbolTable::jumpTo(std::string name, ScopedSymbolTable *scope) {
   }
   return -1;
 }
-bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
+bool ScopedSymbolTable::isSameType(LangObject *lhs, LangObject *rhs) {
   if(lhs == nullptr || rhs == nullptr) return false;
+  if (typeid(*lhs) == typeid(LangNil)) {
+    LangNil *lhsNil = dynamic_cast<LangNil *>(lhs);
+    return isSameType(lhsNil->getType(), rhs);
+  }
   if (typeid(*lhs) != typeid(*rhs))
     return false;
   if (typeid(*lhs) == typeid(LangFunction)) {
@@ -59,29 +63,27 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
   return currentScope->symbols[name];
 }
 
-ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {
-  // TODO
-  ScopedSymbolTable *scope = this;
-  while (scope != nullptr && jumps--) scope = scope->previousScope;
-  
-  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())
-    throw RuntimeError("name not found: " + name);
-
-  if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {
-    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value);
-    
-    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value))
-      throw RuntimeError("type mismatch...: " + name);
-  } else if (!this->isSameType(scope->symbols[name]->value, value))
-    throw RuntimeError("type mismatch...: " + name);
-  return scope->symbols[name]->value = value;
-}
+/*ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {*/
+/*  // TODO*/
+/*  ScopedSymbolTable *scope = this;*/
+/*  while (scope != nullptr && jumps--) scope = scope->previousScope;*/
+/**/
+/*  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())*/
+/*    throw RuntimeError("name not found: " + name);*/
+/**/
+/*  if (dynamic_cast<LangNil *>(scope->symbols[name]->value->value) != nullptr) {*/
+/*    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value->value);*/
+/**/
+/*    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value->value))*/
+/*      throw RuntimeError("type mismatch...: " + name);*/
+/*  } else if (!this->isSameType(scope->symbols[name]->value->value, value->value))*/
+/*    throw RuntimeError("type mismatch...: " + name);*/
+/*  return scope->symbols[name]->value = value;*/
+/*}*/
 
 ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
   Symbol *symbol = this->getSymbol(name, jumps);
   if (symbol == nullptr)
     throw RuntimeError("name not found: " + name);
-  if (dynamic_cast<LangNil *>(symbol->value) != nullptr)
-    throw RuntimeError("variable not initialized: " + name);
   return symbol->value;
 }

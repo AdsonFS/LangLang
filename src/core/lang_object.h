@@ -14,13 +14,12 @@ class ScopedSymbolTable;
 class LangObject {
 private:
 public:
-  /*static bool isSameType(const LangObject *a, const LangObject *b) {*/
-    /*return typeid(*a) == typeid(*b);*/
-  /*}*/
-
   virtual bool isTrue() const = 0;
   virtual void cin(std::istream &is) {
     throw RuntimeError("Cannot read value: LangObject::cin()");
+  }
+  virtual void setValue(LangObject *value) {
+    throw RuntimeError("Cannot set value: LangObject::setValue()");
   }
   virtual void toString(std::ostream &os) const = 0;
 
@@ -76,6 +75,12 @@ public:
   ScopedSymbolTable *getScope() { return scope; }
 
 private:
+  void setValue(LangObject *value) override {
+    LangFunction *func = (LangFunction *)value;
+    this->value = func->value;
+    this->scope = func->scope;
+    this->returnType = func->returnType;
+  }
   bool isTrue() const override { return true; }
   void toString(std::ostream &os) const override;
   AST *value;
@@ -88,6 +93,9 @@ public:
   LangString(std::string value) : value(value) {}
 
 private:
+  void setValue(LangObject *value) override {
+    this->value = ((LangString *)value)->value;
+  }
   LangBoolean *operator==(const LangObject &rhs) const override;
   bool isTrue() const override { return !value.empty(); }
   void toString(std::ostream &os) const override;
@@ -111,6 +119,10 @@ public:
   LangNumber(int value) : value(value) {}
 
 private:
+  void setValue(LangObject *value) override {
+    this->value = ((LangNumber *)value)->value;
+  }
+
   LangObject *operator-() override;
   LangObject *operator+() override;
 
@@ -125,6 +137,19 @@ private:
   void toString(std::ostream &os) const override;
   void cin(std::istream &is) override;
   int value;
+};
+
+class LangClass : public LangObject {
+public:
+  LangClass(std::string name, ScopedSymbolTable *scope)
+      : name(name), scope(scope) {}
+  ScopedSymbolTable *getScope() { return scope; }
+
+private:
+  bool isTrue() const override { return true; }
+  void toString(std::ostream &os) const override;
+  std::string name;
+  ScopedSymbolTable *scope;
 };
 
 class LangVoid : public LangObject {
@@ -157,6 +182,6 @@ private:
   void toString(std::ostream &os) const override;
 };
 
-typedef LangObject ASTValue;
+/*typedef LangObject ASTValue;*/
 
 #endif // LANG_OBJECT_H

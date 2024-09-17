@@ -15,6 +15,8 @@ private:
   static ScopedSymbolTable *scope;
   static std::unordered_map<AST*, int> jumpTable;
 
+  ASTValue *visitCall(LangObject *callee, std::string name);
+
   ASTValue* visitStatementList(StatementListAST *expr) override; 
 
   ASTValue* visitBLock(BlockAST *expr) override;
@@ -26,6 +28,8 @@ private:
   ASTValue* visitForStatement(ForStatementAST *expr) override; 
 
   ASTValue* visitIfStatement(IfStatementAST *expr) override; 
+
+  ASTValue* visitClassDeclaration(ClassDeclarationAST *expr) override;
 
   ASTValue* visitFunctionDeclaration(FunctionDeclarationAST *expr) override; 
 
@@ -42,6 +46,8 @@ private:
   ASTValue* visitUnaryOperatorExpr(UnaryOperatorAST *expr) override; 
 
   ASTValue* visitCall(CallAST *expr) override;
+
+  ASTValue* visitPropertyChain(PropertyChainAST *expr) override;
 
   ASTValue* visitIdentifier(IdentifierAST *expr) override; 
 
