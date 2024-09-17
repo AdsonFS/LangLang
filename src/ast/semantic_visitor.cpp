@@ -144,9 +144,9 @@ SemanticVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   ASTValue *value = expr->value->accept(*this);
 
   ASTValue *type = nullptr;
-  std::stack<Token> types = expr->types;
+  std::stack<TypeAST*> types = expr->types;
   while (!types.empty()) {
-    ASTValue *t = this->scope->getSymbol(types.top().getValue(), 0)->value;
+    ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
       type = t;
     else if (typeid(*t->value) != typeid(LangFunction))
@@ -235,6 +235,13 @@ ASTValue *SemanticVisitor::visitPropertyChain(PropertyChainAST *expr) {
     }
   }
   return value;
+}
+
+ASTValue* SemanticVisitor::visitType(TypeAST *expr) {
+  jumpTable[expr] = ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
+  if (jumpTable[expr] == -1)
+    throw SemanticError("Type " + expr->token.getValue() + " not declared");
+  return this->scope->getSymbol(expr->token.getValue(), jumpTable[expr])->value;
 }
 
 ASTValue *SemanticVisitor::visitIdentifier(IdentifierAST *expr) {

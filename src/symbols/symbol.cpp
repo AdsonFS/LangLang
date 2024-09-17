@@ -43,7 +43,7 @@ ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context,
       return new ScopedSymbolTable(scopeName, currentScope);
     currentScope = currentScope->previousScope;
   }
-  throw RuntimeError("name not found: " + identifier);
+  throw RuntimeError("(0) name not found: " + identifier);
 }
 
 bool ScopedSymbolTable::set(Symbol *symbol) {
@@ -59,7 +59,7 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
   while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
   
   if (currentScope == nullptr || currentScope->symbols.find(name) == currentScope->symbols.end())
-    throw RuntimeError("name not found: " + name);
+    throw RuntimeError("(1) name not found: " + name);
   return currentScope->symbols[name];
 }
 
@@ -84,6 +84,6 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
 ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
   Symbol *symbol = this->getSymbol(name, jumps);
   if (symbol == nullptr)
-    throw RuntimeError("name not found: " + name);
+    throw RuntimeError("(2) name not found: " + name);
   return symbol->value;
 }

@@ -127,9 +127,9 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   ASTValue *value = expr->value->accept(*this);
 
   ASTValue *type = nullptr;
-  std::stack<Token> types = expr->types;
+  std::stack<TypeAST*> types = expr->types;
   while (!types.empty()) {
-    ASTValue *t = this->scope->getSymbol(types.top().getValue(), 0)->value;
+    ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
       type = t;
     else
@@ -255,6 +255,10 @@ ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
 
   return value;
   throw RuntimeError("invalid property chain");
+}
+
+ASTValue *InterpreterVisitor::visitType(TypeAST *expr) {
+  return this->scope->getValue(expr->token.getValue(), this->jumpTable[expr]);
 }
 
 ASTValue *InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {

@@ -6,13 +6,13 @@ AST *LangParser::variableDeclaration() {
   this->consume(Token(TokenType::TK_RESERVED_WORD, "var"));
   Token identifier = this->consume(TokenType::TK_IDENTIFIER);
 
-  std::stack<Token> types;
+  std::stack<TypeAST *> types;
   while (this->match(TokenType::TK_ARROW)) {
     this->consume(Token(TokenType::TK_ARROW, "->"));
     if (this->match(TokenType::TK_RESERVED_WORD))
-      types.push(this->consume(TokenType::TK_RESERVED_WORD));
+      types.push(new TypeAST(this->consume(TokenType::TK_RESERVED_WORD)));
     else
-      types.push(this->consume(TokenType::TK_IDENTIFIER));
+      types.push(new TypeAST(this->consume(TokenType::TK_IDENTIFIER)));
   }
   if (types.empty())
     this->consume(Token(TokenType::TK_ARROW, "->"));

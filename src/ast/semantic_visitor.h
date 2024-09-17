@@ -51,6 +51,8 @@ private:
 
   ASTValue* visitPropertyChain(PropertyChainAST *expr) override;
 
+  ASTValue* visitType(TypeAST *expr) override;
+
   ASTValue* visitIdentifier(IdentifierAST *expr) override; 
 
   ASTValue* visitNumberExpr(NumberAST *expr) override; 

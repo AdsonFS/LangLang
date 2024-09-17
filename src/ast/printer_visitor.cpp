@@ -176,6 +176,12 @@ ASTValue* PrinterVisitor::visitPropertyChain(PropertyChainAST *expr) {
   return new ASTValue(new LangNil());
 }
 
+ASTValue* PrinterVisitor::visitType(TypeAST* expr) {
+  this->printIndent(this->indent);
+  std::cout << "<TypeAST:" << expr->token.getValue() << ">\n";
+  return new ASTValue(new LangNil());
+}
+
 ASTValue* PrinterVisitor::visitIdentifier(IdentifierAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<IdentifierAST:" << expr->token.getValue() << ">\n";

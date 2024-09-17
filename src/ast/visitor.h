@@ -27,6 +27,7 @@ public:
 
   virtual ASTValue* visitCall(CallAST *expr) = 0;
   virtual ASTValue* visitPropertyChain(PropertyChainAST *expr) = 0;
+  virtual ASTValue* visitType(TypeAST *expr) = 0;
   virtual ASTValue* visitIdentifier(IdentifierAST *expr) = 0;
   virtual ASTValue* visitNumberExpr(NumberAST *expr) = 0;
   virtual ASTValue* visitStringExpr(StringAST *expr) = 0;

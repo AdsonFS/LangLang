@@ -1,3 +1,5 @@
+>> "start: main.ll";
+
 func counter() -> func -> void {
   var i -> number := 0;
   func count() -> void {
@@ -22,17 +24,33 @@ dd();
 
 var x -> number := 5;
 
+class address {
+  var street -> string := "123 Main St";
+  var city -> string := "Springfield";
+  var state -> string := "IL";
+  var zip -> string := "62704";
+
+  func print() -> void {
+    >> street;
+    >> city;
+    >> state;
+    >> zip;
+  }
+}
+
 class person {
   var age -> number := 12 + x;
   var name -> string := "John";
+  var addr -> address := address();
 
   func print() -> void {
     >> "Hello";
   }
 }
 
+
 var p -> person := person();
-p.print();
+p.addr.print();
 
 var lout -> func -> void := p.print;
 lout();

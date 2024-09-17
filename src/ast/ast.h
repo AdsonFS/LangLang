@@ -122,13 +122,14 @@ public:
   std::vector<IdentifierAST> identifiers;
 };
 
+class TypeAST;
 class VariableDeclarationAST : public AST {
 public:
-  VariableDeclarationAST(std::stack<Token> types, Token identifier, AST *value)
+  VariableDeclarationAST(std::stack<TypeAST*> types, Token identifier, AST *value)
       : types(types), identifier(identifier), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<Token> types;
+  std::stack<TypeAST*> types;
   Token identifier;
   AST *value;
 };
@@ -178,6 +179,14 @@ public:
   ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<AST *> accesses;
+};
+
+class TypeAST : public AST {
+public:
+  TypeAST(Token token) : token(token) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+
+  Token token;
 };
 
 class IdentifierAST : public AST {

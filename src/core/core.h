@@ -24,6 +24,7 @@ class BinaryOperatorAST;
 class UnaryOperatorAST;
 class CallAST;
 class PropertyChainAST;
+class TypeAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;
