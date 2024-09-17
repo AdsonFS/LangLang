@@ -42,6 +42,10 @@ std::string Token::toString() {
       return "EQUALITY_OPERATOR";
     case TK_COMMENT:
       return "COMMENT";
+    case TK_DOT:
+      return "DOT";
+    case TK_ARROW:
+      return "ARROW";
     }
   return "";
 }

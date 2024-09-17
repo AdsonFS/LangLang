@@ -14,6 +14,7 @@ class ForStatementAST;
 class BlockAST;
 class ReturnAST;
 class IfStatementAST;
+class ClassDeclarationAST;
 class FunctionDeclarationAST;
 class OutputStreamAST;
 class InputStreamAST;
@@ -22,12 +23,13 @@ class AssignmentVariableAST;
 class BinaryOperatorAST;
 class UnaryOperatorAST;
 class CallAST;
+class PropertyChainAST;
 class IdentifierAST;
 class NumberAST;
 class StringAST;
 class VoidAST;
 class NilAST;
 
-typedef LangObject ASTValue;
+/*typedef LangObject ASTValue;*/
 
 #endif // CORE_H

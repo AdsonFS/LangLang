@@ -14,7 +14,7 @@ ASTValue* PrinterVisitor::visitStatementList(StatementListAST *expr) {
   for (auto &statement : expr->statements)
     statement->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitBLock(BlockAST *expr) {
@@ -23,7 +23,7 @@ ASTValue* PrinterVisitor::visitBLock(BlockAST *expr) {
   for (auto &statement : expr->statements)
     statement->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitReturn(ReturnAST *expr) {
@@ -31,7 +31,7 @@ ASTValue* PrinterVisitor::visitReturn(ReturnAST *expr) {
   std::cout << "<ReturnAST>\n";
   /*expr->value->accept(*this);*/
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
@@ -43,7 +43,7 @@ ASTValue* PrinterVisitor::visitWhileStatement(WhileStatementAST *expr) {
   this->indent--;
   expr->ifStatements->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitForStatement(ForStatementAST *expr) {
@@ -61,7 +61,7 @@ ASTValue* PrinterVisitor::visitForStatement(ForStatementAST *expr) {
   this->indent--;
   expr->statements->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
@@ -79,7 +79,17 @@ ASTValue* PrinterVisitor::visitIfStatement(IfStatementAST *expr) {
     expr->elseStatements->accept(*this);
     this->indent--;
   }
-  return new LangNil();
+  return new ASTValue(new LangNil());
+}
+
+ASTValue* PrinterVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
+  this->printIndent(this->indent++);
+  std::cout << "<ClassDeclarationAST:" << expr->identifier.getValue() << ">\n";
+  for (auto &variable: expr->variables) {
+    variable->accept(*this);
+  }
+  this->indent--;
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
@@ -88,7 +98,7 @@ ASTValue* PrinterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr)
     /*<< expr->type << ">\n";*/
   expr->statements->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitOutputStream(OutputStreamAST *expr) {
@@ -97,7 +107,7 @@ ASTValue* PrinterVisitor::visitOutputStream(OutputStreamAST *expr) {
   for (auto &output : expr->outputs)
     output->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitInputStream(InputStreamAST *expr) {
@@ -108,7 +118,7 @@ ASTValue* PrinterVisitor::visitInputStream(InputStreamAST *expr) {
     std::cout << "<IdentifierAST:" << identifier.token.getValue() << ">\n";
   }
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue*
@@ -118,16 +128,16 @@ PrinterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
             << ">\n";
   expr->value->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   this->printIndent(this->indent++);
-  std::cout << "<AssignmentVariableAST:" << expr->identifier.getValue()
-            << ">\n";
+  std::cout << "<AssignmentVariableAST>\n";
+  expr->leftReference->accept(*this);
   expr->value->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
@@ -136,7 +146,7 @@ ASTValue* PrinterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   expr->left->accept(*this);
   expr->right->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
@@ -144,7 +154,7 @@ ASTValue* PrinterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   std::cout << "<UnaryOperatorAST:" << expr->op.getValue() << ">\n";
   expr->child->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitCall(CallAST *expr) {
@@ -153,35 +163,45 @@ ASTValue* PrinterVisitor::visitCall(CallAST *expr) {
   for (auto &argument : expr->arguments)
     argument->accept(*this);
   this->indent--;
-  return new LangNil();
+  return new ASTValue(new LangNil());
+}
+
+ASTValue* PrinterVisitor::visitPropertyChain(PropertyChainAST *expr) {
+  // TODO
+  this->printIndent(this->indent++);
+  std::cout << "<PropertyChainAST>\n";
+  for (auto &access : expr->accesses)
+    access->accept(*this);
+  this->indent--;
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitIdentifier(IdentifierAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<IdentifierAST:" << expr->token.getValue() << ">\n";
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitNumberExpr(NumberAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<NumberAST:" << expr->token.getValue() << ">\n";
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitStringExpr(StringAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<StringAST:" << expr->token.getValue() << ">\n";
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitVoid(VoidAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<VoidAST>\n";
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }
 
 ASTValue* PrinterVisitor::visitNil(NilAST *expr) {
   this->printIndent(this->indent);
   std::cout << "<NilAST>\n";
-  return new LangNil();
+  return new ASTValue(new LangNil());
 }

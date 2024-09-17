@@ -19,6 +19,9 @@ ASTValue* ForStatementAST::accept(ASTVisitor &visitor) {
 ASTValue* IfStatementAST::accept(ASTVisitor &visitor) {
   return visitor.visitIfStatement(this);
 }
+ASTValue* ClassDeclarationAST::accept(ASTVisitor &visitor) {
+  return visitor.visitClassDeclaration(this);
+}
 ASTValue* FunctionDeclarationAST::accept(ASTVisitor &visitor) {
   return visitor.visitFunctionDeclaration(this);
 }
@@ -41,6 +44,9 @@ ASTValue* UnaryOperatorAST::accept(ASTVisitor &visitor) {
   return visitor.visitUnaryOperatorExpr(this);
 }
 ASTValue* CallAST::accept(ASTVisitor &visitor) { return visitor.visitCall(this); }
+ASTValue* PropertyChainAST::accept(ASTVisitor &visitor) {
+  return visitor.visitPropertyChain(this);
+}
 ASTValue* IdentifierAST::accept(ASTVisitor &visitor) {
   return visitor.visitIdentifier(this);
 }

@@ -30,6 +30,10 @@ void LangBoolean::toString(std::ostream &os) const {
 }
 void LangBoolean::cin(std::istream &is) { is >> this->value; }
 
+void LangClass::toString(std::ostream &os) const {
+  os << (std::string) "< class:" + this->name + " >";
+}
+
 void LangVoid::toString(std::ostream &os) const {
   os << (std::string) "< void >";
 }
