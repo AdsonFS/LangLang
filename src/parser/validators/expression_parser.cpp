@@ -84,13 +84,11 @@ AST *LangParser::factor() {
     AST *node = this->expression();
     if (this->token.getType() != TK_PARENTHESES ||
         this->token.getValue() != ")")
-      throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                        this->scanner.getPosition(), ")");
+      throw SyntaxError(this->token, ")");
     this->token = this->scanner.nextToken();
     return node;
   }
-  throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                    this->scanner.getPosition(), "a factor");
+  throw SyntaxError(this->token, "a factor");
 }
 
 AST *LangParser::propertyChain() {
@@ -100,7 +98,8 @@ AST *LangParser::propertyChain() {
     this->consume(Token(TK_DOT, "."));
     accesses.push_back(this->identifier_or_call());
   }
-  if (accesses.size() == 1) return accesses[0];
+  if (accesses.size() == 1)
+    return accesses[0];
   return new PropertyChainAST(accesses);
 }
 
