@@ -65,6 +65,8 @@ Token LexiScanner::getNextToken() {
         return Token(TokenType::TK_INPUTSTREAM, "<<");
       } else if (this->isOperator(currentChar))
         return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
+      else if (currentChar == ':')
+        return Token(TokenType::TK_COLON, ":");
       else if (currentChar == '.')
         return Token(TokenType::TK_DOT, ".");
       else if (this->isSemicolon(currentChar))

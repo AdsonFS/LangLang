@@ -65,13 +65,24 @@ ASTValue *InterpreterVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
   ScopedSymbolTable *currentScope = this->scope;
   ScopedSymbolTable *classScope =
       this->scope->newScope(expr->identifier.getValue());
+
+  ASTValue *superclass =
+      expr->superclass == nullptr ? nullptr : expr->superclass->accept(*this);
+  if (superclass != nullptr) {
+    LangClass *super = dynamic_cast<LangClass *>(superclass->value);
+    classScope->setSymbols(super->getScope()->getSymbols());
+  }
+
   this->scope = classScope;
 
   for (auto &variables : expr->variables)
     variables->accept(*this);
 
-  for (auto &methods : expr->methods)
-    methods->accept(*this);
+  for (auto &method : expr->methods) {
+    if (this->scope->check(method->identifier.getValue(), 0))
+      this->scope->remove(method->identifier.getValue());
+    method->accept(*this);
+  }
 
   this->scope = currentScope;
 
@@ -86,9 +97,9 @@ ASTValue *
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
 
   ASTValue *type = nullptr;
-  std::stack<Token> types = expr->types;
+  std::stack<TypeAST *> types = expr->types;
   while (!types.empty()) {
-    ASTValue *t = this->scope->getSymbol(types.top().getValue(), 0)->value;
+    ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
       type = t;
     else
@@ -127,7 +138,7 @@ InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   ASTValue *value = expr->value->accept(*this);
 
   ASTValue *type = nullptr;
-  std::stack<TypeAST*> types = expr->types;
+  std::stack<TypeAST *> types = expr->types;
   while (!types.empty()) {
     ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
@@ -243,12 +254,10 @@ ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
     AST *node = expr->accesses[i];
     if (typeid(*node) == typeid(IdentifierAST)) {
       IdentifierAST *identifier = dynamic_cast<IdentifierAST *>(node);
-      value = instance->getScope()->getValue(identifier->token.getValue(),
-    0);
+      value = instance->getScope()->getValue(identifier->token.getValue(), 0);
     } else if (typeid(*node) == typeid(CallAST)) {
       CallAST *call = dynamic_cast<CallAST *>(node);
-      value = instance->getScope()->getValue(call->identifier.getValue(),
-    0);
+      value = instance->getScope()->getValue(call->identifier.getValue(), 0);
       value = this->visitCall(value->value, call->identifier.getValue());
     }
   }

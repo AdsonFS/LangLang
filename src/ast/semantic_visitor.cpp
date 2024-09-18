@@ -1,6 +1,7 @@
 #include "semantic_visitor.h"
 #include "../core/lang_object.h"
 #include "../error/error.h"
+#include <iostream>
 
 ScopedSymbolTable *SemanticVisitor::scope;
 std::unordered_map<AST *, int> SemanticVisitor::jumpTable;
@@ -65,15 +66,28 @@ ASTValue *SemanticVisitor::visitIfStatement(IfStatementAST *expr) {
 }
 
 ASTValue *SemanticVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
-  ScopedSymbolTable *currentScope = this->scope;
   ScopedSymbolTable *classScope = this->scope->newScope("class");
+  ASTValue *superclass =
+      expr->superclass == nullptr ? nullptr : expr->superclass->accept(*this);
+  if (superclass != nullptr && typeid(*superclass->value) != typeid(LangClass))
+    throw SemanticError("Invalid superclass for class " +
+                        expr->identifier.getValue());
+  if (superclass != nullptr) {
+    LangClass *super = dynamic_cast<LangClass *>(superclass->value);
+    classScope->setSymbols(super->getScope()->getSymbols());
+  }
+
+  ScopedSymbolTable *currentScope = this->scope;
   this->scope = classScope;
 
-  for (auto &variables : expr->variables)
-    variables->accept(*this);
+  for (auto &variable : expr->variables)
+    variable->accept(*this);
 
-  for (auto &methods : expr->methods)
-    methods->accept(*this);
+  for (auto &method : expr->methods) {
+    if (this->scope->check(method->identifier.getValue(), 0))
+      this->scope->remove(method->identifier.getValue());
+    method->accept(*this);
+  }
 
   this->scope = currentScope;
 
@@ -90,9 +104,9 @@ ASTValue *SemanticVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
 ASTValue *
 SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   ASTValue *type = nullptr;
-  std::stack<Token> types = expr->types;
+  std::stack<TypeAST *> types = expr->types;
   while (!types.empty()) {
-    ASTValue *t = this->scope->getSymbol(types.top().getValue(), 0)->value;
+    ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
       type = t;
     else if (typeid(*t->value) != typeid(LangFunction))
@@ -144,7 +158,7 @@ SemanticVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   ASTValue *value = expr->value->accept(*this);
 
   ASTValue *type = nullptr;
-  std::stack<TypeAST*> types = expr->types;
+  std::stack<TypeAST *> types = expr->types;
   while (!types.empty()) {
     ASTValue *t = types.top()->accept(*this);
     if (type == nullptr)
@@ -237,8 +251,9 @@ ASTValue *SemanticVisitor::visitPropertyChain(PropertyChainAST *expr) {
   return value;
 }
 
-ASTValue* SemanticVisitor::visitType(TypeAST *expr) {
-  jumpTable[expr] = ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
+ASTValue *SemanticVisitor::visitType(TypeAST *expr) {
+  jumpTable[expr] =
+      ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
   if (jumpTable[expr] == -1)
     throw SemanticError("Type " + expr->token.getValue() + " not declared");
   return this->scope->getSymbol(expr->token.getValue(), jumpTable[expr])->value;

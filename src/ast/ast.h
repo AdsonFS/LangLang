@@ -80,27 +80,29 @@ public:
   StatementListAST *elseStatements;
 };
 
+class TypeAST;
 class ClassDeclarationAST : public AST {
 public:
-  ClassDeclarationAST(Token identifier,
+  ClassDeclarationAST(Token identifier, TypeAST *superclass,
                       std::vector<VariableDeclarationAST *> variables,
                       std::vector<FunctionDeclarationAST *> methods)
-      : identifier(identifier), variables(variables), methods(methods) {}
+      : identifier(identifier), superclass(superclass), variables(variables), methods(methods) {}
 
   ASTValue *accept(ASTVisitor &visitor) override;
   Token identifier;
+  TypeAST *superclass;
   std::vector<VariableDeclarationAST *> variables;
   std::vector<FunctionDeclarationAST *> methods;
 };
 
 class FunctionDeclarationAST : public AST {
 public:
-  FunctionDeclarationAST(Token identifier, std::stack<Token> types,
+  FunctionDeclarationAST(Token identifier, std::stack<TypeAST*> types,
                          StatementListAST *statements)
       : identifier(identifier), types(types), statements(statements) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<Token> types;
+  std::stack<TypeAST*> types;
   Token identifier;
   StatementListAST *statements;
 };
@@ -122,7 +124,6 @@ public:
   std::vector<IdentifierAST> identifiers;
 };
 
-class TypeAST;
 class VariableDeclarationAST : public AST {
 public:
   VariableDeclarationAST(std::stack<TypeAST*> types, Token identifier, AST *value)

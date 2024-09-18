@@ -48,9 +48,29 @@ class person {
   }
 }
 
+class student : person {
+  var code -> number := 35;
+
+  func print() -> void {
+    >> "Student";
+  }
+}
+
+func newperson() -> person {
+  var p -> person := person();
+  >> p.age;
+  >> p.name;
+  p.addr.print();
+  return p;
+}
+var person1 -> person := newperson();
 
 var p -> person := person();
 p.addr.print();
 
 var lout -> func -> void := p.print;
 lout();
+
+
+var s -> student := student();
+s.print();

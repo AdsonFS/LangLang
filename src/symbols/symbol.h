@@ -56,6 +56,8 @@ public:
   }
   std::string getName();
   bool set(Symbol *symbol);
+  bool check(std::string name, int jumps);
+  void remove(std::string name);
   /*ASTValue *update(std::string name, ASTValue *value, int jumps);*/
   ASTValue *getValue(std::string name, int jumps);
   Symbol *getSymbol(std::string name, int jumps);
@@ -69,6 +71,11 @@ public:
     return new ScopedSymbolTable(scopeName, this);
   }
   ScopedSymbolTable *previousScope;
+
+  std::unordered_map<std::string, Symbol *> getSymbols() { return symbols; }
+  void setSymbols(std::unordered_map<std::string, Symbol *> symbols) {
+    this->symbols = symbols;
+  }
 
 private:
   std::string scopeName;

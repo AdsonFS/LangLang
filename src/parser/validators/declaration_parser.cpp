@@ -33,10 +33,13 @@ AST *LangParser::funcDeclaration() {
   this->consume(Token(TokenType::TK_PARENTHESES, ")"));
   /*this->consume(Token(TokenType::TK_ARROW, "->"));*/
 
-  std::stack<Token> types;
+  std::stack<TypeAST *> types;
   while (this->match(TokenType::TK_ARROW)) {
     this->consume(Token(TokenType::TK_ARROW, "->"));
-    types.push(this->consume(TokenType::TK_RESERVED_WORD));
+    if (this->match(TokenType::TK_RESERVED_WORD))
+      types.push(new TypeAST(this->consume(TokenType::TK_RESERVED_WORD)));
+    else
+      types.push(new TypeAST(this->consume(TokenType::TK_IDENTIFIER)));
   }
 
   this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
@@ -48,10 +51,19 @@ AST *LangParser::funcDeclaration() {
 }
 
 AST *LangParser::classDeclaration() {
+  TypeAST *superclass = nullptr;
   this->consume(Token(TokenType::TK_RESERVED_WORD, "class"));
   Token identifier = this->consume(TokenType::TK_IDENTIFIER);
-  this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
 
+  if (this->match(TK_COLON)) {
+    this->consume(TK_COLON);
+    if (this->match(TK_RESERVED_WORD))
+      superclass = new TypeAST(this->consume(TK_RESERVED_WORD));
+    else
+      superclass = new TypeAST(this->consume(TK_IDENTIFIER));
+  }
+
+  this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
   std::vector<FunctionDeclarationAST *> methods;
   std::vector<VariableDeclarationAST *> variables;
   while (1 < 2) {
@@ -66,5 +78,5 @@ AST *LangParser::classDeclaration() {
       break;
   }
   this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
-  return new ClassDeclarationAST(identifier, variables, methods);
+  return new ClassDeclarationAST(identifier, superclass, variables, methods);
 }

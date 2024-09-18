@@ -46,6 +46,16 @@ ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context,
   throw RuntimeError("(0) name not found: " + identifier);
 }
 
+bool ScopedSymbolTable::check(std::string name, int jumps) {
+  ScopedSymbolTable *currentScope = this;
+  while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
+  return currentScope != nullptr && currentScope->symbols.find(name) != currentScope->symbols.end();
+}
+
+void ScopedSymbolTable::remove(std::string name) {
+  this->symbols.erase(name);
+}
+
 bool ScopedSymbolTable::set(Symbol *symbol) {
   if (this->symbols.find(symbol->name) != this->symbols.end())
     return false;
