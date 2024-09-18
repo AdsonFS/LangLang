@@ -1,7 +1,6 @@
 #include "semantic_visitor.h"
 #include "../core/lang_object.h"
 #include "../error/error.h"
-#include <iostream>
 
 ScopedSymbolTable *SemanticVisitor::scope;
 std::unordered_map<AST *, int> SemanticVisitor::jumpTable;
@@ -71,7 +70,7 @@ ASTValue *SemanticVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
       expr->superclass == nullptr ? nullptr : expr->superclass->accept(*this);
   if (superclass != nullptr && typeid(*superclass->value) != typeid(LangClass))
     throw SemanticError("Invalid superclass for class " +
-                        expr->identifier.getValue());
+                        expr->identifier.getValue(), expr->superclass->token);
   if (superclass != nullptr) {
     LangClass *super = dynamic_cast<LangClass *>(superclass->value);
     classScope->setSymbols(super->getScope()->getSymbols());
@@ -96,7 +95,7 @@ ASTValue *SemanticVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
       new ASTValue(new LangClass(expr->identifier.getValue(), classScope)));
   if (!this->scope->set(classSymbol))
     throw SemanticError("Class " + expr->identifier.getValue() +
-                        " already declared");
+                        " already declared", expr->identifier);
 
   return new ASTValue(new LangNil());
 }
@@ -110,7 +109,7 @@ SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
     if (type == nullptr)
       type = t;
     else if (typeid(*t->value) != typeid(LangFunction))
-      throw SemanticError("type mismatch: " + expr->identifier.getValue());
+      throw SemanticError("type mismatch: " + expr->identifier.getValue(), types.top()->token);
     else
       type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
     types.pop();
@@ -122,7 +121,7 @@ SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
                                                    type->value, this->scope)));
   if (!this->scope->set(func))
     throw SemanticError("Function " + expr->identifier.getValue() +
-                        " already declared");
+                        " already declared", expr->identifier);
 
   ScopedSymbolTable *currentScope = this->scope;
 
@@ -134,7 +133,7 @@ SemanticVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
 
   if (!ScopedSymbolTable::isSameType(type->value, this->currentReturnType))
     throw SemanticError("Invalid return type to function: " +
-                        expr->identifier.getValue());
+                        expr->identifier.getValue(), expr->identifier);
 
   this->scope = currentScope;
   return new ASTValue(new LangNil());
@@ -164,7 +163,7 @@ SemanticVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
     if (type == nullptr)
       type = t;
     else if (typeid(*t->value) != typeid(LangFunction))
-      throw SemanticError("type mismatch: " + expr->identifier.getValue());
+      throw SemanticError("type mismatch: " + expr->identifier.getValue(), types.top()->token);
     else
       type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
     types.pop();
@@ -173,10 +172,10 @@ SemanticVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
     value->value = new LangNil(type->value);
   else if (!ScopedSymbolTable::isSameType(type->value, value->value))
     throw SemanticError("Invalid type for variable " +
-                        expr->identifier.getValue());
+                        expr->identifier.getValue(), expr->identifier);
   if (!this->scope->set(new VarSymbol(expr->identifier.getValue(), value)))
     throw SemanticError("Variable " + expr->identifier.getValue() +
-                        " already declared");
+                        " already declared", expr->identifier);
   return new ASTValue(new LangNil());
 }
 
@@ -186,7 +185,7 @@ SemanticVisitor::visitAssignmentVariable(AssignmentVariableAST *expr) {
   ASTValue *value = expr->value->accept(*this);
 
   if (!ScopedSymbolTable::isSameType(leftReference->value, value->value))
-    throw SemanticError("Type mismatch:: ");
+    throw SemanticError("Invalid type for assignment", expr->assignmentOperator);
   leftReference->value = value->value;
   return leftReference;
 }
@@ -197,7 +196,7 @@ ASTValue *SemanticVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   ASTValue *rightValue = expr->right->accept(*this);
 
   if (!ScopedSymbolTable::isSameType(leftValue->value, rightValue->value))
-    throw SemanticError("Invalid type for binary operator");
+    throw SemanticError("Invalid type for binary operator", expr->op);
 
   return leftValue;
 }
@@ -213,7 +212,7 @@ ASTValue *SemanticVisitor::visitCall(CallAST *expr) {
       ScopedSymbolTable::jumpTo(expr->identifier.getValue(), this->scope);
   if (jumpTable[expr] == -1)
     throw SemanticError("Function " + expr->identifier.getValue() +
-                        " not declared");
+                        " not declared", expr->identifier);
   LangObject *callee =
       this->scope->getSymbol(expr->identifier.getValue(), jumpTable[expr])
           ->value->value;
@@ -228,7 +227,7 @@ ASTValue *SemanticVisitor::visitCall(CallAST *expr) {
     return new ASTValue(lang_class);
   }
 
-  throw SemanticError("Invalid call to " + expr->identifier.getValue());
+  throw SemanticError("Invalid call to " + expr->identifier.getValue(), expr->identifier);
 }
 
 ASTValue *SemanticVisitor::visitPropertyChain(PropertyChainAST *expr) {
@@ -236,9 +235,14 @@ ASTValue *SemanticVisitor::visitPropertyChain(PropertyChainAST *expr) {
 
   for (int i = 1; i < expr->accesses.size(); i++) {
     LangClass *instance = dynamic_cast<LangClass *>(value->value);
-    if (instance == nullptr)
-      throw SemanticError("Invalid property chain");
-
+    if (instance == nullptr) {
+      IdentifierAST *identifier = dynamic_cast<IdentifierAST *>(expr->accesses[i-1]);
+      CallAST *call = dynamic_cast<CallAST *>(expr->accesses[i-1]);
+      if (identifier != nullptr) 
+        throw SemanticError("Invalid property chain", identifier->token); 
+      else
+        throw SemanticError("Invalid property chain", call->identifier);
+    }
     AST *node = expr->accesses[i];
     if (typeid(*node) == typeid(IdentifierAST)) {
       IdentifierAST *identifier = dynamic_cast<IdentifierAST *>(node);
@@ -255,7 +259,7 @@ ASTValue *SemanticVisitor::visitType(TypeAST *expr) {
   jumpTable[expr] =
       ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
   if (jumpTable[expr] == -1)
-    throw SemanticError("Type " + expr->token.getValue() + " not declared");
+    throw SemanticError("Type " + expr->token.getValue() + " not declared", expr->token);
   return this->scope->getSymbol(expr->token.getValue(), jumpTable[expr])->value;
 }
 
@@ -263,7 +267,7 @@ ASTValue *SemanticVisitor::visitIdentifier(IdentifierAST *expr) {
   jumpTable[expr] =
       ScopedSymbolTable::jumpTo(expr->token.getValue(), this->scope);
   if (jumpTable[expr] == -1)
-    throw SemanticError("Variable " + expr->token.getValue() + " not declared");
+    throw SemanticError("Variable " + expr->token.getValue() + " not declared", expr->token);
   return this->scope->getSymbol(expr->token.getValue(), jumpTable[expr])->value;
 }
 

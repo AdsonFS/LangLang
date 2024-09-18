@@ -1,6 +1,7 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include "../tokens/token.h"
 #include <exception>
 #include <iomanip>
 #include <string>
@@ -67,15 +68,17 @@ public:
   virtual const char *what() const noexcept override { return message.c_str(); }
 };
 
-class SemanticError : public CoreError{
+class SemanticError : public CoreError {
 private:
   std::string message;
 
 public:
-  explicit SemanticError(const std::string &message) {
+  explicit SemanticError(const std::string &message, Token &token) {
     std::ostringstream oss;
-    oss << this->grey << "Semantic Error: " << this->reset << message;
-        
+    oss << this->grey << "Semantic Error: " << this->reset << message
+        << " on line " << token.getPosition().getLine() << ":"
+        << token.getPosition().getColumn() << std::endl;
+
     this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
@@ -86,6 +89,15 @@ private:
   std::string message;
 
 public:
+  explicit RuntimeError(const std::string &message, Token &token) {
+    std::ostringstream oss;
+    oss << this->grey << "Runtime Error: " << this->reset << message
+        << " on line " << token.getPosition().getLine() << ":"
+        << token.getPosition().getColumn() << std::endl;
+
+    this->message = oss.str();
+  }
+  // TODO -> add the line and column to the message
   explicit RuntimeError(const std::string &message) {
     std::ostringstream oss;
     oss << this->grey << "Runtime Error: " << this->reset << message

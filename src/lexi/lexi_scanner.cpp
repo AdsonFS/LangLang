@@ -29,58 +29,62 @@ Token LexiScanner::getNextToken() {
   int state = 0;
   char currentChar;
   std::string tokenValue = "";
+  int cl = this->line;
+  int cc = this->column;
+  int cp = this->position;
+
   while (1 < 2) {
     currentChar = this->nextChar();
 
     switch (state) {
     case 0:
       if (this->isEOF() && this->isWhitespace(currentChar))
-        return Token(TokenType::TK_EOF, "EOF");
+        return Token(TokenType::TK_EOF, "EOF", Position(cl, cc, cp));
       else if (currentChar == '<' && this->peekChar() == '>') {
         while (currentChar != '\0' && currentChar != '\n')
           currentChar = this->nextChar();
-        return Token(TokenType::TK_COMMENT, "");
+        return Token(TokenType::TK_COMMENT, "", Position(cl, cc, cp));
       } else if (this->isWhitespace(currentChar))
         continue;
       else if (currentChar == '-' && this->peekChar() == '>') {
         this->nextChar();
-        return Token(TokenType::TK_ARROW, "->");
+        return Token(TokenType::TK_ARROW, "->", Position(cl, cc, cp));
       }
       else if (currentChar == ':' && this->peekChar() == '=') {
         this->nextChar();
-        return Token(TokenType::TK_ASSIGNMENT, ":=");
+        return Token(TokenType::TK_ASSIGNMENT, ":=", Position(cl, cc, cp));
       }
       else if (currentChar == '=' && this->peekChar() == '=') {
         this->nextChar();
-        return Token(TokenType::TK_EQUALITY_OPERATOR, "==");
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "==", Position(cl, cc, cp));
       } else if (currentChar == '!' && this->peekChar() == '=') {
         this->nextChar();
-        return Token(TokenType::TK_EQUALITY_OPERATOR, "!=");
+        return Token(TokenType::TK_EQUALITY_OPERATOR, "!=", Position(cl, cc, cp));
       }
       else if (currentChar == '>' && this->peekChar() == '>') {
         this->nextChar();
-        return Token(TokenType::TK_OUTPUTSTREAM, ">>");
+        return Token(TokenType::TK_OUTPUTSTREAM, ">>", Position(cl, cc, cp));
       } else if (currentChar == '<' && this->peekChar() == '<') {
         this->nextChar();
-        return Token(TokenType::TK_INPUTSTREAM, "<<");
+        return Token(TokenType::TK_INPUTSTREAM, "<<", Position(cl, cc, cp));
       } else if (this->isOperator(currentChar))
-        return Token(TokenType::TK_OPERATOR, std::string(1, currentChar));
+        return Token(TokenType::TK_OPERATOR, std::string(1, currentChar), Position(cl, cc, cp));
       else if (currentChar == ':')
-        return Token(TokenType::TK_COLON, ":");
+        return Token(TokenType::TK_COLON, ":", Position(cl, cc, cp));
       else if (currentChar == '.')
-        return Token(TokenType::TK_DOT, ".");
+        return Token(TokenType::TK_DOT, ".", Position(cl, cc, cp));
       else if (this->isSemicolon(currentChar))
-        return Token(TokenType::TK_SEMICOLON, ";");
+        return Token(TokenType::TK_SEMICOLON, ";", Position(cl, cc, cp));
       else if (this->isParentheses(currentChar))
-        return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar));
+        return Token(TokenType::TK_PARENTHESES, std::string(1, currentChar), Position(cl, cc, cp));
       else if (this->isCurlyBraces(currentChar))
-        return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar));
+        return Token(TokenType::TK_CURLY_BRACES, std::string(1, currentChar), Position(cl, cc, cp));
       else if (this->isCmpOperator(currentChar) && this->peekChar() != '>')
-        return Token(TokenType::TK_COMPARATOR, std::string(1, currentChar));
+        return Token(TokenType::TK_COMPARATOR, std::string(1, currentChar), Position(cl, cc, cp));
       else if (this->isLogicalOperator(currentChar, this->peekChar()))
         return Token(TokenType::TK_LOGICAL_OPERATOR,
-                     std::string(1, currentChar) +
-                         std::string(1, this->nextChar()));
+                     std::string(1, currentChar) + std::string(1, this->nextChar()),
+                     Position(cl, cc, cp));
 
       /*else if (this->isUpperLetter(currentChar))*/
         /*state = 4;*/
@@ -96,7 +100,7 @@ Token LexiScanner::getNextToken() {
       break;
     case 1:
       if (this->isDoubleQuotes(currentChar)) {
-        return Token(TokenType::TK_STRING, tokenValue);
+        return Token(TokenType::TK_STRING, tokenValue, Position(cl, cc, cp));
       }
       break;
     case 2:
@@ -107,7 +111,7 @@ Token LexiScanner::getNextToken() {
         throw LexicalError(this->getLine(), this->line, this->column);
       else {
         this->backChar();
-        return Token(TokenType::TK_NUMBER, tokenValue);
+        return Token(TokenType::TK_NUMBER, tokenValue, Position(cl, cc, cp));
       }
       break;
     case 3:
@@ -116,8 +120,8 @@ Token LexiScanner::getNextToken() {
       else {
         this->backChar();
         if (this->reservedWords.find(tokenValue) != this->reservedWords.end())
-          return Token(TokenType::TK_RESERVED_WORD, tokenValue);
-        return Token(TokenType::TK_IDENTIFIER, tokenValue);
+          return Token(TokenType::TK_RESERVED_WORD, tokenValue, Position(cl, cc, cp));
+        return Token(TokenType::TK_IDENTIFIER, tokenValue, Position(cl, cc, cp));
       }
       break;
     /*case 4:*/
@@ -136,7 +140,7 @@ Token LexiScanner::getNextToken() {
     }
     tokenValue.push_back(currentChar);
   }
-  return Token(TokenType::TK_UNKNOWN, "");
+  return Token(TokenType::TK_UNKNOWN, "", Position(cl, cc, cp));
 }
 
 bool LexiScanner::isSemicolon(char c) { return c == ';'; }

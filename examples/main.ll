@@ -1,5 +1,7 @@
 >> "start: main.ll";
 
+>> 12 / 3;
+
 func counter() -> func -> void {
   var i -> number := 0;
   func count() -> void {
