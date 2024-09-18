@@ -44,7 +44,7 @@ class person {
   var addr -> address := address();
 
   func print() -> void {
-    >> "Hello";
+    >> "Hello, I am" >> name;
   }
 }
 
@@ -52,7 +52,7 @@ class student : person {
   var code -> number := 35;
 
   func print() -> void {
-    >> "Student";
+    >> "Hi, I am a student, my name is" >> name;
   }
 }
 
