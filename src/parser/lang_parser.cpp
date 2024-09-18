@@ -14,8 +14,7 @@ AST *LangParser::parser() {
 Token LangParser::consume(Token expectedToken) {
   Token token = this->token;
   if (!this->match(expectedToken))
-    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                      this->scanner.getPosition(), expectedToken.toString());
+    throw SyntaxError(token, expectedToken.toString());
   this->token = this->scanner.nextToken();
   return token;
 }
@@ -23,9 +22,7 @@ Token LangParser::consume(Token expectedToken) {
 Token LangParser::consume(TokenType expectedToken) {
   Token token = this->token;
   if (!this->match(expectedToken))
-    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                      this->scanner.getPosition(),
-                      Token(expectedToken, "").toString());
+    throw SyntaxError(token, Token(expectedToken, "").toString());
   this->token = this->scanner.nextToken();
   return token;
 }
@@ -42,14 +39,12 @@ bool LangParser::match(TokenType expectedToken) {
 
 void LangParser::semiColon() {
   if (this->token.getType() != TokenType::TK_SEMICOLON)
-    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                      this->scanner.getPosition(), "SEMICOLON");
+    throw SyntaxError(this->token, "SEMICOLON");
 }
 
 void LangParser::eof() {
   if (this->scanner.nextToken().getType() != TokenType::TK_EOF)
-    throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                      this->scanner.getPosition(), "a statement");
+    throw SyntaxError(this->token, "a statement");
 }
 
 bool LangParser::isEqualityOperator() {

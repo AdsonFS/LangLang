@@ -3,10 +3,12 @@
 #include "ast/semantic_visitor.h"
 #include "core/core.h"
 #include "error/error.h"
+#include "file_handle/file_handle.h"
 #include "lexi/lexi_scanner.h"
 #include "parser/lang_parser.h"
 #include "tokens/token.h"
 #include <iostream>
+
 
 int parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
@@ -31,10 +33,10 @@ int parser(LexiScanner &scanner, Token &token) {
     PrinterVisitor printer;
     SemanticVisitor semantic;
     InterpreterVisitor interpreter;
-    ast->accept(printer);
     try {
       ast->accept(semantic);
 
+      ast->accept(printer);
       interpreter.setJumpTable(SemanticVisitor::getJumpTable());
       ast->accept(interpreter);
     } catch (CoreError &e) {
@@ -71,7 +73,11 @@ int main(int argc, char **argv) {
   }
   std::string fileContent = std::string((std::istreambuf_iterator<char>(file)),
                                         std::istreambuf_iterator<char>());
-  LexiScanner scanner(fileContent);
+  FileHandle::fileName = filename;
+  FileHandle::fileContent = fileContent;
+  FileHandle::fileSize = fileContent.size();
+
+  LexiScanner scanner = LexiScanner();
   Token token = Token(TokenType::TK_UNKNOWN, "");
   return parser(scanner, token);
   /*tokens(scanner);*/

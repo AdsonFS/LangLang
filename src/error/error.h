@@ -1,6 +1,7 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include "../file_handle/file_handle.h"
 #include "../tokens/token.h"
 #include <exception>
 #include <iomanip>
@@ -9,9 +10,10 @@
 
 class CoreError : public std::exception {
 protected:
-  const std::string grey = "\033[97m";
+  const std::string bold = "\033[1m";
   const std::string red = "\033[31m";
   const std::string reset = "\033[0m";
+  const std::string grey = "\033[97m";
 };
 class InternalError : public CoreError {};
 class ExternalError : public CoreError {};
@@ -22,7 +24,7 @@ public:
   explicit ASTValue(LangObject *value) : value(value) {}
   LangObject *value;
 };
-/*typedef LangObject ASTValue;*/
+
 class ReturnError : public InternalError {
 public:
   explicit ReturnError(ASTValue *value) : value(value) {}
@@ -34,15 +36,19 @@ private:
   std::string message;
 
 public:
-  explicit LexicalError(const std::string &token, int line, int column,
-                        std::string error = "Unknown symbol") {
+  explicit LexicalError(Token token, std::string error = "Unknown symbol") {
     std::ostringstream oss;
-    oss << this->grey << "Lexical Error: " << this->red << error << " "
-        << this->reset << "on line " << line << ":" << column << std::endl
-        << std::setw(4) << line << " | " << token << std::endl
+
+    oss << this->bold << FileHandle::fileName << ": " << this->reset
+        << this->grey << "Lexical Error: " << this->red << error << this->reset
+        << ", on line " << token.getPosition().getLine() << ":"
+        << token.getPosition().getColumn() << std::endl
+        << std::setw(4) << token.getPosition().getLine() << " | "
+        << FileHandle::getLineError(token.getPosition().getPosition())
+        << std::endl
         << std::setw(4) << "" << " | "
-        << std::string(std::max(0, column - 1), ' ') << this->red << "^"
-        << this->reset;
+        << std::string(std::max(0, token.getPosition().getColumn() - 1), ' ')
+        << this->red << "^" << this->reset;
     this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
@@ -53,16 +59,19 @@ private:
   std::string message;
 
 public:
-  explicit SyntaxError(const std::string &section, const std::string &token,
-                       std::pair<int, int> position, std::string expected) {
+  explicit SyntaxError(Token &token, std::string expected) {
     std::ostringstream oss;
-    oss << this->grey << "Syntax Error: " << this->reset << "expected "
-        << expected << ", found " << this->red << token << this->reset
-        << ", on line " << position.first << ":" << position.second << std::endl
-        << std::setw(4) << position.first << " | " << section << std::endl
+    oss << this->bold << FileHandle::fileName << ": " << this->reset
+        << this->grey << "Syntax Error: " << this->reset << "expected "
+        << expected << ", found " << this->red << token.getValue()
+        << this->reset << ", on line " << token.getPosition().getLine() << ":"
+        << token.getPosition().getColumn() << std::endl
+        << std::setw(4) << token.getPosition().getLine() << " | "
+        << FileHandle::getLineError(token.getPosition().getPosition())
+        << std::endl
         << std::setw(4) << "" << " | "
-        << std::string(std::max(0, position.second - 1), ' ') << this->red
-        << "^" << this->reset;
+        << std::string(std::max(0, token.getPosition().getColumn() - 1), ' ')
+        << this->red << "^" << this->reset;
     this->message = oss.str();
   }
   virtual const char *what() const noexcept override { return message.c_str(); }
@@ -75,9 +84,16 @@ private:
 public:
   explicit SemanticError(const std::string &message, Token &token) {
     std::ostringstream oss;
-    oss << this->grey << "Semantic Error: " << this->reset << message
-        << " on line " << token.getPosition().getLine() << ":"
-        << token.getPosition().getColumn() << std::endl;
+    oss << this->bold << FileHandle::fileName << ": " << this->reset
+        << this->grey << "Semantic Error: " << this->reset << message
+        << ", on line " << token.getPosition().getLine() << ":"
+        << token.getPosition().getColumn() << std::endl
+        << std::setw(4) << token.getPosition().getLine() << " | "
+        << FileHandle::getLineError(token.getPosition().getPosition())
+        << std::endl
+        << std::setw(4) << "" << " | "
+        << std::string(std::max(0, token.getPosition().getColumn() - 1), ' ')
+        << this->red << "^" << this->reset;
 
     this->message = oss.str();
   }
@@ -91,8 +107,9 @@ private:
 public:
   explicit RuntimeError(const std::string &message, Token &token) {
     std::ostringstream oss;
-    oss << this->grey << "Runtime Error: " << this->reset << message
-        << " on line " << token.getPosition().getLine() << ":"
+    oss << this->bold << FileHandle::fileName << ": " << this->reset
+        << this->grey << "Runtime Error: " << this->reset << message
+        << ", on line " << token.getPosition().getLine() << ":"
         << token.getPosition().getColumn() << std::endl;
 
     this->message = oss.str();
@@ -100,7 +117,8 @@ public:
   // TODO -> add the line and column to the message
   explicit RuntimeError(const std::string &message) {
     std::ostringstream oss;
-    oss << this->grey << "Runtime Error: " << this->reset << message
+    oss << this->bold << FileHandle::fileName << ": " << this->reset
+        << this->grey << "Runtime Error: " << this->reset << message
         << std::endl;
     this->message = oss.str();
   }
