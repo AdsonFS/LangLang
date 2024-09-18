@@ -24,10 +24,13 @@ public:
   AST *whileStatement();
   AST *statementFunction();
   AST *variableDeclaration();
+  AST *classDeclaration();
   AST *funcDeclaration();
   AST *expression();
   AST *equalityExpression();
   AST *logicalExpression();
+  AST *propertyChain();
+  AST *identifier_or_call();
 
 private:
   LexiScanner &scanner;

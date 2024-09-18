@@ -1,10 +1,4 @@
-var i -> number := 0;
-
-func add() -> number {
-  return 1+1;
-}
-var r -> number := 12;
-r := 23;
+>> "start: main.ll";
 
 func counter() -> func -> void {
   var i -> number := 0;
@@ -15,10 +9,68 @@ func counter() -> func -> void {
 
   return count;
 }
+
 var cc -> func -> void;
-var dd -> func -> func -> void;
+var dd -> func -> void;
 counter();
-dd := counter();
 cc := counter();
 dd := cc;
 cc();
+cc();
+cc();
+dd();
+dd();
+dd();
+
+var x -> number := 5;
+
+class address {
+  var street -> string := "123 Main St";
+  var city -> string := "Springfield";
+  var state -> string := "IL";
+  var zip -> string := "62704";
+
+  func print() -> void {
+    >> street;
+    >> city;
+    >> state;
+    >> zip;
+  }
+}
+
+class person {
+  var age -> number := 12 + x;
+  var name -> string := "John";
+  var addr -> address := address();
+
+  func print() -> void {
+    >> "Hello";
+  }
+}
+
+class student : person {
+  var code -> number := 35;
+
+  func print() -> void {
+    >> "Student";
+  }
+}
+
+func newperson() -> person {
+  var p -> person := person();
+  >> p.age;
+  >> p.name;
+  p.addr.print();
+  return p;
+}
+var person1 -> person := newperson();
+
+var p -> person := person();
+p.addr.print();
+
+var lout -> func -> void := p.print;
+lout();
+
+
+var s -> student := student();
+s.print();

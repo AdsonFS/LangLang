@@ -22,6 +22,12 @@ public:
       : Symbol(name,  value) {}
 };
 
+class ClassSymbol : public Symbol {
+public:
+  ClassSymbol(std::string name, ASTValue *value)
+      : Symbol(name, value) {}
+};
+
 class FuncSymbol : public Symbol {
 public:
   FuncSymbol(std::string name, ASTValue *value)
@@ -41,19 +47,21 @@ public:
   ScopedSymbolTable(std::string scopeName,
                     ScopedSymbolTable *previousScope = nullptr)
       : scopeName(scopeName), previousScope(previousScope) {
-    this->set(new BuiltInTypeSymbol("number", new LangNumber(0)));
-    this->set(new BuiltInTypeSymbol("string", new LangString("")));
-    this->set(new BuiltInTypeSymbol("void", new LangVoid()));
+    this->set(new BuiltInTypeSymbol("number", new ASTValue(new LangNumber(0))));
+    this->set(new BuiltInTypeSymbol("string", new ASTValue (new LangString(""))));
+    this->set(new BuiltInTypeSymbol("void", new ASTValue (new LangVoid())));
 
     this->set(new BuiltInTypeSymbol("func",
-                                    new LangFunction(nullptr, new LangVoid(), this)));
+                                    new ASTValue(new LangFunction(nullptr, new LangVoid(), this))));
   }
   std::string getName();
-  void set(Symbol *symbol);
-  ASTValue *update(std::string name, ASTValue *value, int jumps);
+  bool set(Symbol *symbol);
+  bool check(std::string name, int jumps);
+  void remove(std::string name);
+  /*ASTValue *update(std::string name, ASTValue *value, int jumps);*/
   ASTValue *getValue(std::string name, int jumps);
   Symbol *getSymbol(std::string name, int jumps);
-  static bool isSameType(ASTValue *lhs, ASTValue *rhs);
+  static bool isSameType(LangObject *lhs, LangObject *rhs);
   static int jumpTo(std::string name, ScopedSymbolTable *scope);
 
   static ScopedSymbolTable *newScopeByContext(ScopedSymbolTable *context,
@@ -63,6 +71,11 @@ public:
     return new ScopedSymbolTable(scopeName, this);
   }
   ScopedSymbolTable *previousScope;
+
+  std::unordered_map<std::string, Symbol *> getSymbols() { return symbols; }
+  void setSymbols(std::unordered_map<std::string, Symbol *> symbols) {
+    this->symbols = symbols;
+  }
 
 private:
   std::string scopeName;

@@ -2,11 +2,13 @@ statement_list        : statement
                       | statement statement_list
 
 statement             : variable_declaration SEMICOLON 
+                      | func_declaration
+                      | class_declaration
                       | while_statement
                       | for_statement
                       | if_statement
                       | output_stream SEMICOLON
-                      | input_stream SEMICOLON                    
+                      | input_stream SEMICOLON  
                       | expression
                       | identifier
                       | block
@@ -23,12 +25,13 @@ if_statement          : 'if' '(' expression ')' '{' statement_list '}'
 block                 : '{' statement_list '}'
 return                : 'return' expression ;
 
+class_declaration     : class identifier : identifier '{' ( variable_declaration | func_declaration )* '}'
 variable_declaration  : 'var' identifier '->' type := expression
                       | 'var' identifier '->' type;
 
 func_declaration      : 'func' identifier '(' ')' -> type? '{' statement_list '}'
 
-type                  : 'string' | 'number' | void | '(' ')' -> type?
+type                  : 'string' | 'number' | void | identifier | '(' ')' -> type?
 output_stream         : >> output output_stream*
 output                : expression 
 
@@ -38,7 +41,7 @@ input_stream          : << identifier inputStream*
 
 expression            : assignment
 
-assignment            : identifier := assignment
+assignment            : property_chain := assignment
                       | equality_expression (( == | != ) equality_expression)*
 
 
@@ -48,8 +51,11 @@ clause                : term ( PLUS|MINUS ) term
 term                  : factor ((DIV|MULT|MOD) factor)*
 factor                : (PLUS|MINUS)factor 
                       | NUMBER | STRING
-                      | identifier | call
+                      | property_chain
                       | '(' expression ')'
 
+
+property_chain        : (identifier_or_call) ( . property_chain )*
+identifier_or_call    : identifier | call
 call                  : identifier '(' ')'
 identifier            : IDENTIFIER

@@ -7,6 +7,7 @@
 #include "visitor.h"
 #include <iostream>
 #include <map>
+#include <queue>
 #include <stack>
 #include <string>
 #include <unordered_map>
@@ -79,14 +80,29 @@ public:
   StatementListAST *elseStatements;
 };
 
+class TypeAST;
+class ClassDeclarationAST : public AST {
+public:
+  ClassDeclarationAST(Token identifier, TypeAST *superclass,
+                      std::vector<VariableDeclarationAST *> variables,
+                      std::vector<FunctionDeclarationAST *> methods)
+      : identifier(identifier), superclass(superclass), variables(variables), methods(methods) {}
+
+  ASTValue *accept(ASTVisitor &visitor) override;
+  Token identifier;
+  TypeAST *superclass;
+  std::vector<VariableDeclarationAST *> variables;
+  std::vector<FunctionDeclarationAST *> methods;
+};
+
 class FunctionDeclarationAST : public AST {
 public:
-  FunctionDeclarationAST(Token identifier, std::stack<Token> types,
+  FunctionDeclarationAST(Token identifier, std::stack<TypeAST*> types,
                          StatementListAST *statements)
       : identifier(identifier), types(types), statements(statements) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<Token> types;
+  std::stack<TypeAST*> types;
   Token identifier;
   StatementListAST *statements;
 };
@@ -101,7 +117,8 @@ public:
 
 class InputStreamAST : public AST {
 public:
-  InputStreamAST(std::vector<IdentifierAST> identifiers) : identifiers(identifiers) {}
+  InputStreamAST(std::vector<IdentifierAST> identifiers)
+      : identifiers(identifiers) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
   std::vector<IdentifierAST> identifiers;
@@ -109,22 +126,22 @@ public:
 
 class VariableDeclarationAST : public AST {
 public:
-  VariableDeclarationAST(std::stack<Token> types, Token identifier, AST *value)
+  VariableDeclarationAST(std::stack<TypeAST*> types, Token identifier, AST *value)
       : types(types), identifier(identifier), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<Token> types;
+  std::stack<TypeAST*> types;
   Token identifier;
   AST *value;
 };
 
 class AssignmentVariableAST : public AST {
 public:
-  AssignmentVariableAST(Token identifier, AST *value)
-      : identifier(identifier), value(value) {}
+  AssignmentVariableAST(AST *leftReference, AST *value)
+      : leftReference(leftReference), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  Token identifier;
+  AST *leftReference;
   AST *value;
 };
 
@@ -155,6 +172,22 @@ public:
 
   Token identifier;
   std::vector<AST *> arguments;
+};
+
+class PropertyChainAST : public AST {
+public:
+  PropertyChainAST(std::vector<AST *> accesses) : accesses(accesses) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+
+  std::vector<AST *> accesses;
+};
+
+class TypeAST : public AST {
+public:
+  TypeAST(Token token) : token(token) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+
+  Token token;
 };
 
 class IdentifierAST : public AST {

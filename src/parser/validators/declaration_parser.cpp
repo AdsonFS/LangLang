@@ -6,10 +6,13 @@ AST *LangParser::variableDeclaration() {
   this->consume(Token(TokenType::TK_RESERVED_WORD, "var"));
   Token identifier = this->consume(TokenType::TK_IDENTIFIER);
 
-  std::stack<Token> types;
+  std::stack<TypeAST *> types;
   while (this->match(TokenType::TK_ARROW)) {
     this->consume(Token(TokenType::TK_ARROW, "->"));
-    types.push(this->consume(TokenType::TK_RESERVED_WORD));
+    if (this->match(TokenType::TK_RESERVED_WORD))
+      types.push(new TypeAST(this->consume(TokenType::TK_RESERVED_WORD)));
+    else
+      types.push(new TypeAST(this->consume(TokenType::TK_IDENTIFIER)));
   }
   if (types.empty())
     this->consume(Token(TokenType::TK_ARROW, "->"));
@@ -30,10 +33,13 @@ AST *LangParser::funcDeclaration() {
   this->consume(Token(TokenType::TK_PARENTHESES, ")"));
   /*this->consume(Token(TokenType::TK_ARROW, "->"));*/
 
-  std::stack<Token> types;
+  std::stack<TypeAST *> types;
   while (this->match(TokenType::TK_ARROW)) {
     this->consume(Token(TokenType::TK_ARROW, "->"));
-    types.push(this->consume(TokenType::TK_RESERVED_WORD));
+    if (this->match(TokenType::TK_RESERVED_WORD))
+      types.push(new TypeAST(this->consume(TokenType::TK_RESERVED_WORD)));
+    else
+      types.push(new TypeAST(this->consume(TokenType::TK_IDENTIFIER)));
   }
 
   this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
@@ -42,4 +48,35 @@ AST *LangParser::funcDeclaration() {
       dynamic_cast<StatementListAST *>(this->statementList()));
   this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
   return node;
+}
+
+AST *LangParser::classDeclaration() {
+  TypeAST *superclass = nullptr;
+  this->consume(Token(TokenType::TK_RESERVED_WORD, "class"));
+  Token identifier = this->consume(TokenType::TK_IDENTIFIER);
+
+  if (this->match(TK_COLON)) {
+    this->consume(TK_COLON);
+    if (this->match(TK_RESERVED_WORD))
+      superclass = new TypeAST(this->consume(TK_RESERVED_WORD));
+    else
+      superclass = new TypeAST(this->consume(TK_IDENTIFIER));
+  }
+
+  this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
+  std::vector<FunctionDeclarationAST *> methods;
+  std::vector<VariableDeclarationAST *> variables;
+  while (1 < 2) {
+    if (this->match(Token(TokenType::TK_RESERVED_WORD, "var"))) {
+      variables.push_back(
+          dynamic_cast<VariableDeclarationAST *>(this->variableDeclaration()));
+      this->consume(TokenType::TK_SEMICOLON);
+    } else if (this->match(Token(TokenType::TK_RESERVED_WORD, "func")))
+      methods.push_back(
+          dynamic_cast<FunctionDeclarationAST *>(this->funcDeclaration()));
+    else
+      break;
+  }
+  this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
+  return new ClassDeclarationAST(identifier, superclass, variables, methods);
 }

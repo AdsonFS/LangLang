@@ -23,6 +23,8 @@ private:
 
   ASTValue* visitIfStatement(IfStatementAST *expr) override; 
 
+  ASTValue* visitClassDeclaration(ClassDeclarationAST *expr) override;
+
   ASTValue* visitFunctionDeclaration(FunctionDeclarationAST *expr) override; 
 
   ASTValue* visitOutputStream(OutputStreamAST *expr) override; 
@@ -38,6 +40,10 @@ private:
   ASTValue* visitUnaryOperatorExpr(UnaryOperatorAST *expr) override; 
 
   ASTValue* visitCall(CallAST *expr) override;
+
+  ASTValue* visitPropertyChain(PropertyChainAST *expr) override;
+
+  ASTValue* visitType(TypeAST *expr) override;
 
   ASTValue* visitIdentifier(IdentifierAST *expr) override; 
 

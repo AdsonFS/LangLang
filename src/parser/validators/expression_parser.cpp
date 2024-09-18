@@ -5,12 +5,8 @@ AST *LangParser::expression() { return this->assignment(); }
 AST *LangParser::assignment() {
   AST *node = this->equalityExpression();
   if (this->token.getType() == TK_ASSIGNMENT) {
-    IdentifierAST *identifierAST = dynamic_cast<IdentifierAST *>(node);
-    if (identifierAST == nullptr)
-      throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
-                        this->scanner.getPosition(), "an identifier");
     this->consume(TK_ASSIGNMENT);
-    return new AssignmentVariableAST(identifierAST->token, this->expression());
+    return new AssignmentVariableAST(node, this->expression());
   }
   while (this->isEqualityOperator()) {
     Token opToken = this->token;
@@ -73,17 +69,8 @@ AST *LangParser::factor() {
     return new StringAST(token);
   }
 
-  if (this->token.getType() == TK_IDENTIFIER) {
-    Token token = this->token;
-    this->token = this->scanner.nextToken();
-    if (this->match(Token(TK_PARENTHESES, "("))) {
-      std::vector<AST *> arguments;
-      this->consume(Token(TK_PARENTHESES, "("));
-      this->consume(Token(TK_PARENTHESES, ")"));
-      return new CallAST(token, arguments);
-    }
-    return new IdentifierAST(token);
-  }
+  if (this->token.getType() == TK_IDENTIFIER)
+    return this->propertyChain();
 
   if (this->isPlusOrMinus()) {
     Token opToken = this->token;
@@ -104,4 +91,26 @@ AST *LangParser::factor() {
   }
   throw SyntaxError(this->scanner.getLine(), this->token.getValue(),
                     this->scanner.getPosition(), "a factor");
+}
+
+AST *LangParser::propertyChain() {
+  std::vector<AST *> accesses;
+  accesses.push_back(this->identifier_or_call());
+  while (this->match(Token(TK_DOT, "."))) {
+    this->consume(Token(TK_DOT, "."));
+    accesses.push_back(this->identifier_or_call());
+  }
+  if (accesses.size() == 1) return accesses[0];
+  return new PropertyChainAST(accesses);
+}
+
+AST *LangParser::identifier_or_call() {
+  Token token = this->consume(TK_IDENTIFIER);
+  if (this->match(Token(TK_PARENTHESES, "("))) {
+    std::vector<AST *> arguments;
+    this->consume(Token(TK_PARENTHESES, "("));
+    this->consume(Token(TK_PARENTHESES, ")"));
+    return new CallAST(token, arguments);
+  }
+  return new IdentifierAST(token);
 }

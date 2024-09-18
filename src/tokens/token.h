@@ -5,6 +5,8 @@
 
 enum TokenType {
   TK_IDENTIFIER,
+  TK_DOT,
+  TK_COLON,
   TK_STRING,
   TK_NUMBER,
   TK_ARROW,

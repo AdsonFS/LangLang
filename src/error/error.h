@@ -16,7 +16,12 @@ class InternalError : public CoreError {};
 class ExternalError : public CoreError {};
 
 class LangObject;
-typedef LangObject ASTValue;
+class ASTValue {
+public:
+  explicit ASTValue(LangObject *value) : value(value) {}
+  LangObject *value;
+};
+/*typedef LangObject ASTValue;*/
 class ReturnError : public InternalError {
 public:
   explicit ReturnError(ASTValue *value) : value(value) {}

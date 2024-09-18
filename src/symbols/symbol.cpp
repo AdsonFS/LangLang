@@ -14,8 +14,12 @@ int ScopedSymbolTable::jumpTo(std::string name, ScopedSymbolTable *scope) {
   }
   return -1;
 }
-bool ScopedSymbolTable::isSameType(ASTValue *lhs, ASTValue *rhs) {
+bool ScopedSymbolTable::isSameType(LangObject *lhs, LangObject *rhs) {
   if(lhs == nullptr || rhs == nullptr) return false;
+  if (typeid(*lhs) == typeid(LangNil)) {
+    LangNil *lhsNil = dynamic_cast<LangNil *>(lhs);
+    return isSameType(lhsNil->getType(), rhs);
+  }
   if (typeid(*lhs) != typeid(*rhs))
     return false;
   if (typeid(*lhs) == typeid(LangFunction)) {
@@ -39,13 +43,24 @@ ScopedSymbolTable::newScopeByContext(ScopedSymbolTable* context,
       return new ScopedSymbolTable(scopeName, currentScope);
     currentScope = currentScope->previousScope;
   }
-  throw RuntimeError("name not found: " + identifier);
+  throw RuntimeError("(0) name not found: " + identifier);
 }
 
-void ScopedSymbolTable::set(Symbol *symbol) {
+bool ScopedSymbolTable::check(std::string name, int jumps) {
+  ScopedSymbolTable *currentScope = this;
+  while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
+  return currentScope != nullptr && currentScope->symbols.find(name) != currentScope->symbols.end();
+}
+
+void ScopedSymbolTable::remove(std::string name) {
+  this->symbols.erase(name);
+}
+
+bool ScopedSymbolTable::set(Symbol *symbol) {
   if (this->symbols.find(symbol->name) != this->symbols.end())
-    throw RuntimeError("name already declared: " + symbol->name);
+    return false;
   this->symbols[symbol->name] = symbol;
+  return true;
 }
 
 Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
@@ -54,33 +69,31 @@ Symbol *ScopedSymbolTable::getSymbol(std::string name, int jumps) {
   while (currentScope != nullptr && jumps--) currentScope = currentScope->previousScope;
   
   if (currentScope == nullptr || currentScope->symbols.find(name) == currentScope->symbols.end())
-    throw RuntimeError("name not found: " + name);
+    throw RuntimeError("(1) name not found: " + name);
   return currentScope->symbols[name];
 }
 
-ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {
-  // TODO
-  ScopedSymbolTable *scope = this;
-  while (scope != nullptr && jumps--) scope = scope->previousScope;
-  
-  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())
-    throw RuntimeError("name not found: " + name);
-
-  if (dynamic_cast<LangNil *>(scope->symbols[name]->value) != nullptr) {
-    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value);
-    
-    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value))
-      throw RuntimeError("type mismatch...: " + name);
-  } else if (!this->isSameType(scope->symbols[name]->value, value))
-    throw RuntimeError("type mismatch...: " + name);
-  return scope->symbols[name]->value = value;
-}
+/*ASTValue *ScopedSymbolTable::update(std::string name, ASTValue *value, int jumps) {*/
+/*  // TODO*/
+/*  ScopedSymbolTable *scope = this;*/
+/*  while (scope != nullptr && jumps--) scope = scope->previousScope;*/
+/**/
+/*  if (scope == nullptr || scope->symbols.find(name) == scope->symbols.end())*/
+/*    throw RuntimeError("name not found: " + name);*/
+/**/
+/*  if (dynamic_cast<LangNil *>(scope->symbols[name]->value->value) != nullptr) {*/
+/*    LangNil *nil = dynamic_cast<LangNil *>(scope->symbols[name]->value->value);*/
+/**/
+/*    if (nil->getType() == nullptr || !this->isSameType(nil->getType(), value->value))*/
+/*      throw RuntimeError("type mismatch...: " + name);*/
+/*  } else if (!this->isSameType(scope->symbols[name]->value->value, value->value))*/
+/*    throw RuntimeError("type mismatch...: " + name);*/
+/*  return scope->symbols[name]->value = value;*/
+/*}*/
 
 ASTValue *ScopedSymbolTable::getValue(std::string name, int jumps) {
   Symbol *symbol = this->getSymbol(name, jumps);
   if (symbol == nullptr)
-    throw RuntimeError("name not found: " + name);
-  if (dynamic_cast<LangNil *>(symbol->value) != nullptr)
-    throw RuntimeError("variable not initialized: " + name);
+    throw RuntimeError("(2) name not found: " + name);
   return symbol->value;
 }
