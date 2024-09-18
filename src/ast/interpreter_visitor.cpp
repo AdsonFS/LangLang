@@ -171,7 +171,7 @@ ASTValue *InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
       return new ASTValue(
           new LangBoolean(expr->left->accept(*this)->value->isTrue() ||
                           expr->right->accept(*this)->value->isTrue()));
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
+    throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
   }
 
   ASTValue *leftValue = expr->left->accept(*this);
@@ -182,7 +182,7 @@ ASTValue *InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
       return new ASTValue(*leftValue->value == *rightValue->value);
     if (expr->op.getValue() == "!=")
       return new ASTValue(*leftValue->value != *rightValue->value);
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
+    throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
   }
 
   switch (expr->op.getValue()[0]) {
@@ -202,9 +202,9 @@ ASTValue *InterpreterVisitor::visitBinaryOperatorExpr(BinaryOperatorAST *expr) {
   case '>':
     return new ASTValue(*leftValue->value > *rightValue->value);
   default:
-    throw RuntimeError("invalid operator: " + expr->op.getValue());
+    throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
   }
-  throw RuntimeError("invalid operator: " + expr->op.getValue());
+  throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
 }
 
 ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
@@ -215,10 +215,10 @@ ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   case '-':
     return new ASTValue(-(*expr->child->accept(*this)->value));
   }
-  throw RuntimeError("invalid operator: " + expr->op.getValue());
+  throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
 }
 
-ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name) {
+ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name, Token &token) {
   if (typeid(*callee) == typeid(LangFunction)) {
     LangFunction *func = dynamic_cast<LangFunction *>(callee);
     ScopedSymbolTable *currentScope = this->scope;
@@ -236,13 +236,13 @@ ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name) {
     LangClass *lang_class = dynamic_cast<LangClass *>(callee);
     return new ASTValue(lang_class);
   }
-  throw RuntimeError("invalid call to " + name);
+  throw RuntimeError("invalid call to " + name, token);
 }
 
 ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
   ASTValue *value =
       this->scope->getValue(expr->identifier.getValue(), this->jumpTable[expr]);
-  return this->visitCall(value->value, expr->identifier.getValue());
+  return this->visitCall(value->value, expr->identifier.getValue(), expr->identifier);
 }
 
 ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
@@ -258,12 +258,10 @@ ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
     } else if (typeid(*node) == typeid(CallAST)) {
       CallAST *call = dynamic_cast<CallAST *>(node);
       value = instance->getScope()->getValue(call->identifier.getValue(), 0);
-      value = this->visitCall(value->value, call->identifier.getValue());
+      value = this->visitCall(value->value, call->identifier.getValue(), call->identifier);
     }
   }
-
   return value;
-  throw RuntimeError("invalid property chain");
 }
 
 ASTValue *InterpreterVisitor::visitType(TypeAST *expr) {

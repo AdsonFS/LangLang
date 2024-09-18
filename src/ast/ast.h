@@ -137,10 +137,11 @@ public:
 
 class AssignmentVariableAST : public AST {
 public:
-  AssignmentVariableAST(AST *leftReference, AST *value)
-      : leftReference(leftReference), value(value) {}
+  AssignmentVariableAST(AST *leftReference, Token assignmentOperator, AST *value)
+      : leftReference(leftReference), assignmentOperator(assignmentOperator), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
+  Token assignmentOperator;
   AST *leftReference;
   AST *value;
 };

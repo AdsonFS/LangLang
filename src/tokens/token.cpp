@@ -1,10 +1,9 @@
 #include "token.h"
 
-Token::Token() : type(TK_UNKNOWN), value("") {}
-Token::Token(TokenType type, std::string value) {
-  this->type = type;
-  this->value = value;
-}
+Token::Token() : type(TK_UNKNOWN), value(""), position(Position(1, 1, 1)) {}
+Token::Token(TokenType type, std::string value) : type(type), value(value), position(Position(1, 1, 1)) {}
+Token::Token(TokenType type, std::string value, Position position) 
+  : type(type), value(value), position(position) {}
 
 std::string Token::toString() {
   switch(this->type) {
@@ -46,6 +45,9 @@ std::string Token::toString() {
       return "DOT";
     case TK_ARROW:
       return "ARROW";
+    case TK_COLON:
+      return "COLON";
+      break;
     }
   return "";
 }

@@ -28,16 +28,31 @@ enum TokenType {
   TK_EOF
 };
 
+class Position {
+public:
+  Position(int line, int column, int position)
+    : line(line), column(column), position(position) {}
+  int getLine() { return this->line; }
+  int getColumn() { return this->column; }
+  int getPosition() { return this->position; }
+private:
+  int line, column, position;
+};
+
 class Token {
 public:
   Token();
   Token(TokenType type, std::string value);
+  Token(TokenType type, std::string value, Position position);
   TokenType getType() { return this->type; }
   std::string getValue() { return this->value; }
   std::string toString();
+  Position getPosition() { return this->position; }
 private:
   TokenType type;
   std::string value;
+  Position position;
 };
+
 
 #endif // TOKEN_H

@@ -5,8 +5,8 @@ AST *LangParser::expression() { return this->assignment(); }
 AST *LangParser::assignment() {
   AST *node = this->equalityExpression();
   if (this->token.getType() == TK_ASSIGNMENT) {
-    this->consume(TK_ASSIGNMENT);
-    return new AssignmentVariableAST(node, this->expression());
+    Token assignment = this->consume(TK_ASSIGNMENT);
+    return new AssignmentVariableAST(node, assignment, this->expression());
   }
   while (this->isEqualityOperator()) {
     Token opToken = this->token;
