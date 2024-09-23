@@ -77,6 +77,8 @@ Token LexiScanner::getNextToken() {
         return Token(TokenType::TK_COLON, ":", Position(cl, cc, cp));
       else if (currentChar == '.')
         return Token(TokenType::TK_DOT, ".", Position(cl, cc, cp));
+      else if (currentChar == ',')
+        return Token(TokenType::TK_COMMA, ",", Position(cl, cc, cp));
       else if (this->isSemicolon(currentChar))
         return Token(TokenType::TK_SEMICOLON, ";", Position(cl, cc, cp));
       else if (this->isParentheses(currentChar))

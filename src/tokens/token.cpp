@@ -47,7 +47,8 @@ std::string Token::toString() {
       return "ARROW";
     case TK_COLON:
       return "COLON";
-      break;
+    case TK_COMMA:
+      return "COMMA";
     }
   return "";
 }

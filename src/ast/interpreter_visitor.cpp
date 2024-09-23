@@ -95,18 +95,7 @@ ASTValue *InterpreterVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
 
 ASTValue *
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
-
-  ASTValue *type = nullptr;
-  std::stack<TypeAST *> types = expr->types;
-  while (!types.empty()) {
-    ASTValue *t = types.top()->accept(*this);
-    if (type == nullptr)
-      type = t;
-    else
-      type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
-    types.pop();
-  }
-
+  ASTValue *type = expr->type->accept(*this);
   FuncSymbol *func =
       new FuncSymbol(expr->identifier.getValue(),
                      new ASTValue(new LangFunction(expr->statements,
@@ -136,17 +125,8 @@ ASTValue *InterpreterVisitor::visitInputStream(InputStreamAST *expr) {
 ASTValue *
 InterpreterVisitor::visitVariableDeclaration(VariableDeclarationAST *expr) {
   ASTValue *value = expr->value->accept(*this);
+  ASTValue *type = expr->type->accept(*this);
 
-  ASTValue *type = nullptr;
-  std::stack<TypeAST *> types = expr->types;
-  while (!types.empty()) {
-    ASTValue *t = types.top()->accept(*this);
-    if (type == nullptr)
-      type = t;
-    else
-      type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
-    types.pop();
-  }
   if (dynamic_cast<LangNil *>(value->value) != nullptr)
     value->value = new LangNil(type->value);
   this->scope->set(new VarSymbol(expr->identifier.getValue(), value));
@@ -218,7 +198,8 @@ ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
 }
 
-ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name, Token &token) {
+ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name,
+                                        Token &token) {
   if (typeid(*callee) == typeid(LangFunction)) {
     LangFunction *func = dynamic_cast<LangFunction *>(callee);
     ScopedSymbolTable *currentScope = this->scope;
@@ -242,7 +223,8 @@ ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name, To
 ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
   ASTValue *value =
       this->scope->getValue(expr->identifier.getValue(), this->jumpTable[expr]);
-  return this->visitCall(value->value, expr->identifier.getValue(), expr->identifier);
+  return this->visitCall(value->value, expr->identifier.getValue(),
+                         expr->identifier);
 }
 
 ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
@@ -258,14 +240,25 @@ ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
     } else if (typeid(*node) == typeid(CallAST)) {
       CallAST *call = dynamic_cast<CallAST *>(node);
       value = instance->getScope()->getValue(call->identifier.getValue(), 0);
-      value = this->visitCall(value->value, call->identifier.getValue(), call->identifier);
+      value = this->visitCall(value->value, call->identifier.getValue(),
+                              call->identifier);
     }
   }
   return value;
 }
 
 ASTValue *InterpreterVisitor::visitType(TypeAST *expr) {
-  return this->scope->getValue(expr->token.getValue(), this->jumpTable[expr]);
+  ASTValue *type = nullptr;
+  std::stack<IdentifierAST *> types = expr->types;
+  while (!types.empty()) {
+    ASTValue *t = types.top()->accept(*this);
+    if (type == nullptr)
+      type = t;
+    else
+      type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
+    types.pop();
+  }
+  return type;
 }
 
 ASTValue *InterpreterVisitor::visitIdentifier(IdentifierAST *expr) {

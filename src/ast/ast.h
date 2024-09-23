@@ -97,12 +97,12 @@ public:
 
 class FunctionDeclarationAST : public AST {
 public:
-  FunctionDeclarationAST(Token identifier, std::stack<TypeAST*> types,
+  FunctionDeclarationAST(Token identifier, TypeAST *type,
                          StatementListAST *statements)
-      : identifier(identifier), types(types), statements(statements) {}
+      : identifier(identifier), type(type), statements(statements) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<TypeAST*> types;
+  TypeAST *type;
   Token identifier;
   StatementListAST *statements;
 };
@@ -126,11 +126,11 @@ public:
 
 class VariableDeclarationAST : public AST {
 public:
-  VariableDeclarationAST(std::stack<TypeAST*> types, Token identifier, AST *value)
-      : types(types), identifier(identifier), value(value) {}
+  VariableDeclarationAST(TypeAST* type, Token identifier, AST *value)
+      : type(type), identifier(identifier), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<TypeAST*> types;
+  TypeAST* type;
   Token identifier;
   AST *value;
 };
@@ -185,10 +185,10 @@ public:
 
 class TypeAST : public AST {
 public:
-  TypeAST(Token token) : token(token) {}
+  TypeAST(std::stack<IdentifierAST*> types) : types(types) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  Token token;
+  std::stack<IdentifierAST*> types;
 };
 
 class IdentifierAST : public AST {

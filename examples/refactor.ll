@@ -24,6 +24,11 @@ class person {
 
 var p -> person := person();
 p.print();
-
+if (x > -12) {
+  var y -> number := 10;
+  dd := counter();
+  cc();
+  dd();
+}
 var lout -> func -> void := p.print;
 lout();

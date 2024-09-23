@@ -31,6 +31,7 @@ public:
   AST *logicalExpression();
   AST *propertyChain();
   AST *identifier_or_call();
+  AST *type();
 
 private:
   LexiScanner &scanner;
