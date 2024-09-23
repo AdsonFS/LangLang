@@ -96,10 +96,17 @@ ASTValue *InterpreterVisitor::visitClassDeclaration(ClassDeclarationAST *expr) {
 ASTValue *
 InterpreterVisitor::visitFunctionDeclaration(FunctionDeclarationAST *expr) {
   ASTValue *type = expr->type->accept(*this);
-  FuncSymbol *func =
-      new FuncSymbol(expr->identifier.getValue(),
-                     new ASTValue(new LangFunction(expr->statements,
-                                                   type->value, this->scope)));
+  std::vector<LangObject *> parameters;
+  for (auto &parameter : expr->parameters)
+    parameters.push_back(parameter->type->accept(*this)->value);
+
+  /*for (auto &parameter : expr->parameters)*/
+  /*  parameter->accept(*this);*/
+
+  FuncSymbol *func = new FuncSymbol(
+      expr->identifier.getValue(),
+      new ASTValue(new LangFunction(expr->statements, parameters, expr->parameters,
+                                    type->value, this->scope)));
   this->scope->set(func);
   return new ASTValue(new LangNil());
 }
@@ -198,12 +205,18 @@ ASTValue *InterpreterVisitor::visitUnaryOperatorExpr(UnaryOperatorAST *expr) {
   throw RuntimeError("invalid operator: " + expr->op.getValue(), expr->op);
 }
 
-ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name,
+ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name, std::vector<LangObject *> arguments,
                                         Token &token) {
   if (typeid(*callee) == typeid(LangFunction)) {
     LangFunction *func = dynamic_cast<LangFunction *>(callee);
     ScopedSymbolTable *currentScope = this->scope;
     this->scope = func->getScope()->newScope("functioncall");
+    for (int i = 0; i < func->getParameters().size(); i++) {
+      std::string name = func->getParameters()[i]->identifier.getValue();
+      ASTValue *value = new ASTValue(arguments[i]);
+      this->scope->set(new VarSymbol(name, value));
+    } 
+
     LangObject *returnValue = new LangVoid();
     try {
       func->getValue()->accept(*this);
@@ -223,7 +236,11 @@ ASTValue *InterpreterVisitor::visitCall(LangObject *callee, std::string name,
 ASTValue *InterpreterVisitor::visitCall(CallAST *expr) {
   ASTValue *value =
       this->scope->getValue(expr->identifier.getValue(), this->jumpTable[expr]);
-  return this->visitCall(value->value, expr->identifier.getValue(),
+  std::vector<LangObject *> arguments;
+  for (auto &argument : expr->arguments)
+    arguments.push_back(argument->accept(*this)->value);
+
+  return this->visitCall(value->value, expr->identifier.getValue(), arguments,
                          expr->identifier);
 }
 
@@ -240,7 +257,11 @@ ASTValue *InterpreterVisitor::visitPropertyChain(PropertyChainAST *expr) {
     } else if (typeid(*node) == typeid(CallAST)) {
       CallAST *call = dynamic_cast<CallAST *>(node);
       value = instance->getScope()->getValue(call->identifier.getValue(), 0);
-      value = this->visitCall(value->value, call->identifier.getValue(),
+      std::vector<LangObject *> arguments; 
+      for (auto &argument : call->arguments)
+        arguments.push_back(argument->accept(*this)->value);
+
+      value = this->visitCall(value->value, call->identifier.getValue(), arguments,
                               call->identifier);
     }
   }
@@ -255,7 +276,8 @@ ASTValue *InterpreterVisitor::visitType(TypeAST *expr) {
     if (type == nullptr)
       type = t;
     else
-      type = new ASTValue(new LangFunction(nullptr, type->value, this->scope));
+      type =
+          new ASTValue(new LangFunction(nullptr, {}, {}, type->value, this->scope));
     types.pop();
   }
   return type;

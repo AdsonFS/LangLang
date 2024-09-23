@@ -95,17 +95,6 @@ public:
   std::vector<FunctionDeclarationAST *> methods;
 };
 
-class FunctionDeclarationAST : public AST {
-public:
-  FunctionDeclarationAST(Token identifier, TypeAST *type,
-                         StatementListAST *statements)
-      : identifier(identifier), type(type), statements(statements) {}
-  ASTValue *accept(ASTVisitor &visitor) override;
-
-  TypeAST *type;
-  Token identifier;
-  StatementListAST *statements;
-};
 
 class OutputStreamAST : public AST {
 public:
@@ -133,6 +122,25 @@ public:
   TypeAST* type;
   Token identifier;
   AST *value;
+};
+class FunctionDeclarationAST : public AST {
+public:
+  FunctionDeclarationAST(Token identifier, TypeAST *type,
+                         std::vector<VariableDeclarationAST *> parameters,
+                         StatementListAST *statements)
+      : identifier(identifier), type(type), parameters(parameters), statements(statements) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+  std::vector<std::string> getParameterNames() {
+    std::vector<std::string> names;
+    for (auto &parameter : parameters)
+      names.push_back(parameter->identifier.getValue());
+    return names;
+  }
+
+  TypeAST *type;
+  std::vector<VariableDeclarationAST *> parameters;
+  Token identifier;
+  StatementListAST *statements;
 };
 
 class AssignmentVariableAST : public AST {

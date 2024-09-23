@@ -3,6 +3,7 @@
 
 #include <string>
 #include <variant>
+#include <vector>
 #include "lang_object.h"
 
 class ASTVisitor;

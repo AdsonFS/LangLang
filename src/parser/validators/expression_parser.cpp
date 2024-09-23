@@ -108,6 +108,11 @@ AST *LangParser::identifier_or_call() {
   if (this->match(Token(TK_PARENTHESES, "("))) {
     std::vector<AST *> arguments;
     this->consume(Token(TK_PARENTHESES, "("));
+    while (this->token.getType() != TK_PARENTHESES) {
+      arguments.push_back(this->expression());
+      if (this->match(Token(TK_COMMA, ",")))
+        this->consume(Token(TK_COMMA, ","));
+    } 
     this->consume(Token(TK_PARENTHESES, ")"));
     return new CallAST(token, arguments);
   }

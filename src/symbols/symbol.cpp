@@ -20,6 +20,10 @@ bool ScopedSymbolTable::isSameType(LangObject *lhs, LangObject *rhs) {
     LangNil *lhsNil = dynamic_cast<LangNil *>(lhs);
     return isSameType(lhsNil->getType(), rhs);
   }
+  if (typeid(*rhs) == typeid(LangNil)) {
+    LangNil *rhsNil = dynamic_cast<LangNil *>(rhs);
+    return isSameType(lhs, rhsNil->getType());
+  }
   if (typeid(*lhs) != typeid(*rhs))
     return false;
   if (typeid(*lhs) == typeid(LangFunction)) {

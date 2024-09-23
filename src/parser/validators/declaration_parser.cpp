@@ -19,13 +19,24 @@ AST *LangParser::variableDeclaration() {
 AST *LangParser::funcDeclaration() {
   this->consume(Token(TokenType::TK_RESERVED_WORD, "func"));
   Token identifier = this->consume(TokenType::TK_IDENTIFIER);
-  this->consume(Token(TokenType::TK_PARENTHESES, "("));
-  this->consume(Token(TokenType::TK_PARENTHESES, ")"));
-  TypeAST *type = dynamic_cast<TypeAST *>(this->type());
 
+  this->consume(Token(TokenType::TK_PARENTHESES, "("));
+  std::vector<VariableDeclarationAST *> parameters;
+  while (this->match(TokenType::TK_IDENTIFIER)) {
+    Token identifier = this->consume(TokenType::TK_IDENTIFIER);
+    TypeAST *type = dynamic_cast<TypeAST *>(this->type());
+    parameters.push_back(
+        new VariableDeclarationAST(type, identifier, new NilAST()));
+    if (this->match(TokenType::TK_COMMA))
+      this->consume(TokenType::TK_COMMA);
+  }
+  this->consume(Token(TokenType::TK_PARENTHESES, ")"));
+
+
+  TypeAST *type = dynamic_cast<TypeAST *>(this->type());
   this->consume(Token(TokenType::TK_CURLY_BRACES, "{"));
   AST *node = new FunctionDeclarationAST(
-      identifier, type,
+      identifier, type, parameters,
       dynamic_cast<StatementListAST *>(this->statementList()));
   this->consume(Token(TokenType::TK_CURLY_BRACES, "}"));
   return node;

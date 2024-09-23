@@ -25,6 +25,7 @@ void LangNumber::cin(std::istream &is) { is >> this->value; }
 LangObject *LangNumber::operator-() { return new LangNumber(-this->value); }
 LangObject *LangNumber::operator+() { return new LangNumber(+this->value); }
 
+
 void LangBoolean::toString(std::ostream &os) const {
   os << (std::string) (this->value ? "true" : "false");
 }

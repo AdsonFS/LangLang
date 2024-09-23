@@ -5,8 +5,10 @@
 #include "istream"
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 class AST;
+class VariableDeclarationAST;
 class LangBoolean;
 class LangFunction;
 class ScopedSymbolTable;
@@ -67,12 +69,17 @@ public:
 
 class LangFunction : public LangObject {
 public:
-  LangFunction(AST *value, LangObject *returnType, ScopedSymbolTable *scope)
-      : value(value), returnType(returnType), scope(scope) {}
+  LangFunction(AST *value, std::vector<LangObject *> arguments,
+               std::vector<VariableDeclarationAST *> parameters, LangObject *returnType,
+               ScopedSymbolTable *scope)
+      : value(value), arguments(arguments), parameters(parameters),
+        returnType(returnType), scope(scope) {}
   void setValue(AST *value) { this->value = value; }
   AST *getValue() { return value; }
   LangObject *getReturnType() { return returnType; }
   ScopedSymbolTable *getScope() { return scope; }
+  std::vector<LangObject *> getArguments() { return arguments; }
+  std::vector<VariableDeclarationAST *> getParameters() { return parameters; }
 
 private:
   void setValue(LangObject *value) override {
@@ -84,6 +91,8 @@ private:
   bool isTrue() const override { return true; }
   void toString(std::ostream &os) const override;
   AST *value;
+  std::vector<VariableDeclarationAST *> parameters;
+  std::vector<LangObject *> arguments;
   ScopedSymbolTable *scope;
   LangObject *returnType;
 };
@@ -126,11 +135,21 @@ private:
   LangObject *operator-() override;
   LangObject *operator+() override;
 
+  LangBoolean *operator==(const LangObject &rhs) const override {
+    return new LangBoolean(value == ((LangNumber &)rhs).value);
+  }
+
   LangBoolean *operator<(const LangObject &rhs) const override {
     return new LangBoolean(value < ((LangNumber &)rhs).value);
   }
+  LangBoolean *operator>(const LangObject &rhs) const override {
+    return new LangBoolean(value > ((LangNumber &)rhs).value);
+  }
   LangObject *operator+(const LangObject &rhs) const override {
     return new LangNumber(value + ((LangNumber &)rhs).value);
+  }
+  LangObject *operator-(const LangObject &rhs) const override {
+    return new LangNumber(value - ((LangNumber &)rhs).value);
   }
 
   bool isTrue() const override { return value; }
