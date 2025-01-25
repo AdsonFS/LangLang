@@ -95,17 +95,6 @@ public:
   std::vector<FunctionDeclarationAST *> methods;
 };
 
-class FunctionDeclarationAST : public AST {
-public:
-  FunctionDeclarationAST(Token identifier, std::stack<TypeAST*> types,
-                         StatementListAST *statements)
-      : identifier(identifier), types(types), statements(statements) {}
-  ASTValue *accept(ASTVisitor &visitor) override;
-
-  std::stack<TypeAST*> types;
-  Token identifier;
-  StatementListAST *statements;
-};
 
 class OutputStreamAST : public AST {
 public:
@@ -126,13 +115,32 @@ public:
 
 class VariableDeclarationAST : public AST {
 public:
-  VariableDeclarationAST(std::stack<TypeAST*> types, Token identifier, AST *value)
-      : types(types), identifier(identifier), value(value) {}
+  VariableDeclarationAST(TypeAST* type, Token identifier, AST *value)
+      : type(type), identifier(identifier), value(value) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  std::stack<TypeAST*> types;
+  TypeAST* type;
   Token identifier;
   AST *value;
+};
+class FunctionDeclarationAST : public AST {
+public:
+  FunctionDeclarationAST(Token identifier, TypeAST *type,
+                         std::vector<VariableDeclarationAST *> parameters,
+                         StatementListAST *statements)
+      : identifier(identifier), type(type), parameters(parameters), statements(statements) {}
+  ASTValue *accept(ASTVisitor &visitor) override;
+  std::vector<std::string> getParameterNames() {
+    std::vector<std::string> names;
+    for (auto &parameter : parameters)
+      names.push_back(parameter->identifier.getValue());
+    return names;
+  }
+
+  TypeAST *type;
+  std::vector<VariableDeclarationAST *> parameters;
+  Token identifier;
+  StatementListAST *statements;
 };
 
 class AssignmentVariableAST : public AST {
@@ -185,10 +193,10 @@ public:
 
 class TypeAST : public AST {
 public:
-  TypeAST(Token token) : token(token) {}
+  TypeAST(std::stack<IdentifierAST*> types) : types(types) {}
   ASTValue *accept(ASTVisitor &visitor) override;
 
-  Token token;
+  std::stack<IdentifierAST*> types;
 };
 
 class IdentifierAST : public AST {

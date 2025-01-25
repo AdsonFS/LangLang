@@ -29,7 +29,10 @@ class_declaration     : class identifier : identifier '{' ( variable_declaration
 variable_declaration  : 'var' identifier '->' type := expression
                       | 'var' identifier '->' type;
 
-func_declaration      : 'func' identifier '(' ')' -> type? '{' statement_list '}'
+func_declaration      : 'func' identifier '(' parameters? ')' -> type? '{' statement_list '}'
+
+parameters            : identifier -> type ( COMMA identifier -> type )*
+arguments             : expression ( COMMA expression )* 
 
 type                  : 'string' | 'number' | void | identifier | '(' ')' -> type?
 output_stream         : >> output output_stream*
@@ -57,5 +60,5 @@ factor                : (PLUS|MINUS)factor
 
 property_chain        : (identifier_or_call) ( . property_chain )*
 identifier_or_call    : identifier | call
-call                  : identifier '(' ')'
+call                  : identifier '(' arguments? ')'
 identifier            : IDENTIFIER

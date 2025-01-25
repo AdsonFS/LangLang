@@ -52,7 +52,7 @@ public:
     this->set(new BuiltInTypeSymbol("void", new ASTValue (new LangVoid())));
 
     this->set(new BuiltInTypeSymbol("func",
-                                    new ASTValue(new LangFunction(nullptr, new LangVoid(), this))));
+                                    new ASTValue(new LangFunction(nullptr, {}, {}, new LangVoid(), this))));
   }
   std::string getName();
   bool set(Symbol *symbol);
