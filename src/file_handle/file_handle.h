@@ -8,6 +8,12 @@ public:
   static std::string fileContent;
   static int fileSize;
 
+  static void setFileHandle(std::string filename, std::string fileContent) {
+    FileHandle::fileName = filename;
+    FileHandle::fileContent = fileContent;
+    FileHandle::fileSize = fileContent.size();
+  }
+
   static std::string getLineError(int position) {
     int start = position, end = position;
     while (start > 0 && FileHandle::fileContent[start - 1] != '\n')

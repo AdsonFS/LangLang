@@ -1,4 +1,4 @@
-#include "../lexi/lexi_scanner.h"
+#include "./lexi_scanner.h"
 #include "../error/error.h"
 #include "../file_handle/file_handle.h"
 #include <string>

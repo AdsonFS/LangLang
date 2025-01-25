@@ -9,7 +9,6 @@
 #include "tokens/token.h"
 #include <iostream>
 
-
 int parser(LexiScanner &scanner, Token &token) {
   LangParser parser(scanner, token);
   bool hasErrors = false;
@@ -73,9 +72,8 @@ int main(int argc, char **argv) {
   }
   std::string fileContent = std::string((std::istreambuf_iterator<char>(file)),
                                         std::istreambuf_iterator<char>());
-  FileHandle::fileName = filename;
-  FileHandle::fileContent = fileContent;
-  FileHandle::fileSize = fileContent.size();
+  // file.close();
+  FileHandle::setFileHandle(filename, fileContent);
 
   LexiScanner scanner = LexiScanner();
   Token token = Token(TokenType::TK_UNKNOWN, "");
