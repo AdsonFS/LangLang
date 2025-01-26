@@ -32,18 +32,8 @@ private:
   bool isDoubleQuotes(char c);
   bool isLogicalOperator(char c1, char c2);
   bool isEOF();
-  
-  FRIEND_TEST(LexiUnitTest, lexi_is_digit);
-  FRIEND_TEST(LexiUnitTest, lexi_is_operator);
-  FRIEND_TEST(LexiUnitTest, lexi_is_semicolon);
-  FRIEND_TEST(LexiUnitTest, lexi_is_whitespace);
-  FRIEND_TEST(LexiUnitTest, lexi_is_parentheses);
-  FRIEND_TEST(LexiUnitTest, lexi_is_cmp_operator);
-  FRIEND_TEST(LexiUnitTest, lexi_is_upper_letter);
-  FRIEND_TEST(LexiUnitTest, lexi_is_lower_letter);
-  FRIEND_TEST(LexiUnitTest, lexi_is_curly_braces);
-  FRIEND_TEST(LexiUnitTest, lexi_is_double_quotes);
-  FRIEND_TEST(LexiUnitTest, lexi_is_logical_operator);
+
+  FRIEND_TEST(LexiUnitTest, lexi_booleans_functions);
   FRIEND_TEST(LexiUnitTest, lexi_is_eof);
 
   char nextChar();

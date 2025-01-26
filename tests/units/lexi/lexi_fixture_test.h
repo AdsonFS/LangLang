@@ -12,8 +12,15 @@ public:
   }
 
   void set_file_content(std::string content) {
+    content.push_back(10);
     FileHandle::fileContent = content;
     FileHandle::fileSize = content.size();
+  }
+
+  bool match(Token a, Token b) {
+    if (a.getType() != b.getType())
+      return false;
+    return a.getValue() == b.getValue();
   }
 
   std::string get_invalid_chars(std::string valid_chars) {
@@ -24,7 +31,8 @@ public:
     return invalid_chars;
   }
 
-  void execute_validation(std::string valid_chars, bool (LexiScanner::*func)(char)) {
+  void execute_validation(std::string valid_chars,
+                          bool (LexiScanner::*func)(char)) {
     const std::string invalid_chars = get_invalid_chars(valid_chars);
     for (char c : valid_chars)
       EXPECT_TRUE((*scanner.*func)(c));
@@ -33,6 +41,7 @@ public:
   }
 
   ~LexiUnitTest() { delete scanner; }
+
 private:
   std::string characters = "123456789_aAzZ\"!@#$^&{()}|| \n\t\r\0 +-*/%";
 };
